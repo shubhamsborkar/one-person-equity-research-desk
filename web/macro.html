@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Macro — Research Desk</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23ED5A24'/><text x='16' y='22' font-size='15' font-weight='800' font-family='Arial' fill='white' text-anchor='middle'>FD</text></svg>">
+<link rel="stylesheet" href="/assets/desk.css">
+<script src="/assets/desk.js" defer></script>
+<style>
+body{padding-bottom:50px}
+main{max-width:1420px;margin:0 auto;padding:20px 22px}
+.sub{color:var(--muted);font-size:12px;margin-bottom:18px}
+h2.grp{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--ink2);
+  margin:22px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+h2.grp:first-of-type{margin-top:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:13px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 15px;
+  cursor:pointer;transition:border-color .15s}
+.card:hover{border-color:var(--line2)}
+.card .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink2)}
+.card .row{display:flex;align-items:baseline;gap:10px;margin-top:7px}
+.card .v{font-size:22px;font-weight:800}
+.card .d{font-size:12px;font-weight:700}
+.card .meta{font-size:10px;color:var(--muted);margin-top:5px}
+.pos{color:var(--pos)} .neg{color:var(--neg)} .dim{color:var(--muted)}
+.loading{padding:60px;text-align:center;color:var(--muted)}
+.calwrap{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  max-height:400px;overflow-y:auto}
+.calwrap::-webkit-scrollbar{width:8px}
+.calwrap::-webkit-scrollbar-thumb{background:var(--line2);border-radius:4px}
+.calwrap thead th{position:sticky;top:0;background:var(--panel);z-index:2}
+.calwrap table{width:100%;border-collapse:collapse;font-size:12.5px}
+.calwrap th,.calwrap td{padding:7px 14px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+.calwrap th{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+.calwrap td.num{text-align:right}.calwrap th.num{text-align:right}
+.calwrap tbody tr:last-child td{border-bottom:none}
+.calwrap tbody tr:hover td{background:var(--panel2)}
+.calwrap td.ev{white-space:normal;max-width:420px}
+tr.dhead td{background:#0d1117;color:var(--ink2);font-weight:700;font-size:11px;letter-spacing:.08em}
+.cc{font-size:9px;font-weight:800;border-radius:4px;padding:1.5px 6px;letter-spacing:.05em}
+.cc.US{background:rgba(91,184,212,.13);color:#5bb8d4}
+.cc.IN{background:rgba(237,90,36,.14);color:var(--accent)}
+.imp{font-size:9px;font-weight:700;border-radius:4px;padding:1.5px 6px}
+.imp.High{background:rgba(241,100,114,.14);color:var(--neg)}
+.imp.Medium{background:rgba(232,161,60,.12);color:#e8a13c}
+footer{max-width:1420px;margin:26px auto 0;padding:14px 22px;border-top:1px solid var(--line);
+  color:var(--muted);font-size:11px;line-height:1.6}
+/* expand modal */
+#modal{display:none;position:fixed;inset:0;z-index:50;background:rgba(6,8,11,.82);
+  backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:24px}
+#modal .box{background:var(--panel);border:1px solid var(--line2);border-radius:14px;
+  width:min(960px,100%);padding:18px 22px 22px}
+#modal .head{display:flex;align-items:baseline;gap:14px;margin-bottom:6px}
+#modal .head .t{font-size:15px;font-weight:800}
+#modal .head .lv{font-size:15px;font-weight:700}
+#modal .head .close{margin-left:auto;cursor:pointer;color:var(--muted);font-size:20px;
+  border:none;background:none;padding:2px 8px}
+#modal .head .close:hover{color:var(--neg)}
+.ranges{display:flex;gap:6px;margin:6px 0 10px}
+.ranges button{background:var(--panel2);color:var(--ink2);border:1px solid var(--line2);
+  border-radius:6px;padding:3px 12px;font-size:11px;cursor:pointer}
+.ranges button.on{color:var(--ink);border-color:var(--accent)}
+#bigchart{width:100%}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">RESEARCH <span>DESK</span></div>
+  <nav></nav>
+  <div class="right"><span id="asof"></span></div>
+</header>
+<main>
+  <div class="sub">US macro backdrop from FRED (St. Louis Fed) — rates, inflation, labor, credit,
+  commodities, equity indices. Sparklines show two years; delta is roughly one month.
+  <b style="color:var(--ink2)">Click any card for the full history.</b></div>
+  <h2 class="grp">Economic calendar · next 10 days</h2>
+  <div class="calwrap" id="econcal" style="margin-bottom:24px"><div class="loading" style="padding:24px">Loading calendar…</div></div>
+  <div id="cards"><div class="loading">Loading FRED series…</div></div>
+</main>
+<footer>Read-only reference. India macro (RBI rate, India CPI) needs a separate source — on the
+list. The three-lenses rule: politics, earnings growth, valuation; this page feeds the backdrop,
+not a trade.</footer>
+
+<div id="modal"><div class="box">
+  <div class="head"><span class="t" id="m_title"></span><span class="lv mono" id="m_val"></span>
+    <button class="close" id="m_close" title="Close (Esc)">×</button></div>
+  <div class="ranges" id="m_ranges"></div>
+  <div id="bigchart"></div>
+</div></div>
+
+<script>
+"use strict";
+let CARDS=[];
+function fmtVal(c,v){
+  const dp = Math.abs(v)<10?2:(Math.abs(v)<1000?1:0);
+  const unit = c.unit==="$"?"$":"";
+  const suf = (c.unit==="%"||c.unit==="pp")?c.unit:(c.unit==="k"?"k":"");
+  return unit+v.toLocaleString("en-US",{minimumFractionDigits:dp,maximumFractionDigits:dp})+suf;
+}
+let SPID=0;
+function spark(series,w=200,h=46){
+  if(!series||series.length<2)return "";
+  const min=Math.min(...series),max=Math.max(...series),span=(max-min)||1;
+  const xy=series.map((v,i)=>[i/(series.length-1)*w, h-4-((v-min)/span*(h-10))]);
+  const pts=xy.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ");
+  const up=series[series.length-1]>=series[0];
+  const col=up?"var(--pos)":"var(--neg)";
+  const id="sg"+(++SPID);
+  const [lx,ly]=xy[xy.length-1];
+  return `<svg width="${w}" height="${h}" style="width:100%;margin-top:8px" preserveAspectRatio="none" viewBox="0 0 ${w} ${h}">
+    <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${col}" stop-opacity="0.30"/>
+      <stop offset="100%" stop-color="${col}" stop-opacity="0.02"/></linearGradient></defs>
+    <polygon class="anim-fade" points="0,${h} ${pts} ${w},${h}" fill="url(#${id})"/>
+    <polyline class="drawline" pathLength="1" points="${pts}" fill="none" stroke="${col}"
+      stroke-width="1.6" vector-effect="non-scaling-stroke"/>
+    <circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="2.4" fill="${col}"/></svg>`;
+}
+async function load(){
+  const r=await fetch("/api/macro"); const d=await r.json();
+  document.getElementById("asof").textContent="as of "+d.ts;
+  CARDS=d.cards;
+  const groups=[];
+  for(const c of d.cards) if(!groups.includes(c.group)) groups.push(c.group);
+  let html="";
+  for(const g of groups){
+    html+=`<h2 class="grp">${g}</h2><div class="grid">`;
+    for(const c of d.cards.filter(x=>x.group===g)){
+      const delta = c.delta==null?"":`<span class="d ${c.delta>=0?"pos":"neg"}">${c.delta>=0?"▲":"▼"} ${Math.abs(c.delta).toFixed(2)}</span>`;
+      html+=`<div class="card" data-id="${c.id}" title="click for full history">
+        <div class="l">${c.label}</div>
+        <div class="row"><span class="v mono">${fmtVal(c,c.value)}</span>${delta}</div>
+        ${spark(c.spark)}
+        <div class="meta mono">${c.id} · ${c.date}</div></div>`;
+    }
+    html+=`</div>`;
+  }
+  document.getElementById("cards").innerHTML=html||'<div class="loading">FRED unreachable.</div>';
+  document.querySelectorAll(".card").forEach(el=>el.onclick=()=>openModal(el.dataset.id));
+}
+
+/* ---- expand modal ---- */
+let mCard=null, mRange="10Y";
+const RANGES={"2Y":2,"10Y":10,"MAX":999};
+async function loadCal(){
+  try{
+    const r=await fetch("/api/econcal"); const d=await r.json();
+    if(!d.rows.length){document.getElementById("econcal").innerHTML='<div class="loading" style="padding:24px">Nothing High/Medium impact scheduled.</div>';return;}
+    let html=`<table><thead><tr><th>IST</th><th></th><th>Event</th><th></th>
+      <th class="num">Est</th><th class="num">Prev</th><th class="num">Actual</th></tr></thead><tbody>`;
+    let lastDay="";
+    for(const e of d.rows){
+      const dt=new Date((e.date||"").replace(" ","T")+"Z");   // FMP times are UTC
+      const day=dt.toLocaleDateString("en-IN",{weekday:"short",month:"short",day:"numeric"});
+      const hm=dt.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit",hour12:false});
+      if(day!==lastDay){html+=`<tr class="dhead"><td colspan="7">${day}</td></tr>`;lastDay=day;}
+      const fmt=x=>x==null?"—":x+(e.unit&&x!==null?e.unit:"");
+      html+=`<tr><td class="mono dim">${hm}</td>
+        <td><span class="cc ${e.country}">${e.country}</span></td>
+        <td class="ev">${e.event}</td>
+        <td><span class="imp ${e.impact}">${e.impact.toUpperCase()}</span></td>
+        <td class="mono num dim">${fmt(e.estimate)}</td>
+        <td class="mono num dim">${fmt(e.previous)}</td>
+        <td class="mono num" style="font-weight:700">${fmt(e.actual)}</td></tr>`;
+    }
+    document.getElementById("econcal").innerHTML=html+"</tbody></table>";
+  }catch(e){}
+}
+loadCal();
+function openModal(id){
+  mCard=CARDS.find(c=>c.id===id); if(!mCard) return;
+  if(!mCard.full || mCard.full.length<2) return;   // point-in-time cards (repo) have no history
+  document.getElementById("modal").style.display="flex";
+  document.getElementById("m_title").textContent=mCard.label+" · "+mCard.id;
+  document.getElementById("m_val").textContent=fmtVal(mCard,mCard.value)+"  ("+mCard.date+")";
+  drawRanges(); drawBig();
+}
+function drawRanges(){
+  document.getElementById("m_ranges").innerHTML=Object.keys(RANGES).map(r=>
+    `<button class="${r===mRange?"on":""}" data-r="${r}">${r}</button>`).join("");
+  document.querySelectorAll("#m_ranges button").forEach(b=>b.onclick=()=>{mRange=b.dataset.r;drawRanges();drawBig();});
+}
+function niceStep(span){
+  const raw=span/5, mag=Math.pow(10,Math.floor(Math.log10(raw)));
+  for(const m of [1,2,2.5,5,10]) if(raw<=m*mag) return m*mag;
+  return 10*mag;
+}
+function drawBig(){
+  const el=document.getElementById("bigchart");
+  const W=el.clientWidth||880, H=380, PL=56, PR=14, PT=12, PB=26;
+  const yrs=RANGES[mRange];
+  const cutoff=new Date(); cutoff.setFullYear(cutoff.getFullYear()-yrs);
+  const cut=cutoff.toISOString().slice(0,10);
+  let pts=mCard.full.filter(p=>mRange==="MAX"||p[0]>=cut);
+  if(pts.length<2) pts=mCard.full;
+  const vals=pts.map(p=>p[1]);
+  let min=Math.min(...vals),max=Math.max(...vals);
+  const pad=(max-min)*0.06||1; min-=pad; max+=pad;
+  const X=i=>PL+(i/(pts.length-1))*(W-PL-PR);
+  const Y=v=>PT+(1-(v-min)/(max-min))*(H-PT-PB);
+  const up=vals[vals.length-1]>=vals[0];
+  const col=up?"var(--pos)":"var(--neg)";
+  let grid="",labels="";
+  const step=niceStep(max-min);
+  for(let v=Math.ceil(min/step)*step; v<=max; v+=step){
+    grid+=`<line x1="${PL}" y1="${Y(v)}" x2="${W-PR}" y2="${Y(v)}" stroke="var(--grid)" stroke-width="1"/>`;
+    labels+=`<text x="${PL-8}" y="${Y(v)+3.5}" text-anchor="end" font-size="10.5" fill="var(--muted)" font-family="Menlo,monospace">${Math.abs(v)<10?v.toFixed(2):v.toLocaleString("en-US",{maximumFractionDigits:0})}</text>`;
+  }
+  const nx=Math.min(7,pts.length);
+  for(let i=0;i<nx;i++){
+    const idx=Math.round(i*(pts.length-1)/(nx-1));
+    const anchor=i===0?"start":(i===nx-1?"end":"middle");
+    labels+=`<text x="${X(idx)}" y="${H-8}" text-anchor="${anchor}" font-size="10.5" fill="var(--muted)" font-family="Menlo,monospace">${pts[idx][0].slice(0,7)}</text>`;
+  }
+  const line=pts.map((p,i)=>`${X(i).toFixed(1)},${Y(p[1]).toFixed(1)}`).join(" ");
+  const area=`${PL},${Y(vals[0]).toFixed(1)} ${line} ${(W-PR).toFixed(1)},${(H-PB)} ${PL},${H-PB}`;
+  const first=pts[0][1], last=vals[vals.length-1];
+  const chg=first?((last-first)/Math.abs(first)*100):null;
+  el.innerHTML=`<svg id="bigsvg" width="${W}" height="${H}" style="cursor:crosshair">
+    <defs><linearGradient id="bigfade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${col}" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="${col}" stop-opacity="0.01"/></linearGradient></defs>
+    ${grid}${labels}
+    <polygon class="anim-fade" points="${area}" fill="url(#bigfade)"/>
+    <polyline class="drawline" pathLength="1" points="${line}" fill="none" stroke="${col}" stroke-width="1.8"/>
+    <circle cx="${X(pts.length-1)}" cy="${Y(last)}" r="3" fill="${col}"/>
+    <text x="${W-PR}" y="${PT+10}" text-anchor="end" font-size="11.5" fill="${col}" font-family="Menlo,monospace">${mRange}: ${chg==null?"—":(chg>=0?"+":"")+chg.toFixed(1)}%</text>
+    <g id="xh" style="display:none">
+      <line id="xh_v" y1="${PT}" y2="${H-PB}" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3,3"/>
+      <circle id="xh_c" r="3.5" fill="none" stroke="var(--ink)" stroke-width="1.5"/>
+      <rect id="xh_bg" height="20" rx="5" fill="var(--panel2)" stroke="var(--line2)"/>
+      <text id="xh_t" font-size="11" fill="var(--ink)" font-family="Menlo,monospace" text-anchor="middle"></text>
+    </g>
+  </svg>`;
+  // crosshair: nearest point under the cursor, date + value pinned to it
+  const svg=document.getElementById("bigsvg"), xh=document.getElementById("xh");
+  svg.onmousemove=e=>{
+    const box=svg.getBoundingClientRect();
+    const mx=e.clientX-box.left;
+    if(mx<PL||mx>W-PR){xh.style.display="none";return;}
+    const i=Math.max(0,Math.min(pts.length-1,Math.round((mx-PL)/(W-PL-PR)*(pts.length-1))));
+    const px=X(i), py=Y(pts[i][1]);
+    const label=`${pts[i][0]}  ${fmtVal(mCard,pts[i][1])}`;
+    const tw=label.length*6.6+16;
+    const tx=Math.max(PL+tw/2,Math.min(W-PR-tw/2,px));
+    xh.style.display="";
+    document.getElementById("xh_v").setAttribute("x1",px);
+    document.getElementById("xh_v").setAttribute("x2",px);
+    const c=document.getElementById("xh_c"); c.setAttribute("cx",px); c.setAttribute("cy",py);
+    const bg=document.getElementById("xh_bg");
+    bg.setAttribute("x",tx-tw/2); bg.setAttribute("y",PT-2); bg.setAttribute("width",tw);
+    const t=document.getElementById("xh_t");
+    t.setAttribute("x",tx); t.setAttribute("y",PT+12); t.textContent=label;
+  };
+  svg.onmouseleave=()=>{xh.style.display="none";};
+}
+function closeModal(){document.getElementById("modal").style.display="none";}
+document.getElementById("m_close").onclick=closeModal;
+document.getElementById("modal").onclick=e=>{if(e.target.id==="modal")closeModal();};
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal();});
+window.addEventListener("resize",()=>{if(document.getElementById("modal").style.display==="flex")drawBig();});
+load();
+</script>
+</body>
+</html>

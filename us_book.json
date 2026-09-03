@@ -1,0 +1,16 @@
+{
+  "_comment": "The US book. List your positions here; the desk prices them live via FMP (or Yahoo on the watch grid). Edit after any trade. If your US broker offers an API, ask the agent to replace this file with a live pull.",
+  "as_of": "",
+  "cash_usd": 0,
+  "cash_note": "",
+  "mandate_target_usd": 0,
+  "positions": [
+    {
+      "symbol": "AAPL",
+      "name": "Apple",
+      "shares": 0,
+      "avg_cost": 0,
+      "decided_by": ""
+    }
+  ]
+}

@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Options Flow — Research Desk</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23ED5A24'/><text x='16' y='22' font-size='15' font-weight='800' font-family='Arial' fill='white' text-anchor='middle'>FD</text></svg>">
+<link rel="stylesheet" href="/assets/desk.css">
+<script src="/assets/desk.js" defer></script>
+<style>
+body{padding-bottom:50px}
+main{max-width:1420px;margin:0 auto;padding:20px 22px}
+.sub{color:var(--muted);font-size:12px;margin-bottom:18px;line-height:1.55;max-width:1050px}
+.loading{padding:60px;text-align:center;color:var(--muted)}
+.pos{color:var(--pos)} .neg{color:var(--neg)} .dim{color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(430px,1fr));gap:14px}
+.nm{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.nm.held{border-color:rgba(237,90,36,.5)}
+.nm-h{display:flex;align-items:baseline;gap:10px;padding:12px 15px;border-bottom:1px solid var(--line)}
+.nm-h .sym{font-size:15px;font-weight:800}
+.nm-h .sym a{color:inherit;text-decoration:none}
+.nm-h .sym a:hover{color:var(--accent)}
+.nm-h .px{font-size:13px;font-weight:700;color:var(--ink2)}
+.nm-h .hd{font-size:9px;font-weight:800;border-radius:4px;padding:1.5px 6px;
+  background:rgba(237,90,36,.16);color:var(--accent);letter-spacing:.05em}
+.nm-h .right2{margin-left:auto;font-size:11px;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:11px 15px;
+  border-bottom:1px solid var(--line)}
+.st .l{font-size:8.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+.st .v{font-size:14.5px;font-weight:800;margin-top:2px}
+.st .m{font-size:9px;color:var(--muted)}
+/* the range ladder: put wall … spot … call wall on one scale, with the
+   paid-for expected-move band shaded */
+.ladder{padding:12px 15px 11px;border-bottom:1px solid var(--line)}
+.ladder .trk{position:relative;height:8px;border-radius:4px;background:var(--panel2)}
+.ladder .band{position:absolute;top:0;bottom:0;border-radius:4px;
+  background:color-mix(in srgb,var(--amber) 22%,transparent)}
+.ladder .wall{position:absolute;top:-4px;width:3px;height:16px;border-radius:2px;
+  transform:translateX(-50%)}
+.ladder .wall.p{background:var(--neg)} .ladder .wall.c{background:var(--pos)}
+.ladder .spot{position:absolute;top:-3.5px;width:15px;height:15px;border-radius:50%;
+  background:var(--ink);border:3px solid var(--bg);transform:translateX(-50%);
+  box-shadow:0 0 7px rgba(0,0,0,.6)}
+.ladder .lbls{display:flex;justify-content:space-between;gap:8px;font-size:9.5px;
+  color:var(--muted);margin-top:7px}
+.ladder .lbls .pw{color:var(--neg)} .ladder .lbls .cw{color:var(--pos)}
+.oisplit{display:flex;gap:2px;height:7px;border-radius:4px;overflow:hidden;margin-top:9px}
+.oisplit i{display:block;height:100%;border-radius:2px}
+.sec{padding:8px 15px 10px}
+.sec .t{font-size:9px;text-transform:uppercase;letter-spacing:.11em;color:var(--muted);margin-bottom:5px}
+.rows{width:100%;border-collapse:collapse;font-size:11.5px}
+.rows td{padding:3.5px 4px;border-bottom:1px solid #1a212b;white-space:nowrap}
+.rows tr:last-child td{border-bottom:none}
+.rows td.r{text-align:right}
+.cp{font-size:9px;font-weight:800;border-radius:3px;padding:1px 5px}
+.cp.C{background:rgba(62,207,142,.15);color:var(--pos)}
+.cp.P{background:rgba(241,100,114,.14);color:var(--neg)}
+.empty{font-size:11px;color:var(--muted);font-style:italic}
+footer{max-width:1420px;margin:26px auto 0;padding:14px 22px;border-top:1px solid var(--line);
+  color:var(--muted);font-size:11px;line-height:1.6}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">RESEARCH <span>DESK</span></div>
+  <nav></nav>
+  <div class="right"><span id="asof"></span></div>
+</header>
+<main>
+  <div class="sub">The options-tape read on every US book and watchlist name, from CBOE's free
+  15-min-delayed chains (<span id="win"></span>-day expiry window). <b style="color:var(--ink2)">Unusual
+  strikes</b> = today's volume at least twice the existing open interest with real premium — positions
+  that did not exist yesterday. <b style="color:var(--ink2)">OI builds</b> compare open interest against
+  the previous daily snapshot on disk, so they appear from a name's second covered day. Describes
+  positioning only; it makes no call.</div>
+  <div id="body"><div class="loading">Reading chains… a full sweep takes about a minute.</div></div>
+</main>
+<footer>PCR = put/call ratio (OI = standing positioning, VOL = today's tape). Walls = the strikes with
+the most open interest in the window — dealer hedging tends to pin near big walls into expiry.
+Expected move = ATM straddle cost on the nearest expiry, the move the market has paid for. Skew =
+5% OTM put IV minus 5% OTM call IV on the first expiry past 20 days; rising skew is downside fear.
+Delayed public data; OI updates overnight at OCC.</footer>
+
+<script>
+"use strict";
+const money=v=>v>=1e6?"$"+(v/1e6).toFixed(1)+"M":"$"+Math.round(v/1e3)+"k";
+const kfmt=v=>v>=1e6?(v/1e6).toFixed(1)+"M":v>=1e3?(v/1e3).toFixed(1)+"k":""+v;
+const strike=s=>s.toLocaleString("en-US",{maximumFractionDigits:2});
+function statHTML(n){
+  const em=n.exp_move, sk=n.skew;
+  return `<div class="stats">
+    <div class="st"><div class="l">PCR · OI</div><div class="v mono">${n.pcr_oi==null?"—":n.pcr_oi.toFixed(2)}</div>
+      <div class="m mono">${kfmt(n.put_oi)}P/${kfmt(n.call_oi)}C</div></div>
+    <div class="st"><div class="l">PCR · VOL</div><div class="v mono">${n.pcr_vol==null?"—":n.pcr_vol.toFixed(2)}</div>
+      <div class="m mono">${kfmt(n.put_vol)}P/${kfmt(n.call_vol)}C</div></div>
+    <div class="st"><div class="l">IV30</div><div class="v mono">${n.iv30==null?"—":n.iv30.toFixed(0)+"%"}</div></div>
+    <div class="st"><div class="l">Exp move</div><div class="v mono">${em?"±"+em.pct.toFixed(1)+"%":"—"}</div>
+      <div class="m mono">${em?em.exp.slice(5)+" · "+em.dte+"d":""}</div></div>
+    <div class="st"><div class="l">Skew</div><div class="v mono ${sk&&sk.pts>5?"neg":""}">${sk?(sk.pts>=0?"+":"")+sk.pts.toFixed(1):"—"}</div>
+      <div class="m mono">${sk?sk.put_iv.toFixed(0)+"p/"+sk.call_iv.toFixed(0)+"c":""}</div></div>
+  </div>`;
+}
+function ladderHTML(n){
+  const pw=n.put_wall&&n.put_wall.strike, cw=n.call_wall&&n.call_wall.strike;
+  const em=n.exp_move, spot=n.spot;
+  if(pw==null&&cw==null) return "";
+  const emLo=em?spot*(1-em.pct/100):null, emHi=em?spot*(1+em.pct/100):null;
+  let lo=Math.min(spot, pw??spot, emLo??spot), hi=Math.max(spot, cw??spot, emHi??spot);
+  const pad=(hi-lo)*0.07||spot*0.02; lo-=pad; hi+=pad;
+  const X=v=>((v-lo)/(hi-lo)*100).toFixed(1);
+  const tot=(n.put_oi||0)+(n.call_oi||0);
+  const pShare=tot?(n.put_oi/tot*100):null;
+  return `<div class="ladder">
+    <div class="trk">
+      ${em?`<div class="band" style="left:${X(emLo)}%;width:${(X(emHi)-X(emLo)).toFixed(1)}%"></div>`:""}
+      ${pw!=null?`<span class="wall p" style="left:${X(pw)}%" title="put wall ${strike(pw)} · ${kfmt(n.put_wall.oi)} oi"></span>`:""}
+      ${cw!=null?`<span class="wall c" style="left:${X(cw)}%" title="call wall ${strike(cw)} · ${kfmt(n.call_wall.oi)} oi"></span>`:""}
+      <span class="spot" style="left:${X(spot)}%" title="spot ${strike(spot)}"></span>
+    </div>
+    <div class="lbls mono">
+      <span class="pw">${pw!=null?"put wall "+strike(pw)+" · "+kfmt(n.put_wall.oi)+" oi":""}</span>
+      <span>spot ${strike(spot)}${em?" · paid-for ±"+em.pct.toFixed(1)+"%":""}</span>
+      <span class="cw">${cw!=null?"call wall "+strike(cw)+" · "+kfmt(n.call_wall.oi)+" oi":""}</span>
+    </div>
+    ${pShare!=null?`<div class="oisplit">
+      <i style="width:${pShare.toFixed(1)}%;background:color-mix(in srgb,var(--neg) 75%,transparent)"></i>
+      <i style="width:${(100-pShare).toFixed(1)}%;background:color-mix(in srgb,var(--pos) 75%,transparent)"></i></div>
+    <div class="lbls"><span class="mono pw">puts ${pShare.toFixed(0)}% of standing OI</span>
+      <span class="mono cw">calls ${(100-pShare).toFixed(0)}%</span></div>`:""}
+  </div>`;
+}
+function rowsHTML(rows,kind,vs){
+  if(!rows.length) return "";
+  let h=`<div class="sec"><div class="t">${kind==="u"?"Unusual strikes (vol ≥ 2× OI)":"OI builds vs "+vs}</div><table class="rows">`;
+  for(const r of rows){
+    h+=`<tr><td class="mono dim">${r.exp.slice(5)}</td>
+      <td><span class="cp ${r.cp}">${r.cp}</span></td>
+      <td class="mono r"><b>${strike(r.strike)}</b></td>`+
+      (kind==="u"
+       ?`<td class="mono r">${kfmt(r.vol)} vol</td><td class="mono r dim">${kfmt(r.oi)} oi</td><td class="mono r">${money(r.prem)}</td>`
+       :`<td class="mono r pos">+${kfmt(r.d_oi)} oi</td><td class="mono r dim">now ${kfmt(r.oi)}</td><td></td>`)
+      +`</tr>`;
+  }
+  return h+"</table></div>";
+}
+async function load(){
+  const r=await fetch("/api/flow"); const d=await r.json();
+  document.getElementById("asof").textContent="as of "+d.ts;
+  document.getElementById("win").textContent=d.window_days;
+  if(!d.names.length){
+    document.getElementById("body").innerHTML='<div class="loading">No chains fetched — CBOE may be unreachable; retry shortly.</div>';
+    return;
+  }
+  let h=`<div class="grid">`;
+  for(const n of d.names){
+    const dp=n.day_pct;
+    h+=`<div class="nm ${n.held?"held":""}">
+      <div class="nm-h"><span class="sym"><a href="/t?symbol=${n.symbol}">${n.symbol}</a></span>
+        ${n.held?'<span class="hd">HELD</span>':""}
+        <span class="px mono">${n.spot.toLocaleString("en-US",{maximumFractionDigits:2})}</span>
+        ${dp==null?"":`<span class="mono ${dp>=0?"pos":"neg"}" style="font-size:12px;font-weight:700">${dp>=0?"+":""}${dp.toFixed(2)}%</span>`}
+        <span class="right2 mono">${n.builds_vs?"vs "+n.builds_vs:"first snapshot"}</span></div>
+      ${statHTML(n)}
+      ${ladderHTML(n)}
+      ${rowsHTML(n.unusual,"u")}
+      ${n.builds_vs?rowsHTML(n.builds,"b",n.builds_vs):'<div class="sec"><div class="empty">First snapshot today — OI builds appear from tomorrow.</div></div>'}
+    </div>`;
+  }
+  h+="</div>";
+  if(d.skipped&&d.skipped.length)
+    h+=`<div class="dim" style="font-size:11px;margin-top:12px">No listed options / no chain served: ${d.skipped.join(", ")}</div>`;
+  document.getElementById("body").innerHTML=h;
+}
+load();
+</script>
+</body>
+</html>

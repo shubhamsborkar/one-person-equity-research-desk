@@ -1,0 +1,29 @@
+{
+  "_comment": "Edit in the Watch US page.",
+  "names": [
+    {
+      "code": "AAPL",
+      "source": "fmp"
+    },
+    {
+      "code": "MSFT",
+      "source": "fmp"
+    },
+    {
+      "code": "NVDA",
+      "source": "fmp"
+    },
+    {
+      "code": "AMZN",
+      "source": "fmp"
+    },
+    {
+      "code": "GOOGL",
+      "source": "fmp"
+    },
+    {
+      "code": "META",
+      "source": "fmp"
+    }
+  ]
+}

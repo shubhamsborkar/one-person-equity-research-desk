@@ -1,0 +1,764 @@
+[
+ {
+  "category": "search",
+  "endpoint": "search-symbol",
+  "status": "OK",
+  "note": "symbol,name,currency,exchangeFullName,exchange"
+ },
+ {
+  "category": "search",
+  "endpoint": "search-name",
+  "status": "OK",
+  "note": "symbol,name,currency,exchangeFullName,exchange"
+ },
+ {
+  "category": "search",
+  "endpoint": "search-cik",
+  "status": "OK",
+  "note": "symbol,companyName,cik,exchangeFullName,exchange,currency"
+ },
+ {
+  "category": "search",
+  "endpoint": "search-cusip",
+  "status": "OK",
+  "note": "symbol,companyName,cusip,marketCap"
+ },
+ {
+  "category": "search",
+  "endpoint": "search-isin",
+  "status": "OK",
+  "note": "symbol,name,isin,marketCap"
+ },
+ {
+  "category": "directory",
+  "endpoint": "stock-list",
+  "status": "OK",
+  "note": "symbol,companyName"
+ },
+ {
+  "category": "directory",
+  "endpoint": "etf-list",
+  "status": "OK",
+  "note": "symbol,name"
+ },
+ {
+  "category": "directory",
+  "endpoint": "available-exchanges",
+  "status": "OK",
+  "note": "exchange,name,countryName,countryCode,symbolSuffix,delay"
+ },
+ {
+  "category": "directory",
+  "endpoint": "available-sectors",
+  "status": "OK",
+  "note": "sector"
+ },
+ {
+  "category": "directory",
+  "endpoint": "available-industries",
+  "status": "OK",
+  "note": "industry"
+ },
+ {
+  "category": "company",
+  "endpoint": "profile",
+  "status": "OK",
+  "note": "symbol,price,marketCap,beta,lastDividend,range,change,changePercentage"
+ },
+ {
+  "category": "company",
+  "endpoint": "company-notes",
+  "status": "OK",
+  "note": "cik,symbol,title,exchange"
+ },
+ {
+  "category": "company",
+  "endpoint": "stock-peers",
+  "status": "OK",
+  "note": "symbol,companyName,price,mktCap"
+ },
+ {
+  "category": "company",
+  "endpoint": "employee-count",
+  "status": "OK",
+  "note": "symbol,cik,acceptanceTime,periodOfReport,companyName,formType,filingDate,employeeCount"
+ },
+ {
+  "category": "company",
+  "endpoint": "historical-employee-count",
+  "status": "OK",
+  "note": "symbol,cik,acceptanceTime,periodOfReport,companyName,formType,filingDate,employeeCount"
+ },
+ {
+  "category": "company",
+  "endpoint": "market-cap",
+  "status": "HTTP404",
+  "note": "[]"
+ },
+ {
+  "category": "company",
+  "endpoint": "historical-market-capitalization",
+  "status": "OK",
+  "note": "symbol,date,marketCap"
+ },
+ {
+  "category": "company",
+  "endpoint": "shares-float",
+  "status": "OK",
+  "note": "symbol,date,freeFloat,floatShares,outstandingShares,source"
+ },
+ {
+  "category": "company",
+  "endpoint": "key-executives",
+  "status": "OK",
+  "note": "title,name,pay,currencyPay,gender,yearBorn,titleSince,active"
+ },
+ {
+  "category": "company",
+  "endpoint": "governance-executive-compensation",
+  "status": "OK",
+  "note": "cik,symbol,companyName,filingDate,acceptedDate,nameAndPosition,year,salary"
+ },
+ {
+  "category": "company",
+  "endpoint": "mergers-acquisitions-latest",
+  "status": "OK",
+  "note": "symbol,companyName,cik,targetedCompanyName,targetedCik,targetedSymbol,transactionDate,acceptedDate"
+ },
+ {
+  "category": "company",
+  "endpoint": "delisted-companies",
+  "status": "OK",
+  "note": "symbol,companyName,exchange,ipoDate,delistedDate"
+ },
+ {
+  "category": "quote",
+  "endpoint": "quote",
+  "status": "OK",
+  "note": "symbol,name,price,changePercentage,change,volume,dayLow,dayHigh"
+ },
+ {
+  "category": "quote",
+  "endpoint": "quote-short",
+  "status": "OK",
+  "note": "symbol,price,change,volume"
+ },
+ {
+  "category": "quote",
+  "endpoint": "aftermarket-trade",
+  "status": "OK",
+  "note": "symbol,price,tradeSize,timestamp"
+ },
+ {
+  "category": "quote",
+  "endpoint": "aftermarket-quote",
+  "status": "OK",
+  "note": "symbol,bidSize,bidPrice,askSize,askPrice,volume,timestamp"
+ },
+ {
+  "category": "quote",
+  "endpoint": "stock-price-change",
+  "status": "OK",
+  "note": "symbol,1D,5D,1M,3M,6M,ytd,1Y"
+ },
+ {
+  "category": "quote",
+  "endpoint": "batch-quote",
+  "status": "GATED",
+  "note": "HTTP 402"
+ },
+ {
+  "category": "quote",
+  "endpoint": "batch-quote-short",
+  "status": "GATED",
+  "note": "HTTP 402"
+ },
+ {
+  "category": "quote",
+  "endpoint": "exchange-market-hours",
+  "status": "OK",
+  "note": "exchange,name,openingHour,closingHour,timezone,isMarketOpen"
+ },
+ {
+  "category": "chart",
+  "endpoint": "historical-price-eod/light",
+  "status": "OK",
+  "note": "symbol,date,price,volume"
+ },
+ {
+  "category": "chart",
+  "endpoint": "historical-price-eod/full",
+  "status": "OK",
+  "note": "symbol,date,open,high,low,close,volume,change"
+ },
+ {
+  "category": "chart",
+  "endpoint": "historical-price-eod/dividend-adjusted",
+  "status": "OK",
+  "note": "symbol,date,adjOpen,adjHigh,adjLow,adjClose,volume"
+ },
+ {
+  "category": "chart",
+  "endpoint": "historical-chart/1min",
+  "status": "GATED",
+  "note": "HTTP 402"
+ },
+ {
+  "category": "chart",
+  "endpoint": "historical-chart/5min",
+  "status": "OK",
+  "note": "date,open,low,high,close,volume"
+ },
+ {
+  "category": "chart",
+  "endpoint": "historical-chart/15min",
+  "status": "OK",
+  "note": "date,open,low,high,close,volume"
+ },
+ {
+  "category": "chart",
+  "endpoint": "historical-chart/1hour",
+  "status": "OK",
+  "note": "date,open,low,high,close,volume"
+ },
+ {
+  "category": "statements",
+  "endpoint": "income-statement",
+  "status": "OK",
+  "note": "date,symbol,reportedCurrency,cik,filingDate,acceptedDate,fiscalYear,period"
+ },
+ {
+  "category": "statements",
+  "endpoint": "balance-sheet-statement",
+  "status": "OK",
+  "note": "date,symbol,reportedCurrency,cik,filingDate,acceptedDate,fiscalYear,period"
+ },
+ {
+  "category": "statements",
+  "endpoint": "cash-flow-statement",
+  "status": "OK",
+  "note": "date,symbol,reportedCurrency,cik,filingDate,acceptedDate,fiscalYear,period"
+ },
+ {
+  "category": "statements",
+  "endpoint": "latest-financial-statements",
+  "status": "GATED",
+  "note": "HTTP 402"
+ },
+ {
+  "category": "statements",
+  "endpoint": "income-statement-growth",
+  "status": "OK",
+  "note": "symbol,date,fiscalYear,period,reportedCurrency,growthRevenue,growthCostOfRevenue,growthGrossProfit"
+ },
+ {
+  "category": "statements",
+  "endpoint": "financial-growth",
+  "status": "OK",
+  "note": "symbol,date,fiscalYear,period,reportedCurrency,revenueGrowth,grossProfitGrowth,ebitgrowth"
+ },
+ {
+  "category": "statements",
+  "endpoint": "ratios",
+  "status": "OK",
+  "note": "symbol,date,fiscalYear,period,reportedCurrency,grossProfitMargin,ebitMargin,ebitdaMargin"
+ },
+ {
+  "category": "statements",
+  "endpoint": "ratios-ttm",
+  "status": "OK",
+  "note": "symbol,grossProfitMarginTTM,ebitMarginTTM,ebitdaMarginTTM,operatingProfitMarginTTM,pretaxProfitMarginTTM,continuousOperationsProfitMarginTTM,netProfitMarginTTM"
+ },
+ {
+  "category": "statements",
+  "endpoint": "key-metrics",
+  "status": "OK",
+  "note": "symbol,date,fiscalYear,period,reportedCurrency,marketCap,enterpriseValue,evToSales"
+ },
+ {
+  "category": "statements",
+  "endpoint": "key-metrics-ttm",
+  "status": "OK",
+  "note": "symbol,marketCap,enterpriseValueTTM,evToSalesTTM,evToOperatingCashFlowTTM,evToFreeCashFlowTTM,evToEBITDATTM,netDebtToEBITDATTM"
+ },
+ {
+  "category": "statements",
+  "endpoint": "financial-scores",
+  "status": "OK",
+  "note": "symbol,reportedCurrency,altmanZScore,piotroskiScore,workingCapital,totalAssets,retainedEarnings,ebit"
+ },
+ {
+  "category": "statements",
+  "endpoint": "owner-earnings",
+  "status": "OK",
+  "note": "symbol,reportedCurrency,fiscalYear,period,date,averagePPE,maintenanceCapex,ownersEarnings"
+ },
+ {
+  "category": "statements",
+  "endpoint": "enterprise-values",
+  "status": "OK",
+  "note": "symbol,date,stockPrice,numberOfShares,marketCapitalization,minusCashAndCashEquivalents,addTotalDebt,enterpriseValue"
+ },
+ {
+  "category": "statements",
+  "endpoint": "revenue-product-segmentation",
+  "status": "OK",
+  "note": "symbol,fiscalYear,period,reportedCurrency,date,data"
+ },
+ {
+  "category": "statements",
+  "endpoint": "revenue-geographic-segmentation",
+  "status": "OK",
+  "note": "symbol,fiscalYear,period,reportedCurrency,date,data"
+ },
+ {
+  "category": "valuation",
+  "endpoint": "discounted-cash-flow",
+  "status": "OK",
+  "note": "symbol,date,dcf,Stock Price"
+ },
+ {
+  "category": "valuation",
+  "endpoint": "levered-discounted-cash-flow",
+  "status": "OK",
+  "note": "symbol,date,dcf,Stock Price"
+ },
+ {
+  "category": "analyst",
+  "endpoint": "analyst-estimates",
+  "status": "OK",
+  "note": "symbol,date,revenueLow,revenueHigh,revenueAvg,ebitdaLow,ebitdaHigh,ebitdaAvg"
+ },
+ {
+  "category": "analyst",
+  "endpoint": "ratings-snapshot",
+  "status": "OK",
+  "note": "symbol,rating,overallScore,discountedCashFlowScore,returnOnEquityScore,returnOnAssetsScore,debtToEquityScore,priceToEarningsScore"
+ },
+ {
+  "category": "analyst",
+  "endpoint": "ratings-historical",
+  "status": "OK",
+  "note": "symbol,date,rating,overallScore,discountedCashFlowScore,returnOnEquityScore,returnOnAssetsScore,debtToEquityScore"
+ },
+ {
+  "category": "analyst",
+  "endpoint": "price-target-summary",
+  "status": "OK",
+  "note": "symbol,lastMonthCount,lastMonthAvgPriceTarget,lastQuarterCount,lastQuarterAvgPriceTarget,lastYearCount,lastYearAvgPriceTarget,allTimeCount"
+ },
+ {
+  "category": "analyst",
+  "endpoint": "price-target-consensus",
+  "status": "OK",
+  "note": "symbol,targetHigh,targetLow,targetConsensus,targetMedian"
+ },
+ {
+  "category": "analyst",
+  "endpoint": "price-target-news",
+  "status": "OK",
+  "note": "symbol,publishedDate,newsURL,newsTitle,analystName,priceTarget,adjPriceTarget,priceWhenPosted"
+ },
+ {
+  "category": "analyst",
+  "endpoint": "price-target-latest-news",
+  "status": "OK",
+  "note": "symbol,publishedDate,newsURL,newsTitle,analystName,priceTarget,adjPriceTarget,priceWhenPosted"
+ },
+ {
+  "category": "analyst",
+  "endpoint": "grades",
+  "status": "OK",
+  "note": "symbol,date,gradingCompany,previousGrade,newGrade,action"
+ },
+ {
+  "category": "analyst",
+  "endpoint": "grades-historical",
+  "status": "OK",
+  "note": "symbol,date,analystRatingsStrongBuy,analystRatingsBuy,analystRatingsHold,analystRatingsSell,analystRatingsStrongSell"
+ },
+ {
+  "category": "analyst",
+  "endpoint": "grades-consensus",
+  "status": "OK",
+  "note": "symbol,strongBuy,buy,hold,sell,strongSell,consensus"
+ },
+ {
+  "category": "analyst",
+  "endpoint": "grades-news",
+  "status": "OK",
+  "note": "symbol,publishedDate,newsURL,newsTitle,newsBaseURL,newsPublisher,newGrade,previousGrade"
+ },
+ {
+  "category": "analyst",
+  "endpoint": "grades-latest-news",
+  "status": "OK",
+  "note": "symbol,publishedDate,newsURL,newsTitle,newsBaseURL,newsPublisher,newGrade,previousGrade"
+ },
+ {
+  "category": "calendar",
+  "endpoint": "dividends",
+  "status": "OK",
+  "note": "symbol,date,recordDate,paymentDate,declarationDate,adjDividend,dividend,yield"
+ },
+ {
+  "category": "calendar",
+  "endpoint": "dividends-calendar",
+  "status": "OK",
+  "note": "symbol,date,recordDate,paymentDate,declarationDate,adjDividend,dividend,yield"
+ },
+ {
+  "category": "calendar",
+  "endpoint": "earnings",
+  "status": "OK",
+  "note": "symbol,date,epsActual,epsEstimated,revenueActual,revenueEstimated,lastUpdated"
+ },
+ {
+  "category": "calendar",
+  "endpoint": "earnings-calendar",
+  "status": "OK",
+  "note": "symbol,date,epsActual,epsEstimated,revenueActual,revenueEstimated,lastUpdated"
+ },
+ {
+  "category": "calendar",
+  "endpoint": "ipos-calendar",
+  "status": "OK",
+  "note": "symbol,date,daa,company,exchange,actions,shares,priceRange"
+ },
+ {
+  "category": "calendar",
+  "endpoint": "splits",
+  "status": "OK",
+  "note": "symbol,date,numerator,denominator,splitType"
+ },
+ {
+  "category": "calendar",
+  "endpoint": "splits-calendar",
+  "status": "OK",
+  "note": "symbol,date,numerator,denominator,splitType"
+ },
+ {
+  "category": "news",
+  "endpoint": "news/stock",
+  "status": "OK",
+  "note": "symbol,publishedDate,publisher,title,image,site,text,url"
+ },
+ {
+  "category": "news",
+  "endpoint": "news/stock-latest",
+  "status": "OK",
+  "note": "symbol,publishedDate,publisher,title,image,site,text,url"
+ },
+ {
+  "category": "news",
+  "endpoint": "news/general-latest",
+  "status": "OK",
+  "note": "symbol,publishedDate,publisher,title,image,site,text,url"
+ },
+ {
+  "category": "news",
+  "endpoint": "news/press-releases",
+  "status": "GATED",
+  "note": "HTTP 402"
+ },
+ {
+  "category": "news",
+  "endpoint": "news/crypto",
+  "status": "OK",
+  "note": "symbol,publishedDate,publisher,title,image,site,text,url"
+ },
+ {
+  "category": "news",
+  "endpoint": "news/forex",
+  "status": "OK",
+  "note": "symbol,publishedDate,publisher,title,image,site,text,url"
+ },
+ {
+  "category": "insider",
+  "endpoint": "insider-trading/search",
+  "status": "OK",
+  "note": "symbol,filingDate,transactionDate,reportingCik,companyCik,transactionType,securitiesOwned,reportingName"
+ },
+ {
+  "category": "insider",
+  "endpoint": "insider-trading/latest",
+  "status": "OK",
+  "note": "symbol,filingDate,transactionDate,reportingCik,companyCik,transactionType,securitiesOwned,reportingName"
+ },
+ {
+  "category": "insider",
+  "endpoint": "insider-trading-statistics",
+  "status": "HTTP404",
+  "note": "[]"
+ },
+ {
+  "category": "insider",
+  "endpoint": "acquisition-of-beneficial-ownership",
+  "status": "OK",
+  "note": "cik,symbol,filingDate,acceptedDate,cusip,nameOfReportingPerson,citizenshipOrPlaceOfOrganization,soleVotingPower"
+ },
+ {
+  "category": "congress",
+  "endpoint": "senate-latest",
+  "status": "OK",
+  "note": "symbol,senateID,disclosureDate,transactionDate,firstName,lastName,office,district"
+ },
+ {
+  "category": "congress",
+  "endpoint": "house-latest",
+  "status": "OK",
+  "note": "symbol,senateID,disclosureDate,transactionDate,firstName,lastName,office,district"
+ },
+ {
+  "category": "congress",
+  "endpoint": "senate-trades",
+  "status": "OK",
+  "note": "symbol,senateID,disclosureDate,transactionDate,firstName,lastName,office,district"
+ },
+ {
+  "category": "congress",
+  "endpoint": "house-trades",
+  "status": "OK",
+  "note": "symbol,senateID,disclosureDate,transactionDate,firstName,lastName,office,district"
+ },
+ {
+  "category": "institutional",
+  "endpoint": "institutional-ownership/latest",
+  "status": "GATED",
+  "note": "HTTP 402"
+ },
+ {
+  "category": "institutional",
+  "endpoint": "institutional-ownership/symbol-positions-summary",
+  "status": "GATED",
+  "note": "HTTP 402"
+ },
+ {
+  "category": "market",
+  "endpoint": "biggest-gainers",
+  "status": "OK",
+  "note": "symbol,price,name,change,changesPercentage,exchange"
+ },
+ {
+  "category": "market",
+  "endpoint": "biggest-losers",
+  "status": "OK",
+  "note": "symbol,price,name,change,changesPercentage,exchange"
+ },
+ {
+  "category": "market",
+  "endpoint": "most-actives",
+  "status": "OK",
+  "note": "symbol,price,name,change,changesPercentage,exchange"
+ },
+ {
+  "category": "market",
+  "endpoint": "sector-performance-snapshot",
+  "status": "OK",
+  "note": "date,sector,exchange,averageChange"
+ },
+ {
+  "category": "market",
+  "endpoint": "industry-performance-snapshot",
+  "status": "OK",
+  "note": "date,industry,exchange,averageChange"
+ },
+ {
+  "category": "market",
+  "endpoint": "historical-sector-performance",
+  "status": "EMPTY",
+  "note": ""
+ },
+ {
+  "category": "market",
+  "endpoint": "sector-pe-snapshot",
+  "status": "OK",
+  "note": "date,sector,exchange,pe"
+ },
+ {
+  "category": "market",
+  "endpoint": "industry-pe-snapshot",
+  "status": "OK",
+  "note": "date,industry,exchange,pe"
+ },
+ {
+  "category": "index",
+  "endpoint": "index-list",
+  "status": "OK",
+  "note": "symbol,name,exchange,currency"
+ },
+ {
+  "category": "index",
+  "endpoint": "sp500-constituent",
+  "status": "GATED",
+  "note": "HTTP 402"
+ },
+ {
+  "category": "index",
+  "endpoint": "nasdaq-constituent",
+  "status": "GATED",
+  "note": "HTTP 402"
+ },
+ {
+  "category": "index",
+  "endpoint": "dowjones-constituent",
+  "status": "GATED",
+  "note": "HTTP 402"
+ },
+ {
+  "category": "commodity",
+  "endpoint": "commodities-list",
+  "status": "OK",
+  "note": "symbol,name,exchange,tradeMonth,currency"
+ },
+ {
+  "category": "commodity",
+  "endpoint": "quote?symbol=GCUSD",
+  "status": "OK",
+  "note": "symbol,name,price,changePercentage,change,volume,dayLow,dayHigh"
+ },
+ {
+  "category": "forex",
+  "endpoint": "forex-list",
+  "status": "OK",
+  "note": "symbol,fromCurrency,toCurrency,fromName,toName"
+ },
+ {
+  "category": "forex",
+  "endpoint": "quote?symbol=EURUSD",
+  "status": "OK",
+  "note": "symbol,name,price,changePercentage,change,volume,dayLow,dayHigh"
+ },
+ {
+  "category": "crypto",
+  "endpoint": "cryptocurrency-list",
+  "status": "OK",
+  "note": "symbol,name,exchange,icoDate,circulatingSupply,totalSupply"
+ },
+ {
+  "category": "crypto",
+  "endpoint": "quote?symbol=BTCUSD",
+  "status": "OK",
+  "note": "symbol,name,price,changePercentage,change,volume,dayLow,dayHigh"
+ },
+ {
+  "category": "economics",
+  "endpoint": "treasury-rates",
+  "status": "OK",
+  "note": "date,month1,month2,month3,month6,year1,year2,year3"
+ },
+ {
+  "category": "economics",
+  "endpoint": "economic-indicators",
+  "status": "OK",
+  "note": "name,date,value"
+ },
+ {
+  "category": "economics",
+  "endpoint": "economic-calendar",
+  "status": "OK",
+  "note": "date,country,event,currency,previous,estimate,actual,change"
+ },
+ {
+  "category": "economics",
+  "endpoint": "market-risk-premium",
+  "status": "OK",
+  "note": "country,continent,countryRiskPremium,totalEquityRiskPremium"
+ },
+ {
+  "category": "etf",
+  "endpoint": "etf/info",
+  "status": "OK",
+  "note": "symbol,name,description,isin,assetClass,securityCusip,domicile,website"
+ },
+ {
+  "category": "etf",
+  "endpoint": "etf/holdings",
+  "status": "GATED",
+  "note": "HTTP 402"
+ },
+ {
+  "category": "etf",
+  "endpoint": "etf/asset-exposure",
+  "status": "GATED",
+  "note": "HTTP 402"
+ },
+ {
+  "category": "etf",
+  "endpoint": "etf/sector-weightings",
+  "status": "OK",
+  "note": "symbol,sector,weightPercentage"
+ },
+ {
+  "category": "etf",
+  "endpoint": "etf/country-weightings",
+  "status": "OK",
+  "note": "country,weightPercentage"
+ },
+ {
+  "category": "esg",
+  "endpoint": "esg-disclosures",
+  "status": "GATED",
+  "note": "HTTP 402"
+ },
+ {
+  "category": "esg",
+  "endpoint": "esg-ratings",
+  "status": "GATED",
+  "note": "HTTP 402"
+ },
+ {
+  "category": "sec",
+  "endpoint": "sec-filings-search/symbol",
+  "status": "OK",
+  "note": "symbol,cik,filingDate,acceptedDate,formType,link,finalLink"
+ },
+ {
+  "category": "sec",
+  "endpoint": "sec-filings-8k",
+  "status": "OK",
+  "note": "symbol,cik,filingDate,acceptedDate,formType,hasFinancials,link,finalLink"
+ },
+ {
+  "category": "sec",
+  "endpoint": "sec-profile",
+  "status": "OK",
+  "note": "symbol,cik,registrantName,sicCode,sicDescription,sicGroup,isin,businessAddress"
+ },
+ {
+  "category": "transcripts",
+  "endpoint": "earning-call-transcript-latest",
+  "status": "GATED",
+  "note": "HTTP 402"
+ },
+ {
+  "category": "transcripts",
+  "endpoint": "earning-call-transcript",
+  "status": "GATED",
+  "note": "HTTP 402"
+ },
+ {
+  "category": "cot",
+  "endpoint": "commitment-of-traders-report",
+  "status": "GATED",
+  "note": "HTTP 402"
+ },
+ {
+  "category": "cot",
+  "endpoint": "commitment-of-traders-analysis",
+  "status": "GATED",
+  "note": "HTTP 402"
+ },
+ {
+  "category": "technical",
+  "endpoint": "technical-indicators/sma",
+  "status": "OK",
+  "note": "date,open,high,low,close,volume,sma"
+ },
+ {
+  "category": "technical",
+  "endpoint": "technical-indicators/rsi",
+  "status": "OK",
+  "note": "date,open,high,low,close,volume,rsi"
+ }
+]

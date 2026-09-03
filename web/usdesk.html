@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>US Desk — Research Desk</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23ED5A24'/><text x='16' y='22' font-size='15' font-weight='800' font-family='Arial' fill='white' text-anchor='middle'>FD</text></svg>">
+<link rel="stylesheet" href="/assets/desk.css">
+<script src="/assets/desk.js" defer></script>
+<style>
+#clock{font-size:15px;color:var(--ink)}
+main{max-width:1180px;margin:0 auto;padding:18px 22px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 16px}
+.tile .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink2);margin-bottom:7px}
+.tile .v{font-size:20px;font-weight:700}
+.tile .s{font-size:10.5px;color:var(--muted);margin-top:5px}
+.bar{height:6px;border-radius:3px;background:var(--line);margin-top:9px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:3px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:16px}
+.panel-h{padding:11px 15px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline}
+.panel-h h2{font-size:11.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink2)}
+.panel-h .sub{font-size:11px;color:var(--muted)}
+
+/* allocation heat strip */
+.alloc{display:flex;gap:2px;height:28px;border-radius:8px;overflow:hidden;margin:12px 15px 0}
+.alloc .as{display:flex;align-items:center;justify-content:center;min-width:3px;
+  text-decoration:none;border-radius:3px;transition:filter .15s}
+.alloc .as span{font-size:9px;font-weight:800;color:var(--ink);letter-spacing:.03em;
+  text-shadow:0 1px 2px rgba(0,0,0,.85);overflow:hidden;white-space:nowrap}
+.alloc .as:hover{filter:brightness(1.3)}
+.alloc-cap{font-size:9.5px;color:var(--muted);margin:5px 15px 10px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:9px 13px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--panel2)}
+td.name a{color:var(--ink);font-weight:700;text-decoration:none}
+td.name a:hover{color:var(--accent)}
+td.name .co{color:var(--muted);font-size:10.5px;font-weight:400;display:block}
+.pos{color:var(--pos)} .neg{color:var(--neg)} .dim{color:var(--muted)}
+.note{font-size:11.5px;color:var(--muted);line-height:1.6;padding:13px 15px}
+.note b{color:var(--ink2)}
+/* earnings rail — countdown cards in two sliding rows, not a table */
+.erail{display:grid;grid-auto-flow:column;grid-template-rows:repeat(2,auto);
+  grid-auto-columns:180px;gap:12px;overflow-x:auto;padding:16px 15px 18px;
+  scrollbar-width:thin}
+.erail>span.dim{grid-row:span 2}
+.ecard{background:var(--panel2);border:1px solid var(--line2);
+  border-radius:11px;padding:12px 14px;position:relative}
+.ecard.held-c{border-color:rgba(237,90,36,.45)}
+.ecard .dd{position:absolute;top:11px;right:12px;font-size:11px;font-weight:800;
+  border-radius:6px;padding:2px 7px}
+.dd.soon{background:rgba(241,100,114,.16);color:var(--neg)}
+.dd.near{background:rgba(232,161,60,.14);color:var(--amber)}
+.dd.far{background:var(--panel);color:var(--muted)}
+.ecard .tick{font-size:16px;font-weight:800}
+.ecard .tick a{color:var(--ink);text-decoration:none}
+.ecard .tick a:hover{color:var(--accent)}
+.ecard .held{font-size:8.5px;font-weight:700;letter-spacing:.08em;color:var(--accent);
+  border:1px solid rgba(237,90,36,.5);border-radius:4px;padding:1px 5px;
+  margin-left:7px;vertical-align:2px}
+.ecard .when{font-size:11px;color:var(--ink2);margin-top:4px}
+.ecard .est{font-size:10.5px;color:var(--muted);margin-top:9px;line-height:1.6}
+.ecard .est b{color:var(--ink2);font-weight:600}
+/* market pulse */
+.secrow{display:flex;gap:6px;flex-wrap:wrap;padding:12px 15px;border-bottom:1px solid var(--line)}
+.sec{font-size:10.5px;border-radius:6px;padding:3px 9px;font-weight:600;background:var(--panel2);
+  border:1px solid var(--line2)}
+.sec b{font-weight:800;margin-left:5px}
+.pulse3{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
+@media(max-width:900px){.pulse3{grid-template-columns:1fr}}
+.pcol{border-right:1px solid var(--line);min-width:0}
+.pcol:last-child{border-right:none}
+.pcol h3{font-size:9.5px;text-transform:uppercase;letter-spacing:.11em;color:var(--muted);
+  padding:9px 14px;border-bottom:1px solid var(--line)}
+.prow{display:flex;align-items:baseline;gap:8px;padding:5.5px 14px;font-size:12px;
+  border-bottom:1px solid var(--line)}
+.prow:last-child{border-bottom:none}
+.prow a{color:var(--ink);font-weight:700;text-decoration:none;min-width:52px}
+.prow a:hover{color:var(--accent)}
+.prow .nm{color:var(--muted);font-size:10.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">RESEARCH <span>DESK</span></div>
+  <nav></nav>
+  <div class="status"><span class="dot" id="mktdot"></span><span id="mktlabel">—</span></div>
+  <div class="right"><span id="clock" class="mono">--:--:--</span></div>
+</header>
+
+<main>
+  <div class="tiles" id="tiles"></div>
+  <section class="panel">
+    <div class="panel-h"><h2>Positions</h2><span class="sub" id="asof"></span></div>
+    <div id="alloc"></div>
+    <table><thead><tr>
+      <th>Name</th><th>Shares</th><th>Avg cost</th><th>Live</th><th>Day %</th>
+      <th>Value</th><th>P&amp;L</th><th>P&amp;L %</th><th>Weight</th><th>Decided by</th>
+    </tr></thead><tbody id="rows"><tr><td class="dim" style="padding:26px">Loading…</td></tr></tbody></table>
+  </section>
+  <section class="panel">
+    <div class="panel-h"><h2>Upcoming earnings</h2><span class="sub" id="esub">US names on the book and watchlist</span></div>
+    <div class="erail" id="erail"><span class="dim" style="font-size:12px">Loading calendar…</span></div>
+  </section>
+  <section class="panel">
+    <div class="panel-h"><h2>US market pulse</h2><span class="sub" id="psub"></span></div>
+    <div class="secrow" id="secrow"></div>
+    <div class="pulse3" id="pulse3"><span class="dim" style="font-size:12px;padding:14px">Loading movers…</span></div>
+  </section>
+  <section class="panel">
+    <div class="panel-h"><h2>Insider tape</h2><span class="sub" id="isub">open-market Form 4 buys · whole market</span></div>
+    <div id="insours"></div>
+    <div class="pulse3" style="grid-template-columns:1fr" id="insclusters">
+      <span class="dim" style="font-size:12px;padding:14px">Loading insider feed…</span></div>
+  </section>
+  <section class="panel"><div class="note" id="note"></div></section>
+</main>
+
+<script>
+"use strict";
+function usd(x,dp=2){ if(x==null||isNaN(x))return "—";
+  return (x<0?"−$":"$")+Math.abs(x).toFixed(dp).replace(/\B(?=(\d{3})+(?!\d))/g,","); }
+function pct(x){ return x==null?"—":(x>=0?"+":"−")+Math.abs(x).toFixed(2)+"%"; }
+function cls(x){ return x==null?"dim":(x>=0?"pos":"neg"); }
+function tile(l,v,k,s,extra){return `<div class="tile"><div class="l">${l}</div><div class="v mono ${k||""}">${v}</div><div class="s">${s||""}</div>${extra||""}</div>`;}
+
+/* allocation heat strip: positions by weight of the whole book, cash included */
+function allocBar(d){
+  if(!d.total) return "";
+  let seg="";
+  for(const p of [...d.positions].sort((a,b)=>(b.value||0)-(a.value||0))){
+    const wt=(p.value||0)/d.total*100; if(wt<0.3) continue;
+    const dp=p.day_pct;
+    const alpha = dp==null?0:Math.min(88,28+Math.abs(dp)*16);
+    const col = dp==null ? "var(--line2)"
+      : `color-mix(in srgb,var(--${dp>=0?"pos":"neg"}) ${alpha.toFixed(0)}%,var(--panel2))`;
+    seg+=`<a class="as" href="/t?symbol=${p.symbol}" style="width:${wt.toFixed(2)}%;background:${col}"
+      title="${p.symbol} · ${wt.toFixed(1)}% of book · day ${dp==null?"—":(dp>=0?"+":"−")+Math.abs(dp).toFixed(2)+"%"}">${wt>=7?`<span>${p.symbol}</span>`:""}</a>`;
+  }
+  const cwt=(d.cash||0)/d.total*100;
+  if(cwt>0.5) seg+=`<a class="as" style="width:${cwt.toFixed(2)}%;background:var(--panel2);cursor:default"
+    title="cash · ${cwt.toFixed(1)}% of book">${cwt>=7?"<span style='color:var(--muted)'>CASH</span>":""}</a>`;
+  return `<div class="alloc">${seg}</div>
+    <div class="alloc-cap">allocation of the whole book · colour = today's move · cash grey</div>`;
+}
+
+async function pull(){
+  const r = await fetch("/api/usbook"); const d = await r.json();
+  const prog = d.mandate ? (d.total/d.mandate*100) : null;
+  document.getElementById("tiles").innerHTML =
+    tile("Book value", usd(d.total,0), "", "positions + cash") +
+    tile("Deployed", usd(d.deployed,0), "", (d.total?(d.deployed/d.total*100).toFixed(1):"—")+"% of book") +
+    tile("Cash", usd(d.cash,0), "", d.cash_note||"") +
+    tile("Open P&L", (d.total_pnl>=0?"+":"")+usd(d.total_pnl,0), cls(d.total_pnl), "on deployed capital") +
+    tile("Mandate", usd(d.mandate,0), "", prog!=null?prog.toFixed(1)+"% there · heading to $50k in 2026":"",
+      prog!=null?`<div class="bar"><i style="width:${Math.min(100,prog)}%"></i></div>`:"");
+  let html="";
+  for(const p of d.positions){
+    const wt = d.total ? (p.value/d.total*100) : null;
+    html+=`<tr>
+      <td class="name"><a href="/t?symbol=${p.symbol}">${p.symbol}</a><span class="co">${p.name||""}</span></td>
+      <td class="mono">${p.shares}</td>
+      <td class="mono">${usd(p.avg_cost)}</td>
+      <td class="mono" style="font-weight:700">${usd(p.ltp)}</td>
+      <td class="mono ${cls(p.day_pct)}">${pct(p.day_pct)}</td>
+      <td class="mono">${usd(p.value)}</td>
+      <td class="mono ${cls(p.pnl)}">${p.pnl==null?"—":(p.pnl>=0?"+":"−")+usd(Math.abs(p.pnl)).slice(1)}</td>
+      <td class="mono ${cls(p.pnl_pct)}">${pct(p.pnl_pct)}</td>
+      <td class="mono dim">${wt!=null?wt.toFixed(1)+"%":"—"}</td>
+      <td class="dim" style="font-size:11px">${p.decided_by||""}</td></tr>`;
+  }
+  document.getElementById("rows").innerHTML=html;
+  document.getElementById("alloc").innerHTML=allocBar(d);
+  document.getElementById("asof").textContent="positions as recorded "+d.as_of+" · prices live via FMP · click a ticker for full research";
+  document.getElementById("note").innerHTML =
+    `Positions come from <b>us_book.json</b> in the desk folder; prices are live. Edit the file
+     after any trade and this desk follows. If your US broker offers an API, have the agent
+     replace the file read with a live pull.`;
+  const dot=document.getElementById("mktdot");
+  dot.className="dot"+(d.market_open?" live":"");
+  document.getElementById("mktlabel").textContent="US "+(d.market_open?"MARKET OPEN":"MARKET CLOSED");
+}
+setInterval(()=>{document.getElementById("clock").textContent=new Date().toLocaleTimeString("en-IN",{hour12:false});},1000);
+async function pullEarnings(){
+  try{
+    const r=await fetch("/api/earnings"); const d=await r.json();
+    const today=new Date();
+    let html="";
+    for(const e of d.rows){
+      const dd=Math.max(0,Math.round((new Date(e.date)-today)/864e5));
+      const k=dd<=7?"soon":(dd<=21?"near":"far");
+      const dt=new Date(e.date+"T12:00:00");
+      const when=dt.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
+      html+=`<div class="ecard ${e.tag==="held"?"held-c":""}">
+        <span class="dd mono ${k}">${dd===0?"today":dd+"d"}</span>
+        <div class="tick"><a href="/t?symbol=${e.symbol}">${e.symbol}</a>${e.tag==="held"?'<span class="held">HELD</span>':""}</div>
+        <div class="when">${when}</div>
+        <div class="est mono">EPS est <b>${e.eps_est??"—"}</b><br>Rev est <b>${e.rev_est?("$"+(e.rev_est/1e9).toFixed(1)+"B"):"—"}</b></div>
+      </div>`;
+    }
+    document.getElementById("erail").innerHTML=html||'<span class="dim" style="font-size:12px">Nothing scheduled in the next 120 days.</span>';
+    document.getElementById("esub").textContent=d.note||"soonest first · red ≤1wk, amber ≤3wk · home-market results come from the exchange calendar";
+  }catch(e){}
+}
+async function pullPulse(){
+  try{
+    const r=await fetch("/api/pulse"); const d=await r.json();
+    document.getElementById("psub").textContent=d.note||
+      ((d.sector_date?`sectors as of ${d.sector_date} · `:"")+"movers refresh every 15 min · whole market, small caps included");
+    document.getElementById("secrow").innerHTML=(d.sectors||[]).map(s=>
+      `<span class="sec">${s.sector}<b class="${cls(s.chg)}">${pct(s.chg)}</b></span>`).join("");
+    const col=(title,rows)=>`<div class="pcol"><h3>${title}</h3>${rows.map(x=>
+      `<div class="prow"><a href="/t?symbol=${x.symbol}">${x.symbol}</a>
+       <span class="nm">${x.name||""}</span>
+       <span class="mono dim">${x.price!=null?usd(x.price):""}</span>
+       <span class="mono ${cls(x.chg_pct)}">${pct(x.chg_pct)}</span></div>`).join("")}</div>`;
+    document.getElementById("pulse3").innerHTML=
+      col("Biggest gainers",d.gainers||[])+col("Biggest losers",d.losers||[])+col("Most active",d.actives||[]);
+  }catch(e){}
+}
+function usdShort(v){
+  if(v>=1e9)return "$"+(v/1e9).toFixed(1)+"B";
+  if(v>=1e6)return "$"+(v/1e6).toFixed(1)+"M";
+  return "$"+Math.round(v/1e3)+"k";
+}
+async function pullInsiders(){
+  try{
+    const r=await fetch("/api/insiders"); const d=await r.json();
+    if(d.error){document.getElementById("insclusters").innerHTML=
+      `<span class="dim" style="font-size:12px;padding:14px">${d.error}</span>`;return;}
+    document.getElementById("isub").textContent=
+      `open-market Form 4 buys ≥ $${(d.min_buy_usd/1000)}k · trailing ${d.window_days}d · refreshed ${d.ts}`+(d.note?` · ${d.note}`:"");
+    const ours=d.our_buys||[];
+    document.getElementById("insours").innerHTML = ours.length
+      ? `<div class="secrow">${ours.slice(0,12).map(b=>
+          `<span class="sec"><a href="/t?symbol=${b.symbol}" style="color:var(--accent);text-decoration:none;font-weight:800">${b.symbol}</a>
+           ${b.who} <span style="opacity:.65">${b.role}</span><b class="pos">${usdShort(b.value)}</b>
+           <span style="opacity:.5;font-weight:400"> ${b.date.slice(5)}</span></span>`).join("")}
+         </div>`
+      : `<div class="secrow"><span class="dim" style="font-size:11px">No open-market buys on book or watchlist names in the window.</span></div>`;
+    const rows=(d.clusters||[]).slice(0,20).map(c=>
+      `<div class="prow" ${c.ours?'style="background:rgba(237,90,36,.06)"':''}>
+        <a href="/t?symbol=${c.symbol}">${c.symbol}</a>
+        <span class="mono" style="min-width:70px">${c.n_buyers} buyers</span>
+        <span class="mono pos" style="min-width:70px">${usdShort(c.total_value)}</span>
+        <span class="nm">${c.buyers.slice(0,4).map(b=>`${b.who} (${b.role} ${usdShort(b.value)})`).join(" · ")}${c.buyers.length>4?" · +"+(c.buyers.length-4)+" more":""}</span>
+        <span class="mono dim" style="font-size:10px">${c.first.slice(5)}→${c.last.slice(5)}</span>
+        ${c.ours?'<span class="sec" style="color:var(--accent);border-color:var(--accent)">OURS</span>':''}
+      </div>`).join("");
+    document.getElementById("insclusters").innerHTML =
+      `<div class="pcol"><h3>Cluster buys — 2+ distinct insiders, same name</h3>${rows||'<div class="prow"><span class="dim">None in the window.</span></div>'}</div>`;
+  }catch(e){}
+}
+setInterval(pull,30000); setInterval(pullPulse,900000); setInterval(pullInsiders,3600000);
+pull(); pullEarnings();  pullPulse(); pullInsiders();
+</script>
+<div id="alertbar"></div>
+</body>
+</html>

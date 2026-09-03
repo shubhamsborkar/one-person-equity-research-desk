@@ -1,0 +1,40 @@
+{
+  "_comment": "Congress members tracked by name on the Capitol tab. name = last-name match against FMP's {chamber}-trades-by-name; label is display only. Edit freely.",
+  "members": [
+    {
+      "name": "Pelosi",
+      "chamber": "house",
+      "label": "Nancy Pelosi"
+    },
+    {
+      "name": "Greene",
+      "chamber": "house",
+      "label": "Marjorie Taylor Greene"
+    },
+    {
+      "name": "Khanna",
+      "chamber": "house",
+      "label": "Ro Khanna"
+    },
+    {
+      "name": "McCaul",
+      "chamber": "house",
+      "label": "Michael McCaul"
+    },
+    {
+      "name": "Gottheimer",
+      "chamber": "house",
+      "label": "Josh Gottheimer"
+    },
+    {
+      "name": "Capito",
+      "chamber": "senate",
+      "label": "Shelley Moore Capito"
+    },
+    {
+      "name": "McCormick",
+      "chamber": "house",
+      "label": "Rich McCormick"
+    }
+  ]
+}

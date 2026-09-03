@@ -1,0 +1,43 @@
+{
+ "_comment": "Alert rules for the desk. Edit freely; the server re-reads this file every cycle. Types: day_move (scope held|watch_in|watch_us, threshold_pct), margin_util (threshold_pct), fno_dte (days), earnings_within (days), price_level (symbol, region in|us|global, above and/or below), insider_cluster (fires when a 30-day insider buy cluster appears on a book/watch name), activist_13d (a SCHEDULE 13D or 13D/A filed on a book/watch name within N days). Each rule fires once per day per symbol. Read-only: alerts notify, they never act.",
+ "rules": [
+  {
+   "type": "day_move",
+   "scope": "held",
+   "threshold_pct": 5
+  },
+  {
+   "type": "day_move",
+   "scope": "watch_in",
+   "threshold_pct": 8
+  },
+  {
+   "type": "day_move",
+   "scope": "watch_us",
+   "threshold_pct": 8
+  },
+  {
+   "type": "margin_util",
+   "threshold_pct": 70
+  },
+  {
+   "type": "fno_dte",
+   "days": 7
+  },
+  {
+   "type": "earnings_within",
+   "days": 3
+  },
+  {
+   "type": "congress_held",
+   "days": 4
+  },
+  {
+   "type": "insider_cluster"
+  },
+  {
+   "type": "activist_13d",
+   "days": 7
+  }
+ ]
+}

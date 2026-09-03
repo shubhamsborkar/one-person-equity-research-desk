@@ -1,0 +1,75 @@
+{
+  "_comment": "13F tracker. Public SEC data. Add any filer by name and CIK (find the CIK on EDGAR's company search); note is a free-text label shown on the card.",
+  "funds": [
+    {
+      "cik": "0001067983",
+      "name": "Berkshire Hathaway",
+      "note": ""
+    },
+    {
+      "cik": "0001536411",
+      "name": "Duquesne (Druckenmiller)",
+      "note": ""
+    },
+    {
+      "cik": "0001656456",
+      "name": "Appaloosa (Tepper)",
+      "note": ""
+    },
+    {
+      "cik": "0001135730",
+      "name": "Coatue Management",
+      "note": ""
+    },
+    {
+      "cik": "0001709323",
+      "name": "Himalaya Capital (Li Lu)",
+      "note": ""
+    },
+    {
+      "cik": "0001777813",
+      "name": "Atreides Management",
+      "note": ""
+    },
+    {
+      "cik": "0001088875",
+      "name": "Baillie Gifford",
+      "note": ""
+    },
+    {
+      "cik": "0001453072",
+      "name": "Alyeska",
+      "note": ""
+    },
+    {
+      "cik": "0001566887",
+      "name": "Ratan Capital",
+      "note": ""
+    },
+    {
+      "cik": "0001508755",
+      "name": "Axon Capital",
+      "note": ""
+    },
+    {
+      "cik": "0001472850",
+      "name": "Permian Investment Partners",
+      "note": ""
+    },
+    {
+      "cik": "0001858353",
+      "name": "Alta Fox",
+      "note": ""
+    },
+    {
+      "cik": "0001549575",
+      "name": "Pabrai (Dalal Street)",
+      "note": ""
+    },
+    {
+      "cik": "0001649339",
+      "name": "Scion (Michael Burry)",
+      "note": ""
+    }
+  ]
+}

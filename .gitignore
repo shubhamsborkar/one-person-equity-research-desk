@@ -1,0 +1,16 @@
+# Never commit credentials or the daily tokens
+.env
+session_token*.txt
+*.token
+
+# Local output
+output/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Breeze SDK logs may contain request details
+logs/
+security_master.zip
+cache/

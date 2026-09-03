@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Capitol — Research Desk</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23ED5A24'/><text x='16' y='22' font-size='15' font-weight='800' font-family='Arial' fill='white' text-anchor='middle'>FD</text></svg>">
+<link rel="stylesheet" href="/assets/desk.css">
+<script src="/assets/desk.js" defer></script>
+<style>
+body{padding-bottom:50px}
+main{max-width:1420px;margin:0 auto;padding:20px 22px}
+.sub{color:var(--muted);font-size:12px;margin-bottom:16px;max-width:980px;line-height:1.6}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:18px}
+.panel-h{padding:11px 15px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.panel-h h2{font-size:11.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink2)}
+.panel-h .s{font-size:11px;color:var(--muted)}
+input#filter{background:var(--panel2);color:var(--ink);border:1px solid var(--line2);
+  border-radius:8px;padding:7px 12px;font-size:13px;outline:none;width:240px}
+input#filter:focus{border-color:var(--accent)}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{padding:7px 12px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:600;
+  position:sticky;top:0;background:var(--panel);z-index:2}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--panel2)}
+td.sym{font-weight:800}
+td.sym a{color:inherit;text-decoration:none}
+td.sym a:hover{color:var(--accent)}
+td.asset{max-width:250px;overflow:hidden;text-overflow:ellipsis;color:var(--ink2)}
+td.person{max-width:190px;overflow:hidden;text-overflow:ellipsis}
+.buy{color:var(--pos);font-weight:700} .sell{color:var(--neg);font-weight:700}
+.xchg{color:var(--amber);font-weight:700}
+.dim{color:var(--muted)}
+.ch{font-size:9px;font-weight:700;letter-spacing:.06em;border-radius:4px;padding:1.5px 5px}
+.ch.senate{background:rgba(91,184,212,.13);color:#5bb8d4}
+.ch.house{background:rgba(232,161,60,.13);color:var(--amber)}
+.held{font-size:8.5px;font-weight:700;color:var(--accent);border:1px solid rgba(237,90,36,.5);
+  border-radius:4px;padding:1px 5px;margin-left:6px;vertical-align:1px;letter-spacing:.06em}
+.lag{font-size:10px}
+.lag.slow{color:var(--neg)}
+.memgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(430px,1fr));gap:0;padding:0}
+.mem{border-right:1px solid var(--line);border-bottom:1px solid var(--line);min-width:0}
+.mem-h{display:flex;align-items:baseline;gap:10px;padding:11px 15px;border-bottom:1px solid var(--line)}
+.mem-h .n{font-weight:800;font-size:13.5px}
+.mem-h .cnt{font-size:10.5px;color:var(--muted);margin-left:auto}
+.mem table{font-size:11.5px;table-layout:fixed;width:100%}
+.mem th,.mem td{padding:5.5px 7px;overflow:hidden;text-overflow:ellipsis}
+.mem th:nth-child(1),.mem td:nth-child(1){width:88px}
+.mem th:nth-child(2),.mem td:nth-child(2){width:56px}
+.mem th:nth-child(3),.mem td:nth-child(3){width:80px}
+.mem th:nth-child(4),.mem td:nth-child(4){width:118px}
+.mem td.asset{max-width:none}
+.memscroll{max-height:300px;overflow-y:auto}
+.memscroll::-webkit-scrollbar{width:7px}
+.memscroll::-webkit-scrollbar-thumb{background:var(--line2);border-radius:4px}
+.mem thead th{position:sticky;top:0;background:var(--panel);z-index:1}
+.scroll{max-height:560px;overflow-y:auto}
+.scroll::-webkit-scrollbar{width:8px}
+.scroll::-webkit-scrollbar-thumb{background:var(--line2);border-radius:4px}
+.loading{padding:60px;text-align:center;color:var(--muted)}
+.empty{padding:26px 15px;color:var(--muted);font-size:12px}
+footer{max-width:1420px;margin:26px auto 0;padding:14px 22px;border-top:1px solid var(--line);
+  color:var(--muted);font-size:11px;line-height:1.6}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">RESEARCH <span>DESK</span></div>
+  <nav></nav>
+  <div class="right"><span id="asof"></span></div>
+</header>
+<main>
+  <div class="sub">US Congress trading disclosures (Senate + House PTRs). Members report up to 45
+  days after trading — the <b style="color:var(--ink2)">lag</b> column shows how stale each filing
+  already is. Top panel: every filing touching a name on the book or watchlist. Bottom: the raw
+  disclosure firehose.</div>
+
+  <section class="panel">
+    <div class="panel-h"><h2>Our names</h2><span class="s" id="oursub"></span></div>
+    <div class="scroll" id="ours"><div class="loading">Loading disclosures…</div></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-h"><h2>Tracked members</h2>
+      <span class="s">edit members.json to follow someone else</span></div>
+    <div class="memgrid" id="members"><div class="loading">Loading…</div></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-h"><h2>Trump Media (DJT) insiders</h2>
+      <span class="s">the president's own DJT stake sits in a revocable trust that rarely
+      transacts; what MOVES are officer/family Form 4s, below. His annual OGE disclosure
+      is the other tracker source and is not machine-readable.</span></div>
+    <div id="djt"><div class="empty">Loading…</div></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-h"><h2>Latest flow</h2>
+      <input id="filter" placeholder="Filter by ticker or member…">
+      <span class="s" id="flowsub"></span></div>
+    <div class="scroll" id="flow"><div class="loading">Loading…</div></div>
+  </section>
+</main>
+<footer>Source: FMP senate-latest / house-latest / senate-trades / house-trades (public PTR data).
+Amounts are disclosure ranges, not exact sizes. Spouse/child trades count — check the owner column.
+Cached 6 hours. Read-only reference; disclosures are context, never a signal by themselves.</footer>
+<script>
+"use strict";
+let D=null;
+function typeCls(t){
+  const s=(t||"").toLowerCase();
+  if(s.includes("purchase")||s.includes("buy")) return "buy";
+  if(s.includes("sale")||s.includes("sell")) return "sell";
+  if(s.includes("exchange")) return "xchg";
+  return "dim";
+}
+function lagDays(r){
+  if(!r.tx||!r.disclosed) return null;
+  return Math.round((new Date(r.disclosed)-new Date(r.tx))/864e5);
+}
+function rowHtml(r, held){
+  const lag=lagDays(r);
+  const sym = r.symbol
+    ? `<a href="/t?symbol=${r.symbol}">${r.symbol}</a>${held.includes(r.symbol)?'<span class="held">HELD</span>':""}`
+    : `<span class="dim">—</span>`;
+  return `<tr>
+    <td class="mono dim">${r.tx||"—"}</td>
+    <td class="sym">${sym}</td>
+    <td class="${typeCls(r.type)}">${r.type||"—"}</td>
+    <td class="mono">${r.amount||"—"}</td>
+    <td class="person" title="${r.name}${r.district?" · "+r.district:""}">${r.name}
+      ${r.owner&&!/self|^--?$/i.test(r.owner)?`<span class="dim" style="font-size:10px"> (${r.owner})</span>`:""}</td>
+    <td><span class="ch ${r.chamber}">${r.chamber.toUpperCase()}</span></td>
+    <td class="asset" title="${r.asset}">${r.asset_type&&r.asset_type!=="Stock"?`<span class="dim">[${r.asset_type}]</span> `:""}${r.asset||""}</td>
+    <td class="mono lag ${lag!=null&&lag>30?"slow":"dim"}">${lag!=null?lag+"d":"—"}</td>
+  </tr>`;
+}
+const HEAD=`<thead><tr><th>Traded</th><th>Ticker</th><th>Type</th><th>Amount</th>
+  <th>Member</th><th></th><th>Asset</th><th title="days between trade and disclosure">Lag</th></tr></thead>`;
+function renderFlow(){
+  const f=(document.getElementById("filter").value||"").toUpperCase();
+  const rows=D.flow.filter(r=>!f||r.symbol.includes(f)||r.name.toUpperCase().includes(f));
+  document.getElementById("flow").innerHTML = rows.length
+    ? `<table>${HEAD}<tbody>${rows.map(r=>rowHtml(r,D.held)).join("")}</tbody></table>`
+    : `<div class="empty">Nothing matches.</div>`;
+  document.getElementById("flowsub").textContent=rows.length+" filings";
+}
+function renderMembers(){
+  const ms=D.members||[];
+  document.getElementById("members").innerHTML = ms.length ? ms.map(m=>{
+    const rows=m.rows.map(r=>{
+      const sym=r.symbol?`<a href="/t?symbol=${r.symbol}" style="color:inherit;text-decoration:none">${r.symbol}</a>`:"—";
+      return `<tr><td class="mono dim">${r.tx||"—"}</td>
+        <td class="sym">${sym}</td>
+        <td class="${typeCls(r.type)}">${r.type||"—"}</td>
+        <td class="mono">${r.amount||"—"}</td>
+        <td class="asset" title="${r.asset}">${r.asset_type&&r.asset_type!=="Stock"?`<span class="dim">[${r.asset_type}]</span> `:""}${r.asset||""}</td></tr>`;
+    }).join("");
+    return `<div class="mem"><div class="mem-h"><span class="n">${m.label}</span>
+        <span class="ch ${m.chamber}">${m.chamber.toUpperCase()}</span>
+        <span class="cnt">${m.count} filings on record · scroll for the latest ${m.rows.length}</span></div>
+      <div class="memscroll"><table><thead><tr><th>Traded</th><th>Ticker</th><th>Type</th><th>Amount</th><th>Asset</th></tr></thead>
+      <tbody>${rows||'<tr><td class="dim" style="padding:14px">No filings.</td></tr>'}</tbody></table></div></div>`;
+  }).join("") : '<div class="empty">No members tracked — add one to members.json.</div>';
+}
+function renderDjt(){
+  const rows=(D.djt||[]).map(r=>`<tr>
+    <td class="mono dim">${r.filed||"—"}</td>
+    <td class="person" title="${r.name}">${r.name||"—"}</td>
+    <td class="${/buy|purchase|p-/i.test(r.type||"")?"buy":(/sale|sell|s-/i.test(r.type||"")?"sell":"dim")}">${r.type||"—"}</td>
+    <td class="mono">${r.shares!=null?Math.round(r.shares).toLocaleString():"—"}</td>
+    <td class="mono dim">${r.price?("$"+r.price.toFixed(2)):"—"}</td></tr>`).join("");
+  document.getElementById("djt").innerHTML=rows
+    ? `<table><thead><tr><th>Filed</th><th>Insider</th><th>Type</th><th>Shares</th><th>Price</th></tr></thead><tbody>${rows}</tbody></table>`
+    : '<div class="empty">No recent DJT Form 4 filings.</div>';
+}
+async function load(){
+  const r=await fetch("/api/capitol"); D=await r.json();
+  document.getElementById("asof").textContent="as of "+D.ts+(D.note?" · "+D.note:"");
+  renderMembers();
+  renderDjt();
+  document.getElementById("oursub").textContent=
+    D.ours.length+" filings across "+D.tracked+" tracked names";
+  document.getElementById("ours").innerHTML = D.ours.length
+    ? `<table>${HEAD}<tbody>${D.ours.map(r=>rowHtml(r,D.held)).join("")}</tbody></table>`
+    : `<div class="empty">No Congress filings on any tracked name — that is itself worth knowing.</div>`;
+  renderFlow();
+  document.getElementById("filter").addEventListener("input",renderFlow);
+}
+load();
+</script>
+</body>
+</html>

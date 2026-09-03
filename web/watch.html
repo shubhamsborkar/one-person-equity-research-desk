@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Watchlist — Research Desk</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23ED5A24'/><text x='16' y='22' font-size='15' font-weight='800' font-family='Arial' fill='white' text-anchor='middle'>FD</text></svg>">
+<link rel="stylesheet" href="/assets/desk.css">
+<script src="/assets/desk.js" defer></script>
+<style>
+:root{--flashpos:rgba(62,207,142,.28); --flashneg:rgba(241,100,114,.28)}
+.right{display:flex;align-items:center;gap:14px;font-size:12px;color:var(--ink2);white-space:nowrap}
+#clock{font-size:15px;color:var(--ink)}
+.tokenbar{display:none;margin-bottom:12px;background:rgba(232,161,60,.1);
+  border:1px solid rgba(232,161,60,.4);border-radius:10px;padding:10px 16px;
+  font-size:12px;color:var(--ink2);line-height:1.6}
+.tokenbar b{color:var(--amber, #e8a13c)}
+
+main{max-width:1500px;margin:0 auto;padding:16px 22px}
+.toolbar{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+input,select,button{background:var(--panel2);color:var(--ink);border:1px solid var(--line2);
+  border-radius:8px;padding:8px 12px;font-size:13px;outline:none}
+input:focus{border-color:var(--accent)}
+input#filter{width:220px}
+input#addcode{width:150px;text-transform:uppercase}
+button{cursor:pointer}
+button:hover{border-color:var(--accent);color:var(--accent)}
+#msg{font-size:12px;color:var(--neg);min-height:15px}
+#msg.ok{color:var(--pos)}
+.addwrap{position:relative}
+#sugg{display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:30;
+  min-width:340px;max-width:460px;background:var(--panel);border:1px solid var(--line2);
+  border-radius:10px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.sg{display:flex;align-items:baseline;gap:10px;padding:8px 13px;cursor:pointer;
+  border-bottom:1px solid var(--line);font-size:12.5px}
+.sg:last-child{border-bottom:none}
+.sg:hover,.sg.sel{background:#1a212c}
+.sg .c{font-weight:800;min-width:74px}
+.sg .n{color:var(--ink2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sg .e{color:var(--muted);font-size:10px;white-space:nowrap}
+.count{font-size:11.5px;color:var(--muted);margin-left:auto}
+
+/* the grid scrolls INSIDE the panel (viewport-bound height) — that is what
+   lets the sticky header row actually freeze; with no height the panel never
+   scrolls itself and sticky never engages */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  overflow:auto;max-height:calc(100vh - 150px);min-height:320px}
+.panel::-webkit-scrollbar{width:9px;height:9px}
+.panel::-webkit-scrollbar-thumb{background:var(--line2);border-radius:5px}
+table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:1100px}
+th,td{padding:7px 11px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.08em;
+  font-weight:600;cursor:pointer;position:sticky;top:0;background:var(--panel);z-index:2}
+th:hover{color:var(--accent)}
+tbody tr:hover td{background:var(--panel2)}
+tbody tr:last-child td{border-bottom:none}
+td.sym{font-weight:700}
+td.sym .ex{color:var(--muted);font-weight:400;font-size:10px;margin-left:5px}
+td{transition:background .15s}
+td.flash-pos{background:var(--flashpos)!important}
+td.flash-neg{background:var(--flashneg)!important}
+.pos{color:var(--pos)} .neg{color:var(--neg)} .dim{color:var(--muted)}
+.arrow{font-size:11px;width:26px;text-align:center!important}
+.rm{opacity:0;color:var(--muted);cursor:pointer;border:none;background:none;
+  font-size:14px;padding:0 4px}
+tr:hover .rm{opacity:1}
+.rm:hover{color:var(--neg)}
+.hl,.ll{font-size:9px;letter-spacing:.05em;border-radius:4px;padding:1px 5px;margin-left:6px}
+.hl{background:rgba(62,207,142,.15);color:var(--pos)}
+.ll{background:rgba(241,100,114,.15);color:var(--neg)}
+tr.grphead td{background:#0d1117;color:var(--ink2);font-size:10px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;padding:8px 11px;text-align:left;
+  border-bottom:1px solid var(--line)}
+td.sym .ex{display:inline-block;max-width:150px;overflow:hidden;text-overflow:ellipsis;
+  vertical-align:bottom;white-space:nowrap}
+footer{max-width:1500px;margin:14px auto 40px;padding:0 22px;color:var(--muted);font-size:11px}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">RESEARCH <span>DESK</span></div>
+  <nav id="nav"></nav>
+  <div class="status"><span class="dot" id="mktdot"></span><span id="mktlabel">—</span></div>
+  <div class="right"><span id="clock" class="mono">--:--:--</span></div>
+</header>
+
+<main>
+  <div class="tokenbar" id="tokenbar"><b>India session expired.</b> Prices below froze at the
+  last live tick. Quit the desk, double-click <b>Start&nbsp;Desk.command</b> and paste fresh
+  Breeze tokens to reconnect.</div>
+  <div class="toolbar">
+    <input id="filter" placeholder="Filter list…">
+    <span style="width:14px"></span>
+    <span class="addwrap">
+      <input id="addcode" placeholder="ICICI code e.g. RELIND" autocomplete="off">
+      <div id="sugg"></div>
+    </span>
+    <select id="addexch"><option>NSE</option><option>BSE</option></select>
+    <button id="addbtn">+ Add to watch</button>
+    <span id="msg"></span>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="panel">
+    <table id="grid"><thead></thead><tbody>
+      <tr><td class="dim" style="padding:30px">Loading quotes… first pass over the list takes a few seconds.</td></tr>
+    </tbody></table>
+  </div>
+</main>
+
+<footer>Quotes cycle continuously through the list (each name refreshes roughly once a
+minute on a big list; faster on a short one). LTP flashing green/red = ticked up/down since
+the last look. HI/LO badge = trading at the day's high or low. Remove a name with the ×
+that appears on hover. Read-only — this page cannot place orders.</footer>
+
+<script>
+"use strict";
+const _l = new URLSearchParams(location.search).get("list");
+const REGION = _l==="us" ? "us" : (_l==="global" ? "global" : "in");
+let prev={}, sortKey="code", sortDir=1, data=null;
+
+// region-aware number formatting: Indian lakh grouping vs US thousands
+function inr(x,dp=2){ if(x==null||isNaN(x))return "—";
+  const neg=x<0; x=Math.abs(x); let [i,f]=x.toFixed(dp).split(".");
+  if(REGION==="us"||REGION==="global"){ i=i.replace(/\B(?=(\d{3})+(?!\d))/g,","); }
+  else if(i.length>3){let h=i.slice(0,-3),t=i.slice(-3),p=[];
+    while(h.length>2){p.unshift(h.slice(-2));h=h.slice(0,-2);}p.unshift(h);i=p.join(",")+","+t;}
+  return (neg?"−":"")+i+(f?"."+f:"");}
+function pct(x){ return x==null?"—":(x>=0?"+":"−")+Math.abs(x).toFixed(2)+"%"; }
+function cls(x){ return x==null?"dim":(x>=0?"pos":"neg"); }
+function mcapFmt(x){ if(x==null)return "—";
+  if(x>=1e12)return "$"+(x/1e12).toFixed(2)+"T";
+  if(x>=1e9)return "$"+(x/1e9).toFixed(1)+"B";
+  return "$"+(x/1e6).toFixed(0)+"M"; }
+
+const COLS = REGION==="us" ? [
+ ["code","Ticker"],["arrow",""],["ltp","Price"],["day_pct","Day %"],["chg","Chg"],
+ ["ttq","Volume"],["open","Open"],["high","High"],["low","Low"],["prev","Prev"],
+ ["ylow","52W L"],["yhigh","52W H"],["vs50","vs 50D"],["vs200","vs 200D"],
+ ["mcap","Mkt Cap"],["rm",""]
+] : REGION==="global" ? [
+ ["code","Symbol"],["arrow",""],["ltp","Price"],["day_pct","Day %"],
+ ["prev","Prev"],["high","High"],["low","Low"],["ttq","Volume"],
+ ["ylow","52W L"],["yhigh","52W H"],["rm",""]
+] : [
+ ["code","Ticker"],["arrow",""],["bid_qty","Bid Qty"],["bid","Bid"],
+ ["offer","Offer"],["offer_qty","Off Qty"],["ltp","LTP"],["day_pct","Day %"],
+ ["ttq","Volume"],["open","Open"],["high","High"],["low","Low"],["prev","Prev"],["rm",""]];
+
+document.title = (REGION==="us"?"Watch US":REGION==="global"?"Watch Global":"Watch Home")+" — Research Desk";
+if(REGION==="us"){
+  document.getElementById("addcode").placeholder="US ticker e.g. AAPL";
+  document.getElementById("addexch").style.display="none";
+}
+if(REGION==="global"){
+  document.getElementById("addcode").placeholder="Yahoo symbol e.g. TALABAT.AE";
+  document.getElementById("addcode").style.width="200px";
+  document.getElementById("addexch").style.display="none";
+}
+
+// Global list is a mixed bag by nature — split it into asset-class sections
+// (mixing FX into stocks was confusing). Yahoo symbol patterns are reliable:
+// ^ = index, =X = FX, =F = futures/commodities, -USD = crypto.
+function gGroup(code){
+  if(code.startsWith("^")) return "INDICES";
+  if(code.endsWith("=X")||code==="DX-Y.NYB") return "FX";
+  if(code.endsWith("=F")) return "COMMODITIES";
+  if(/-(USD|USDT|EUR|INR)$/.test(code)) return "CRYPTO";
+  return "STOCKS";
+}
+const G_ORDER=["INDICES","STOCKS","FX","COMMODITIES","CRYPTO"];
+
+function render(){
+  if(!data) return;
+  const f=(document.getElementById("filter").value||"").toUpperCase();
+  let rows=data.names
+    .map(n=>({...n, ...(data.quotes[n.code]||{})}))
+    .filter(r=>!f || r.code.includes(f));
+  rows.sort((a,b)=>{const av=a[sortKey],bv=b[sortKey];
+    if(av==null)return 1; if(bv==null)return -1;
+    return (av<bv?-1:av>bv?1:0)*sortDir;});
+  if(REGION==="global"){
+    const grouped=[];
+    for(const g of G_ORDER){
+      const members=rows.filter(r=>gGroup(r.code)===g);
+      if(members.length){ grouped.push({_head:g}); grouped.push(...members); }
+    }
+    rows=grouped;
+  }
+
+  let thead="<tr>"+COLS.map(([k,l])=>k==="arrow"||k==="rm"
+    ?`<th></th>`:`<th data-s="${k}">${l}${sortKey===k?(sortDir<0?" ▾":" ▴"):""}</th>`).join("")+"</tr>";
+  document.querySelector("#grid thead").innerHTML=thead;
+
+  let html="";
+  for(const r of rows){
+    if(r._head){ html+=`<tr class="grphead"><td colspan="${COLS.length}">${r._head}</td></tr>`; continue; }
+    const up = r.day_pct==null?null:r.day_pct>=0;
+    const atHigh = r.ltp!=null && r.high!=null && r.ltp>=r.high;
+    const atLow  = r.ltp!=null && r.low!=null && r.ltp<=r.low && !atHigh;
+    const codeHtml = REGION==="us"
+      ? `<a href="/t?symbol=${r.code}" style="color:inherit;text-decoration:none">${r.code}</a>`
+      : REGION==="in"
+      ? `<a href="/t?symbol=${r.code}&region=in" style="color:inherit;text-decoration:none">${r.code}</a>`
+      : r.code;
+    const exLabel = REGION==="global"
+      ? (gGroup(r.code)==="STOCKS" ? (r.currency||r.exch||"") : (r.name||r.currency||""))
+      : (r.exch||"");
+    const sym=`<td class="sym" title="${r.name||""}">${codeHtml}<span class="ex">${exLabel}</span>
+        ${atHigh?'<span class="hl">HI</span>':""}${atLow?'<span class="ll">LO</span>':""}</td>
+      <td class="arrow ${cls(r.day_pct)}">${up==null?"·":(up?"▲":"▼")}</td>`;
+    if(REGION==="us"){
+      html+=`<tr>${sym}
+        <td class="mono" style="font-weight:700" data-k="l${r.code}">${inr(r.ltp)}</td>
+        <td class="mono ${cls(r.day_pct)}" data-k="d${r.code}">${pct(r.day_pct)}</td>
+        <td class="mono ${cls(r.chg)}" data-k="c${r.code}">${r.chg!=null?(r.chg>=0?"+":"−")+inr(Math.abs(r.chg)):"—"}</td>
+        <td class="mono dim" data-k="v${r.code}">${r.ttq!=null?inr(r.ttq,0):"—"}</td>
+        <td class="mono dim">${inr(r.open)}</td>
+        <td class="mono dim">${inr(r.high)}</td>
+        <td class="mono dim">${inr(r.low)}</td>
+        <td class="mono dim">${inr(r.prev)}</td>
+        <td class="mono dim">${inr(r.ylow)}</td>
+        <td class="mono dim">${inr(r.yhigh)}</td>
+        <td class="mono ${cls(r.vs50)}">${pct(r.vs50)}</td>
+        <td class="mono ${cls(r.vs200)}">${pct(r.vs200)}</td>
+        <td class="mono dim">${mcapFmt(r.mcap)}</td>
+        <td><button class="rm" data-c="${r.code}" title="Remove">×</button></td></tr>`;
+    }else if(REGION==="global"){
+      html+=`<tr>${sym}
+        <td class="mono" style="font-weight:700" data-k="l${r.code}">${inr(r.ltp)}</td>
+        <td class="mono ${cls(r.day_pct)}" data-k="d${r.code}">${pct(r.day_pct)}</td>
+        <td class="mono dim">${inr(r.prev)}</td>
+        <td class="mono dim">${inr(r.high)}</td>
+        <td class="mono dim">${inr(r.low)}</td>
+        <td class="mono dim" data-k="v${r.code}">${r.ttq!=null?inr(r.ttq,0):"—"}</td>
+        <td class="mono dim">${inr(r.ylow)}</td>
+        <td class="mono dim">${inr(r.yhigh)}</td>
+        <td><button class="rm" data-c="${r.code}" title="Remove">×</button></td></tr>`;
+    }else{
+      html+=`<tr>${sym}
+        <td class="mono dim" data-k="bq${r.code}">${r.bid_qty!=null?inr(r.bid_qty,0):"—"}</td>
+        <td class="mono" data-k="b${r.code}">${inr(r.bid)}</td>
+        <td class="mono" data-k="o${r.code}">${inr(r.offer)}</td>
+        <td class="mono dim" data-k="oq${r.code}">${r.offer_qty!=null?inr(r.offer_qty,0):"—"}</td>
+        <td class="mono" style="font-weight:700" data-k="l${r.code}">${inr(r.ltp)}</td>
+        <td class="mono ${cls(r.day_pct)}" data-k="d${r.code}">${pct(r.day_pct)}</td>
+        <td class="mono dim" data-k="v${r.code}">${r.ttq!=null?inr(r.ttq,0):"—"}</td>
+        <td class="mono dim">${inr(r.open)}</td>
+        <td class="mono dim">${inr(r.high)}</td>
+        <td class="mono dim">${inr(r.low)}</td>
+        <td class="mono dim">${inr(r.prev)}</td>
+        <td><button class="rm" data-c="${r.code}" title="Remove">×</button></td></tr>`;
+    }
+  }
+  document.querySelector("#grid tbody").innerHTML=html||`<tr><td class="dim" style="padding:30px">Nothing matches.</td></tr>`;
+  document.getElementById("count").textContent=rows.filter(r=>!r._head).length+" names";
+
+  // flashes
+  document.querySelectorAll("td[data-k]").forEach(td=>{
+    const k=td.dataset.k, v=parseFloat(td.textContent.replace(/[,+%]/g,"").replace("−","-"));
+    if(!isNaN(v)&&k in prev&&prev[k]!==v){
+      td.classList.add(v>prev[k]?"flash-pos":"flash-neg");
+      setTimeout(()=>td.classList.remove("flash-pos","flash-neg"),800);}
+    if(!isNaN(v))prev[k]=v;});
+
+  // sort + remove handlers
+  document.querySelectorAll("th[data-s]").forEach(el=>el.onclick=()=>{
+    const k=el.dataset.s; if(sortKey===k)sortDir*=-1; else{sortKey=k;sortDir=k==="code"?1:-1;} render();});
+  document.querySelectorAll(".rm").forEach(el=>el.onclick=async()=>{
+    if(!confirm("Remove "+el.dataset.c+" from the watchlist?"))return;
+    await fetch("/api/watch/remove",{method:"POST",body:JSON.stringify({code:el.dataset.c,list:REGION})});
+    pull();});
+
+  const dot=document.getElementById("mktdot");
+  dot.className="dot"+(data.market_open?" live":"");
+  document.getElementById("mktlabel").textContent=
+    REGION==="global" ? "MIXED SESSIONS"
+    : (REGION==="us"?"US ":"NSE ")+(data.market_open?"MARKET OPEN":"MARKET CLOSED")
+      +((REGION==="in"&&data.stream)?" · LIVE TICKS":"");
+  document.getElementById("tokenbar").style.display=
+    (REGION==="in" && data.session_dead) ? "block" : "none";
+}
+
+async function pull(){
+  try{const r=await fetch("/api/watch?list="+REGION); data=await r.json(); render();}catch(e){}
+}
+document.getElementById("addbtn").onclick=async()=>{
+  const code=document.getElementById("addcode").value.trim().toUpperCase();
+  const exch=document.getElementById("addexch").value;
+  const msg=document.getElementById("msg");
+  if(!code){msg.textContent="type a code first";return;}
+  msg.className="";msg.textContent="checking "+code+"…";
+  const r=await fetch("/api/watch/add",{method:"POST",body:JSON.stringify({code,exch,list:REGION})});
+  const j=await r.json();
+  if(j.ok){msg.className="ok";msg.textContent=code+" added ✓";document.getElementById("addcode").value="";pull();}
+  else{msg.className="";msg.textContent=j.error||"could not add";}
+};
+/* ---- search-as-you-type: confirm the symbol before adding ---- */
+const addEl=document.getElementById("addcode"), suggEl=document.getElementById("sugg");
+let suggTimer=null, suggItems=[], suggSel=-1;
+function hideSugg(){ suggEl.style.display="none"; suggItems=[]; suggSel=-1; }
+function renderSugg(){
+  if(!suggItems.length){ hideSugg(); return; }
+  suggEl.innerHTML=suggItems.map((r,i)=>
+    `<div class="sg ${i===suggSel?"sel":""}" data-i="${i}">
+      <span class="c mono">${r.code}</span><span class="n">${r.name||""}</span>
+      <span class="e">${r.exch||""}</span></div>`).join("");
+  suggEl.style.display="block";
+  suggEl.querySelectorAll(".sg").forEach(el=>{
+    el.onmousedown=e=>{e.preventDefault(); pickSugg(+el.dataset.i);};
+  });
+}
+function pickSugg(i){
+  const r=suggItems[i]; if(!r) return;
+  addEl.value=r.code; hideSugg();
+  document.getElementById("addbtn").click();
+}
+addEl.addEventListener("input",()=>{
+  clearTimeout(suggTimer);
+  const q=addEl.value.trim();
+  if(q.length<2){ hideSugg(); return; }
+  suggTimer=setTimeout(async()=>{
+    try{
+      const r=await fetch(`/api/search?q=${encodeURIComponent(q)}&list=${REGION}`);
+      const d=await r.json();
+      if(addEl.value.trim()!==q) return;   // stale response
+      suggItems=d.results||[]; suggSel=-1; renderSugg();
+    }catch(e){}
+  },280);
+});
+addEl.addEventListener("blur",()=>setTimeout(hideSugg,150));
+addEl.addEventListener("keydown",e=>{
+  if(suggEl.style.display==="block"){
+    if(e.key==="ArrowDown"){e.preventDefault(); suggSel=Math.min(suggItems.length-1,suggSel+1); renderSugg(); return;}
+    if(e.key==="ArrowUp"){e.preventDefault(); suggSel=Math.max(0,suggSel-1); renderSugg(); return;}
+    if(e.key==="Escape"){hideSugg(); return;}
+    if(e.key==="Enter" && suggSel>=0){e.preventDefault(); pickSugg(suggSel); return;}
+  }
+  if(e.key==="Enter"){hideSugg(); document.getElementById("addbtn").click();}
+});
+document.getElementById("filter").addEventListener("input",render);
+setInterval(()=>{document.getElementById("clock").textContent=new Date().toLocaleTimeString("en-IN",{hour12:false});},1000);
+setInterval(pull, REGION==="us"?2000:(REGION==="in"?1500:5000));
+pull();
+</script>
+</body>
+</html>

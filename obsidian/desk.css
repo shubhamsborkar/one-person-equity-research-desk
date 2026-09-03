@@ -1,0 +1,3 @@
+/* Put this file in <vault>/.obsidian/snippets/ and enable it under Settings > Appearance > CSS snippets.
+   It lets the Live Desk note use the full width instead of the readable-line width. */
+.full-desk .markdown-preview-sizer, .full-desk .cm-sizer { max-width: 100% !important; }

@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Research Desk</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23ED5A24'/><text x='16' y='22' font-size='15' font-weight='800' font-family='Arial' fill='white' text-anchor='middle'>FD</text></svg>">
+<link rel="stylesheet" href="/assets/desk.css">
+<script src="/assets/desk.js" defer></script>
+<style>
+:root{--flashpos:rgba(62,207,142,.22); --flashneg:rgba(241,100,114,.22)}
+html{font-size:14px}
+body{padding-bottom:48px}
+
+/* ---------- header ---------- */
+header{position:sticky;top:0;z-index:10;background:rgba(10,13,18,.92);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:14px;padding:9px 18px}
+header .brand{font-weight:800;font-size:15px;letter-spacing:.14em;white-space:nowrap}
+header .brand span{color:var(--accent)}
+header .right{display:flex;align-items:center;gap:12px;
+  font-size:12px;color:var(--ink2);white-space:nowrap}
+#clock{font-size:15px;color:var(--ink);letter-spacing:.05em}
+button#refresh{background:var(--panel2);color:var(--ink);border:1px solid var(--line2);
+  border-radius:7px;padding:5px 12px;font-size:12px;cursor:pointer}
+button#refresh:hover{border-color:var(--accent);color:var(--accent)}
+#stale{display:none;background:var(--neg);color:#fff;font-size:11px;
+  padding:2px 8px;border-radius:5px}
+.tokenbar{margin:14px 0;background:rgba(232,161,60,.1);border:1px solid rgba(232,161,60,.4);
+  border-radius:12px;padding:18px 22px;line-height:1.7}
+.tokenbar h3{color:var(--amber);font-size:14px;letter-spacing:.06em;margin-bottom:6px}
+.tokenbar p{font-size:12.5px;color:var(--ink2)}
+.tokenbar b{color:var(--ink)}
+
+/* ---------- ticker ---------- */
+.ticker{overflow:hidden;border-bottom:1px solid var(--line);background:var(--panel);
+  white-space:nowrap;user-select:none}
+.ticker-track{display:inline-block;padding:6px 0;animation:tick 60s linear infinite}
+.ticker:hover .ticker-track{animation-play-state:paused}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.tk{display:inline-flex;align-items:baseline;gap:6px;margin:0 16px;font-size:12px}
+.tk .sym{color:var(--ink2);font-weight:600}
+.tk .acct{color:var(--muted);font-size:10px}
+
+/* ---------- layout ---------- */
+main{max-width:1440px;margin:0 auto;padding:18px 22px}
+.grid{display:grid;gap:14px}
+.family-strip{grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-bottom:14px}
+.mid{grid-template-columns:1fr 380px;margin-bottom:14px}
+.accounts{grid-template-columns:1fr 1fr}
+@media(max-width:1100px){.mid{grid-template-columns:1fr}.accounts{grid-template-columns:1fr}}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.panel-h{display:flex;align-items:baseline;justify-content:space-between;
+  padding:11px 15px;border-bottom:1px solid var(--line)}
+.panel-h h2{font-size:11.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink2)}
+.panel-h .sub{font-size:11px;color:var(--muted)}
+.panel-b{padding:13px 15px}
+
+/* ---------- tiles ---------- */
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 15px}
+.tile .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink2);margin-bottom:7px}
+.tile .v{font-size:19px;font-weight:700}
+.tile .s{font-size:10.5px;color:var(--muted);margin-top:5px;min-height:12px}
+.bar{height:6px;border-radius:3px;background:var(--line);margin-top:9px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:3px;background:var(--pos);transition:width .6s}
+.bar i.warn{background:var(--amber)} .bar i.hot{background:var(--neg)}
+
+/* ---------- tables ---------- */
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.08em;
+  font-weight:600;cursor:pointer;position:sticky;top:0;background:var(--panel)}
+th:hover{color:var(--accent)}
+th .arr{font-size:9px}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--panel2)}
+td.name{font-weight:700;color:var(--ink)}
+td{transition:background .15s}
+td.flash-pos{background:var(--flashpos)!important}
+td.flash-neg{background:var(--flashneg)!important}
+.pos{color:var(--pos)} .neg{color:var(--neg)} .dim{color:var(--muted)}
+.scroll{max-height:420px;overflow-y:auto}
+.scroll::-webkit-scrollbar{width:8px}
+.scroll::-webkit-scrollbar-thumb{background:var(--line2);border-radius:4px}
+
+/* ---------- tape cards ---------- */
+.tape-card{padding:12px 15px;border-bottom:1px solid var(--line)}
+.tape-card:last-child{border-bottom:none}
+.tape-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.tape-top .sym{font-weight:800;font-size:14px}
+.tape-top .spot{font-size:13px}
+.tape-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.tg{background:var(--panel2);border-radius:8px;padding:7px 9px}
+.tg .l{font-size:9.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.tg .v{font-size:13px;font-weight:700;margin-top:3px}
+.walls{margin-top:8px;font-size:11px;color:var(--ink2)}
+.walls b{color:var(--ink)}
+
+/* ---------- misc ---------- */
+.spark{vertical-align:middle}
+/* first paint only: tiles rise, sparklines draw. The 30s repoll re-renders
+   the same DOM, so these classes hang off #app.firstpaint and never replay. */
+#app.firstpaint .tile{animation:vrise .45s ease both}
+#app.firstpaint .grid.family-strip .tile:nth-child(2){animation-delay:40ms}
+#app.firstpaint .grid.family-strip .tile:nth-child(3){animation-delay:80ms}
+#app.firstpaint .grid.family-strip .tile:nth-child(4){animation-delay:120ms}
+#app.firstpaint .grid.family-strip .tile:nth-child(5){animation-delay:160ms}
+#app.firstpaint .grid.family-strip .tile:nth-child(6){animation-delay:200ms}
+#app.firstpaint .panel{animation:vfade .5s ease both}
+#app.firstpaint .spark polyline{stroke-dasharray:1;stroke-dashoffset:1;
+  animation:drawline .9s ease .15s forwards}
+#app.firstpaint .spark circle{opacity:0;animation:vfade .3s ease 1s forwards}
+.acct-head{display:flex;justify-content:space-between;align-items:baseline;
+  padding:11px 15px;border-bottom:1px solid var(--line)}
+.acct-head h2{font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.acct-head .mini{font-size:11px;color:var(--ink2)}
+.acct-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line)}
+.acct-tiles .at{background:var(--panel);padding:10px 14px}
+.at .l{font-size:9.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+.at .v{font-size:14.5px;font-weight:700;margin-top:4px}
+
+/* ---------- allocation heat strip (one bar = the whole book) ---------- */
+.alloc{display:flex;gap:2px;height:28px;border-radius:8px;overflow:hidden;margin:12px 15px 0}
+.alloc .as{display:flex;align-items:center;justify-content:center;min-width:3px;
+  text-decoration:none;border-radius:3px;transition:filter .15s}
+.alloc .as span{font-size:9px;font-weight:800;color:var(--ink);letter-spacing:.03em;
+  text-shadow:0 1px 2px rgba(0,0,0,.85);overflow:hidden;white-space:nowrap}
+.alloc .as:hover{filter:brightness(1.3)}
+.alloc-cap{font-size:9.5px;color:var(--muted);margin:5px 15px 10px}
+footer{max-width:1440px;margin:26px auto 0;padding:14px 22px;border-top:1px solid var(--line);
+  color:var(--muted);font-size:11px;line-height:1.6}
+footer b{color:var(--ink2)}
+.loading{padding:40px;text-align:center;color:var(--muted);font-size:13px}
+
+/* ---------- results rail (two sliding rows) ---------- */
+.erail{display:grid;grid-auto-flow:column;grid-template-rows:repeat(2,auto);
+  grid-auto-columns:195px;gap:12px;overflow-x:auto;padding:16px 15px 18px;
+  scrollbar-width:thin}
+.erail>span.dim{grid-row:span 2}
+.ecard{background:var(--panel2);border:1px solid var(--line2);
+  border-radius:11px;padding:12px 14px;position:relative}
+.ecard .dd{position:absolute;top:11px;right:12px;font-size:11px;font-weight:800;
+  border-radius:6px;padding:2px 7px}
+.dd.soon{background:rgba(241,100,114,.16);color:var(--neg)}
+.dd.near{background:rgba(232,161,60,.14);color:var(--amber)}
+.dd.far{background:var(--panel);color:var(--muted)}
+.ecard .tick{font-size:15px;font-weight:800}
+.ecard .tick a{color:var(--ink);text-decoration:none}
+.ecard .tick a:hover{color:var(--accent)}
+.ecard .when{font-size:11px;color:var(--ink2);margin-top:4px}
+.ecard .pur{font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5;
+  white-space:normal}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">RESEARCH <span>DESK</span></div>
+  <nav></nav>
+  <div class="status"><span class="dot" id="mktdot"></span><span id="mktlabel">—</span></div>
+  <div class="right">
+    <span id="stale">STALE DATA</span>
+    <button id="refresh">Refresh</button>
+    <span id="clock" class="mono">--:--:--</span>
+  </div>
+</header>
+
+<div class="ticker"><div class="ticker-track mono" id="ticker"></div></div>
+
+<main>
+  <div id="app" class="loading">Connecting to desk&hellip;</div>
+</main>
+
+<footer>
+  <p><b>Marks:</b> the broker's own live marks, the prices it computes margin and square-off against.</p>
+  <p><b>Square-off:</b> the margin-used bars show blocked margin against the account's total limit,
+  the way the shipped adapter's broker reports it; other brokers report it differently, so cross-check
+  the exact limits on your broker's own page.</p>
+  <p><b>Orders:</b> this copy reads the account and places no orders. Order routing against your broker's API is your own build.</p>
+</footer>
+
+<div id="alertbar"></div>
+
+<script>
+"use strict";
+const POLL_MS = 30000;
+let prevVals = {};   // cell-key -> numeric value (for change flashes)
+let sortState = {};  // tableId -> {key, dir}
+let lastSnap = null;
+
+/* ---------- formatting ---------- */
+function inr(x, dp=0){
+  if(x==null || isNaN(x)) return "—";
+  const neg = x<0; x = Math.abs(x);
+  let [i,f] = x.toFixed(dp).split(".");
+  if(i.length>3){
+    let head=i.slice(0,-3), tail=i.slice(-3), parts=[];
+    while(head.length>2){parts.unshift(head.slice(-2)); head=head.slice(0,-2);}
+    parts.unshift(head); i=parts.join(",")+","+tail;
+  }
+  return (neg?"−":"")+i+(f?"."+f:"");
+}
+function rupee(x,dp=0){ return x==null?"—":"₹"+inr(x,dp); }
+function pct(x,dp=2){ return x==null?"—":(x>=0?"+":"−")+Math.abs(x).toFixed(dp)+"%"; }
+function cls(x){ return x==null?"dim":(x>=0?"pos":"neg"); }
+function signed(x,dp=0){ return x==null?"—":(x>=0?"+":"−")+inr(Math.abs(x),dp); }
+
+/* ---------- change-flash ---------- */
+function cell(key, html, klass){
+  return `<td class="mono ${klass||""}" data-k="${key}">${html}</td>`;
+}
+function applyFlashes(root){
+  root.querySelectorAll("td[data-k]").forEach(td=>{
+    const k = td.dataset.k;
+    const num = parseFloat(td.textContent.replace(/[₹,+%\s]/g,"").replace("−","-"));
+    if(!isNaN(num) && k in prevVals && prevVals[k]!==num){
+      td.classList.add(num>prevVals[k] ? "flash-pos" : "flash-neg");
+      setTimeout(()=>td.classList.remove("flash-pos","flash-neg"), 900);
+    }
+    if(!isNaN(num)) prevVals[k]=num;
+  });
+}
+
+/* ---------- sparkline ---------- */
+function spark(series, w=110, h=26){
+  if(!series || series.length<2) return "";
+  const min=Math.min(...series), max=Math.max(...series), span=(max-min)||1;
+  const pts=series.map((v,i)=>`${(i/(series.length-1)*w).toFixed(1)},${(h-2-((v-min)/span*(h-4))).toFixed(1)}`).join(" ");
+  const up = series[series.length-1]>=series[0];
+  const col = up?"var(--pos)":"var(--neg)";
+  const last = series[series.length-1];
+  const ly=(26-2-((last-min)/span*(26-4))).toFixed(1);
+  return `<svg class="spark" width="${w}" height="${h}" aria-hidden="true">
+    <polyline pathLength="1" points="${pts}" fill="none" stroke="${col}" stroke-width="1.6"/>
+    <circle cx="${w}" cy="${ly}" r="2.4" fill="${col}"/></svg>`;
+}
+
+/* ---------- tables ---------- */
+function sortRows(rows, tableId, defKey){
+  const st = sortState[tableId] || {key:defKey, dir:-1};
+  sortState[tableId]=st;
+  return [...rows].sort((a,b)=>{
+    const av=a[st.key], bv=b[st.key];
+    if(av==null) return 1; if(bv==null) return -1;
+    return (av<bv?-1:av>bv?1:0)*st.dir;
+  });
+}
+function th(tableId,key,label,cur){
+  const arr = cur.key===key ? (cur.dir<0?" ▾":" ▴") : "";
+  return `<th data-t="${tableId}" data-s="${key}">${label}<span class="arr">${arr}</span></th>`;
+}
+function bindSort(root){
+  root.querySelectorAll("th[data-s]").forEach(el=>{
+    el.onclick=()=>{
+      const t=el.dataset.t,k=el.dataset.s,st=sortState[t];
+      if(st && st.key===k) st.dir*=-1; else sortState[t]={key:k,dir:-1};
+      render(lastSnap);
+    };
+  });
+}
+
+function futuresTable(accounts, sparks){
+  const rows=[];
+  for(const [acct,a] of Object.entries(accounts))
+    for(const f of a.futures) rows.push({...f, acct, acctLabel:a.label||acct});
+  if(!rows.length) return '<div class="panel-b dim">No open futures or options positions.</div>';
+  const st = sortState["fut"]||{key:"mtm",dir:1}; sortState["fut"]=st;
+  const sorted = sortRows(rows,"fut","mtm");
+  let html=`<table><thead><tr>
+    ${th("fut","underlying","Contract",st)}<th>Acct</th>${th("fut","expiry","Expiry",st)}
+    ${th("fut","dte","DTE",st)}<th>Side</th>${th("fut","qty","Qty",st)}
+    ${th("fut","avg","Avg",st)}${th("fut","ltp","Mark",st)}
+    ${th("fut","notional","Notional",st)}${th("fut","mtm","MTM",st)}
+    ${th("fut","mtm_pct","MTM %",st)}<th>3-day</th></tr></thead><tbody>`;
+  for(const f of sorted){
+    const dte = f.expiry ? Math.max(0,Math.round((new Date(f.expiry)-new Date())/864e5)) : null;
+    f.dte=dte;
+    html+=`<tr><td class="name"><a href="/t?symbol=${f.underlying}&region=in" style="color:inherit;text-decoration:none">${f.contract||f.underlying}</a></td>
+      <td class="dim mono" style="text-align:left;font-size:11px">${f.acctLabel}</td>
+      <td class="mono dim">${f.expiry||"—"}</td>
+      <td class="mono ${dte!=null&&dte<=7?"neg":"dim"}">${dte??"—"}d</td>
+      <td class="dim">${f.side}</td>
+      ${cell("fq"+f.acct+f.underlying, inr(f.qty))}
+      ${cell("fa"+f.acct+f.underlying, inr(f.avg,2))}
+      ${cell("fm"+f.acct+f.underlying, inr(f.ltp,2))}
+      ${cell("fn"+f.acct+f.underlying, inr(f.notional))}
+      ${cell("fp"+f.acct+f.underlying, signed(f.mtm), cls(f.mtm))}
+      ${cell("fpp"+f.acct+f.underlying, pct(f.mtm_pct), cls(f.mtm_pct))}
+      <td>${spark(sparks[f.underlying])}</td></tr>`;
+  }
+  return html+"</tbody></table>";
+}
+
+function equityTable(acct, eq){
+  if(!eq.length) return '<div class="panel-b dim">No holdings.</div>';
+  const total = eq.reduce((s,e)=>s+(e.value||0),0);
+  const id="eq_"+acct;
+  const st = sortState[id]||{key:"value",dir:-1}; sortState[id]=st;
+  const sorted=sortRows(eq,id,"value");
+  let html=`<div class="scroll"><table><thead><tr>
+    ${th(id,"code","Name",st)}${th(id,"qty","Qty",st)}${th(id,"avg","Avg",st)}
+    ${th(id,"ltp","Mark",st)}${th(id,"value","Value",st)}${th(id,"pnl","P&L",st)}
+    ${th(id,"pnl_pct","P&L %",st)}${th(id,"day_pct","Day %",st)}<th>Wt</th></tr></thead><tbody>`;
+  for(const e of sorted){
+    const wt = total?(e.value/total*100):null;
+    html+=`<tr><td class="name"><a href="/t?symbol=${e.code}&region=in" style="color:inherit;text-decoration:none">${e.code}</a></td>
+      ${cell("q"+acct+e.code, inr(e.qty))}
+      ${cell("a"+acct+e.code, inr(e.avg,2))}
+      ${cell("m"+acct+e.code, inr(e.ltp,2))}
+      ${cell("v"+acct+e.code, inr(e.value))}
+      ${cell("p"+acct+e.code, signed(e.pnl), cls(e.pnl))}
+      ${cell("pp"+acct+e.code, pct(e.pnl_pct), cls(e.pnl_pct))}
+      ${cell("d"+acct+e.code, pct(e.day_pct), cls(e.day_pct))}
+      <td class="mono dim">${wt!=null?wt.toFixed(1)+"%":"—"}</td></tr>`;
+  }
+  return html+"</tbody></table></div>";
+}
+
+/* ---------- panels ---------- */
+function utilBar(p){
+  if(p==null) return "";
+  const k = p>75?"hot":p>50?"warn":"";
+  return `<div class="bar"><i class="${k}" style="width:${Math.min(100,p).toFixed(1)}%"></i></div>`;
+}
+function tile(label,val,klass,sub,extra){
+  return `<div class="tile"><div class="l">${label}</div>
+    <div class="v mono ${klass||""}" data-k="t_${label}">${val}</div>
+    <div class="s">${sub||""}</div>${extra||""}</div>`;
+}
+function allocBar(eq){
+  const total=eq.reduce((s,e)=>s+(e.value||0),0);
+  if(!total) return "";
+  const sorted=[...eq].sort((a,b)=>(b.value||0)-(a.value||0));
+  let seg="";
+  for(const e of sorted){
+    const wt=(e.value||0)/total*100; if(wt<0.3) continue;
+    const d=e.day_pct;
+    const alpha = d==null?0:Math.min(88,28+Math.abs(d)*16);
+    const col = d==null ? "var(--line2)"
+      : `color-mix(in srgb,var(--${d>=0?"pos":"neg"}) ${alpha.toFixed(0)}%,var(--panel2))`;
+    seg+=`<a class="as" href="/t?symbol=${e.code}&region=in" style="width:${wt.toFixed(2)}%;background:${col}"
+      title="${e.code} · ${wt.toFixed(1)}% of book · day ${d==null?"—":(d>=0?"+":"−")+Math.abs(d).toFixed(2)+"%"}">${wt>=8?`<span>${e.code}</span>`:""}</a>`;
+  }
+  return `<div class="alloc">${seg}</div>
+    <div class="alloc-cap">allocation by value · colour = today's move · hover for detail, click for research</div>`;
+}
+function accountPanel(name,a){
+  const t=a.totals,f=a.funds;
+  const frozen = a.stale_funds ?
+    `<span class="mini mono" style="color:var(--amber,#d9a441)" title="No token pasted for this account today. Stock and futures marks are LIVE (priced via the other session — quotes are market data); cash, margin and quantities are the broker's state from the time shown.">no token today · marks LIVE · funds/margin as of ${a.broker_as_of||"?"}</span>` : "";
+  return `<section class="panel">
+    <div class="acct-head"><h2>${a.label||name}</h2>${frozen}
+      <span class="mini mono">margin used ${t.util_pct!=null?t.util_pct.toFixed(1)+"%":"—"}</span></div>
+    <div class="acct-tiles">
+      <div class="at"><div class="l">Equity</div><div class="v mono" data-k="ae_${name}">${rupee(t.equity_value)}</div></div>
+      <div class="at"><div class="l">Eq P&L</div><div class="v mono ${cls(t.equity_pnl)}" data-k="ap_${name}">${signed(t.equity_pnl)}</div></div>
+      <div class="at"><div class="l">F&O MTM</div><div class="v mono ${cls(t.fno_mtm)}" data-k="af_${name}">${signed(t.fno_mtm)}</div></div>
+      <div class="at"><div class="l">Cash</div><div class="v mono" data-k="ac_${name}">${rupee(t.cash)}</div></div>
+      <div class="at"><div class="l">Free limit</div><div class="v mono" data-k="al_${name}">${rupee(t.free_limit)}</div></div>
+      <div class="at"><div class="l">Collateral (impl.)</div><div class="v mono dim">${rupee(f.implied_collateral)}</div></div>
+    </div>
+    <div style="padding:10px 15px 4px">${utilBar(t.util_pct)}
+      <div class="s dim" style="font-size:10px;margin-top:5px">blocked ${rupee(t.blocked)} of ${rupee(t.limit_total)} F&O limit</div></div>
+    ${allocBar(a.equity)}
+    ${equityTable(name,a.equity)}
+  </section>`;
+}
+
+function tapePanel(tape){
+  if(!tape) return `<div class="loading">Loading options tape&hellip;</div>`;
+  if(!tape.names||!tape.names.length)
+    return `<div class="tape-card dim" style="padding:24px 15px">Needs a live Breeze session —
+      the chain read resumes when tokens are pasted.</div>`;
+  let html="";
+  for(const n of tape.names){
+    if(n.error){ html+=`<div class="tape-card dim">${n.code}: ${n.error}</div>`; continue; }
+    const lean = n.flow_pcr==null?"—":(n.flow_pcr>1.1?"PUTS":(n.flow_pcr<0.9?"CALLS":"EVEN"));
+    const leanCls = lean==="CALLS"?"pos":lean==="PUTS"?"neg":"dim";
+    html+=`<div class="tape-card">
+      <div class="tape-top"><span class="sym">${n.code}</span>
+        <span class="spot mono">${inr(n.spot,2)} <span class="dim" style="font-size:10px">${n.expiry||""}</span></span></div>
+      <div class="tape-grid">
+        <div class="tg"><div class="l">PCR (OI)</div><div class="v mono">${n.pcr!=null?n.pcr.toFixed(2):"—"}</div></div>
+        <div class="tg"><div class="l">Fresh OI lean</div><div class="v ${leanCls}">${lean}</div></div>
+        <div class="tg"><div class="l">Exp. move</div><div class="v mono">±${n.exp_move_pct!=null?n.exp_move_pct.toFixed(1):"—"}%</div></div>
+      </div>
+      <div class="walls">support <b class="mono">${inr(n.support)}</b> · resistance <b class="mono">${inr(n.resistance)}</b>
+        ${n.skew!=null?` · 5% put/call <b class="mono">${n.skew.toFixed(2)}x</b>`:""}</div>
+    </div>`;
+  }
+  return html+`<div style="padding:8px 15px;font-size:10px;color:var(--muted)">chain as of ${tape.ts} · refreshes every 10 min</div>`;
+}
+
+/* ---------- ticker ---------- */
+function buildTicker(accounts){
+  let items="";
+  for(const [acct,a] of Object.entries(accounts))
+    for(const e of a.equity){
+      if(e.day_pct==null) continue;
+      items+=`<span class="tk"><span class="sym">${e.code}</span><span class="acct">${(a.label||acct).slice(-4)}</span>
+        <span class="${cls(e.day_pct)}">${pct(e.day_pct)}</span></span>`;
+    }
+  document.getElementById("ticker").innerHTML = items+items; // doubled for seamless loop
+}
+
+/* ---------- render ---------- */
+let tapeData=null;
+function render(snap){
+  if(!snap) return;
+  const dot0=document.getElementById("mktdot"), lbl0=document.getElementById("mktlabel");
+  dot0.className="dot"+(snap.market_open?" live":"");
+  lbl0.textContent = snap.market_open?"MARKET OPEN":"MARKET CLOSED";
+  if(snap.session_dead && !snap.stale){
+    // dead session AND no saved book on disk (first ever run): explain plainly
+    const app=document.getElementById("app");
+    app.className="";
+    app.innerHTML=`<div class="tokenbar">
+      <h3>India session expired — paste fresh Breeze tokens</h3>
+      <p>The daily SEBI session tokens have lapsed and no earlier book is saved yet.
+      To connect: <b>quit the desk</b> (close its terminal window), double-click
+      <b>Start&nbsp;Desk.command</b>, and paste today's session token when prompted.
+      US, Global, Macro and Funds pages keep running without tokens.</p></div>
+    <section class="panel" style="margin-top:14px">
+      <div class="panel-h"><h2>Upcoming results · India</h2>
+        <span class="sub" id="einsub">board meetings with a Financial Results purpose (NSE) — runs without tokens</span></div>
+      <div class="erail" id="einrail">${einHtml||'<span class="dim" style="font-size:12px">Loading NSE calendar… first load takes ~15s.</span>'}</div>
+    </section>`;
+    document.getElementById("ticker").innerHTML="";
+    return;
+  }
+  const stale = snap.session_dead && snap.stale ? snap.stale : null;
+  const ribbon = !stale ? "" :
+    `<div class="staleribbon"><span class="sr-k">Session expired</span>
+      <span>broker book as of <b>${stale.broker_as_of}</b></span>
+      <span>· stock marks refreshed via Yahoo (delayed${stale.yahoo_marks<stale.eq_rows?`, ${stale.eq_rows-stale.yahoo_marks} BSE names frozen`:""})</span>
+      <span>· futures &amp; margin frozen at broker time</span>
+      <span class="dim">· to go live: quit desk → Start Desk.command → paste tokens</span></div>`;
+  const acc=snap.accounts;
+  const fam={eq:0,pnl:0,mtm:0,cash:0,free:0,blocked:0,limit:0};
+  for(const a of Object.values(acc)){
+    fam.eq+=a.totals.equity_value||0; fam.pnl+=a.totals.equity_pnl||0;
+    fam.mtm+=a.totals.fno_mtm||0; fam.cash+=a.totals.cash||0;
+    fam.free+=a.totals.free_limit||0; fam.blocked+=a.totals.blocked||0;
+    fam.limit+=a.totals.limit_total||0;
+  }
+  const famUtil = fam.limit?(fam.blocked/fam.limit*100):null;
+
+  const app=document.getElementById("app");
+  const firstPaint = app.className.includes("loading");
+  app.className = firstPaint ? "firstpaint" : "";
+  if(firstPaint) setTimeout(()=>app.classList.remove("firstpaint"), 1600);
+  app.innerHTML=`${ribbon}
+    <div class="grid family-strip">
+      ${tile("Family equity", rupee(fam.eq))}
+      ${tile("Equity P&L", signed(fam.pnl), cls(fam.pnl),
+        pct(fam.eq-fam.pnl ? fam.pnl/(fam.eq-fam.pnl)*100 : null))}
+      ${tile("F&O MTM", signed(fam.mtm), cls(fam.mtm))}
+      ${tile("Cash", rupee(fam.cash))}
+      ${tile("Free F&O limit", rupee(fam.free), "", "cash + collateral headroom")}
+      ${tile("Margin used", famUtil!=null?famUtil.toFixed(1)+"%":"—",
+        famUtil>75?"neg":famUtil>50?"":"", `blocked ${rupee(fam.blocked)}`, utilBar(famUtil))}
+    </div>
+    <div class="grid mid">
+      <section class="panel">
+        <div class="panel-h"><h2>F&amp;O positions</h2><span class="sub">futures and options, every account · click headers to sort</span></div>
+        ${futuresTable(acc, snap.sparks||{})}
+      </section>
+      <section class="panel">
+        <div class="panel-h"><h2>Options tape</h2><span class="sub">index positioning</span></div>
+        <div id="tape">${tapePanel(tapeData)}</div>
+      </section>
+    </div>
+    <div class="grid accounts">
+      ${Object.entries(acc).map(([n,a])=>accountPanel(n,a)).join("")}
+    </div>
+    <section class="panel" style="margin-top:14px">
+      <div class="panel-h"><h2>Upcoming results · India</h2>
+        <span class="sub" id="einsub">board meetings with a Financial Results purpose (NSE)</span></div>
+      <div class="erail" id="einrail">${einHtml||'<span class="dim" style="font-size:12px">Loading NSE calendar… first load takes ~15s.</span>'}</div>
+    </section>`;
+  buildTicker(acc);
+  applyFlashes(app);
+  bindSort(app);
+}
+
+/* ---------- polling ---------- */
+async function pull(){
+  try{
+    const r=await fetch("/api/snapshot"); if(!r.ok) throw 0;
+    lastSnap=await r.json(); render(lastSnap);
+    document.getElementById("stale").style.display="none";
+  }catch(e){ document.getElementById("stale").style.display="inline-block"; }
+}
+async function pullTape(){
+  try{
+    const r=await fetch("/api/tape"); if(!r.ok) throw 0;
+    tapeData=await r.json();
+    const el=document.getElementById("tape"); if(el) el.innerHTML=tapePanel(tapeData);
+  }catch(e){}
+}
+let einHtml=null;
+async function pullEarningsIn(){
+  try{
+    const r=await fetch("/api/earnings_in"); if(!r.ok) return;
+    const d=await r.json();
+    const today=new Date();
+    let html="";
+    for(const e of d.rows){
+      const dd=Math.max(0,Math.round((new Date(e.date)-today)/864e5));
+      const k=dd<=3?"soon":(dd<=10?"near":"far");
+      const dt=new Date(e.date+"T12:00:00");
+      const when=dt.toLocaleDateString("en-IN",{weekday:"short",month:"short",day:"numeric"});
+      html+=`<div class="ecard">
+        <span class="dd mono ${k}">${dd===0?"today":dd+"d"}</span>
+        <div class="tick"><a href="/t?symbol=${e.code}&region=in">${e.code}</a></div>
+        <div class="when">${when} · ${e.symbol}</div>
+        <div class="pur">${e.purpose||""}</div></div>`;
+    }
+    einHtml = html || '<span class="dim" style="font-size:12px">No results dates announced yet for the book. NSE announces most a week or two out.</span>';
+    const el=document.getElementById("einrail"); if(el) el.innerHTML=einHtml;
+    const sub=document.getElementById("einsub");
+    if(sub && d.skipped_bse) sub.textContent=`board meetings with a Financial Results purpose (NSE) · ${d.skipped_bse} BSE-only names have no feed`;
+  }catch(e){}
+}
+document.getElementById("refresh").onclick=()=>{pull();pullTape();};
+setInterval(()=>{
+  document.getElementById("clock").textContent=new Date().toLocaleTimeString("en-IN",{hour12:false});
+},1000);
+setInterval(pull,POLL_MS);
+setInterval(pullTape,600000);
+setInterval(pullEarningsIn,3600000);
+pull(); pullTape(); pullEarningsIn();
+</script>
+</body>
+</html>

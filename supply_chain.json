@@ -1,0 +1,66 @@
+{
+  "_comment": "Value-chain maps for the Chain tab. This is an EXAMPLE with the structure only; build your own by describing the chain to the agent (layers, what each layer buys and sells, the listed names under each, and a receipt grade per name: DISCLOSED in a filing, ON RECORD, or REPORTED). status is your own tag (OWNED / WATCH / CONTEXT). region us = FMP prices, in = broker prices.",
+  "chains": [
+    {
+      "id": "example-ai-power-us",
+      "title": "Example: AI power and buildout (US)",
+      "region": "us",
+      "as_of": "",
+      "source_note": "Example structure. Replace with your own research.",
+      "capex_notes": [],
+      "hunt": [],
+      "layers": [
+        {
+          "n": 1,
+          "name": "Power generation",
+          "sells": "power to data-centre campuses",
+          "presence": "",
+          "buys_from": "fuel, turbines",
+          "sells_to": "hyperscaler campuses (layer 2)",
+          "names": [
+            {
+              "code": "CEG",
+              "label": "Constellation Energy",
+              "status": "CONTEXT",
+              "receipt": "REPORTED",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "n": 2,
+          "name": "Electrical equipment",
+          "sells": "switchgear, cooling, transformers",
+          "presence": "",
+          "buys_from": "steel, copper",
+          "sells_to": "data-centre builders",
+          "names": [
+            {
+              "code": "ETN",
+              "label": "Eaton",
+              "status": "CONTEXT",
+              "receipt": "REPORTED",
+              "note": ""
+            },
+            {
+              "code": "VRT",
+              "label": "Vertiv",
+              "status": "CONTEXT",
+              "receipt": "REPORTED",
+              "note": ""
+            }
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "from": "Constellation",
+          "to": "a hyperscaler",
+          "what": "example: a long-term power purchase agreement",
+          "receipt": "REPORTED",
+          "source": ""
+        }
+      ]
+    }
+  ]
+}

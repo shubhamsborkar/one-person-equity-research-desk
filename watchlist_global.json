@@ -1,0 +1,57 @@
+{
+  "_comment": "Global watch - Yahoo symbols (0700.HK, MC.PA, TALABAT.AE ...). Edit in the Watch Global page.",
+  "names": [
+    {
+      "code": "^GSPC",
+      "source": "yahoo"
+    },
+    {
+      "code": "^IXIC",
+      "source": "yahoo"
+    },
+    {
+      "code": "^NSEI",
+      "source": "yahoo"
+    },
+    {
+      "code": "^N225",
+      "source": "yahoo"
+    },
+    {
+      "code": "^HSI",
+      "source": "yahoo"
+    },
+    {
+      "code": "^FTSE",
+      "source": "yahoo"
+    },
+    {
+      "code": "^GDAXI",
+      "source": "yahoo"
+    },
+    {
+      "code": "INR=X",
+      "source": "yahoo"
+    },
+    {
+      "code": "EURUSD=X",
+      "source": "yahoo"
+    },
+    {
+      "code": "USDJPY=X",
+      "source": "yahoo"
+    },
+    {
+      "code": "GC=F",
+      "source": "yahoo"
+    },
+    {
+      "code": "CL=F",
+      "source": "yahoo"
+    },
+    {
+      "code": "BTC-USD",
+      "source": "yahoo"
+    }
+  ]
+}

@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Short Interest — Research Desk</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23ED5A24'/><text x='16' y='22' font-size='15' font-weight='800' font-family='Arial' fill='white' text-anchor='middle'>FD</text></svg>">
+<link rel="stylesheet" href="/assets/desk.css">
+<script src="/assets/desk.js" defer></script>
+<style>
+body{padding-bottom:50px}
+main{max-width:1420px;margin:0 auto;padding:20px 22px}
+.sub{color:var(--muted);font-size:12px;margin-bottom:18px;line-height:1.55;max-width:1050px}
+.loading{padding:60px;text-align:center;color:var(--muted)}
+.pos{color:var(--pos)} .neg{color:var(--neg)} .dim{color:var(--muted)}
+.wrap{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  overflow:auto;max-height:calc(100vh - 210px);min-height:320px}
+.wrap::-webkit-scrollbar{width:9px;height:9px}
+.wrap::-webkit-scrollbar-thumb{background:var(--line2);border-radius:5px}
+table{border-collapse:collapse;font-size:12.5px;width:100%}
+th,td{padding:8px 12px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--muted);font-size:9.5px;text-transform:uppercase;letter-spacing:.08em;font-weight:600;
+  position:sticky;top:0;background:var(--panel);z-index:2}
+th .u{display:block;font-size:8.5px;color:var(--muted);letter-spacing:.05em;text-transform:none;font-weight:500}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--panel2)}
+tr.held td{background:rgba(237,90,36,.05)}
+td.sym{font-weight:800}
+td.sym a{color:inherit;text-decoration:none}
+td.sym a:hover{color:var(--accent)}
+.hd{font-size:9px;font-weight:800;border-radius:4px;padding:1.5px 6px;margin-left:7px;
+  background:rgba(237,90,36,.16);color:var(--accent);letter-spacing:.05em;vertical-align:1px}
+.sep{border-left:1px solid var(--line2)}
+footer{max-width:1420px;margin:26px auto 0;padding:14px 22px;border-top:1px solid var(--line);
+  color:var(--muted);font-size:11px;line-height:1.6}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">RESEARCH <span>DESK</span></div>
+  <nav></nav>
+  <div class="right"><span id="asof"></span></div>
+</header>
+<main>
+  <div class="sub">Two different FINRA datasets, kept apart on purpose.
+  <b style="color:var(--ink2)">Short INTEREST</b> (left block) is the bi-monthly consolidated
+  settlement report — actual open short positions, settled <b class="mono" id="settle"></b>, change
+  vs the prior settlement, days-to-cover at recent volume, and the position against FMP's float
+  count. <b style="color:var(--ink2)">Short VOLUME ratio</b> (right block) is the share of each
+  DAY'S off-exchange volume marked short — tape flow, <b style="color:var(--ink2)">not</b> open
+  positions; ~40-50% is normal market-making, the signal is the change against a name's own average.</div>
+  <div id="body"><div class="loading">Reading FINRA files…</div></div>
+</main>
+<footer>Short interest settles twice a month and publishes ~9 days later, so the settlement shown
+may trail today's positioning. Days-to-cover = short position / average daily volume. Daily short
+volume covers off-exchange (TRF) trades only — exchange-floor volume is not in the file, another
+reason the two numbers must not be mixed. OTC names without FINRA equity data are omitted.</footer>
+
+<script>
+"use strict";
+const kfmt=v=>v==null?"—":v>=1e9?(v/1e9).toFixed(1)+"B":v>=1e6?(v/1e6).toFixed(1)+"M":v>=1e3?(v/1e3).toFixed(0)+"k":""+Math.round(v);
+let SPID=0;
+function spark(series,w=120,h=30,col){
+  if(!series||series.length<2)return '<span class="dim">—</span>';
+  const vals=series.map(p=>p[1]);
+  const min=Math.min(...vals),max=Math.max(...vals),span=(max-min)||1;
+  const xy=vals.map((v,i)=>[i/(vals.length-1)*w, h-3-((v-min)/span*(h-7))]);
+  const pts=xy.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ");
+  const c=col||(vals[vals.length-1]>=vals[0]?"var(--neg)":"var(--pos)"); /* shorts UP = red */
+  const id="ss"+(++SPID);
+  const [lx,ly]=xy[xy.length-1];
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+    <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${c}" stop-opacity="0.30"/>
+      <stop offset="100%" stop-color="${c}" stop-opacity="0.02"/></linearGradient></defs>
+    <polygon points="0,${h} ${pts} ${w},${h}" fill="url(#${id})"/>
+    <polyline points="${pts}" fill="none" stroke="${c}" stroke-width="1.5"
+      vector-effect="non-scaling-stroke"/>
+    <circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="2" fill="${c}"/></svg>`;
+}
+async function load(){
+  const r=await fetch("/api/short"); const d=await r.json();
+  document.getElementById("asof").textContent="as of "+d.ts;
+  document.getElementById("settle").textContent=d.settlement||"—";
+  if(!d.names||!d.names.length){
+    document.getElementById("body").innerHTML='<div class="loading">FINRA unreachable — retry shortly.</div>';return;
+  }
+  let h=`<div class="wrap"><table><thead><tr>
+    <th>Name</th>
+    <th>Short int<span class="u">shares · ${d.settlement||""}</span></th>
+    <th>Δ vs prior<span class="u">${d.prev_settlement||""}</span></th>
+    <th>Days to cover<span class="u">SI / avg daily vol</span></th>
+    <th>% of float<span class="u">FMP float</span></th>
+    <th>SI trend<span class="u">${(d.names[0].si_trend||[]).length} settlements</span></th>
+    <th class="sep">Short vol ratio<span class="u">latest day</span></th>
+    <th>20d avg<span class="u">daily files</span></th>
+    <th>Daily trend<span class="u">${d.sv_days} sessions</span></th>
+  </tr></thead><tbody>`;
+  for(const n of d.names){
+    const chg=n.si_chg_pct;
+    const sif=n.si_pct_float;
+    const dev=(n.srv_latest!=null&&n.srv_avg!=null)?n.srv_latest-n.srv_avg:null;
+    h+=`<tr class="${n.held?"held":""}">
+      <td class="sym"><a href="/t?symbol=${n.symbol}">${n.symbol}</a>${n.held?'<span class="hd">HELD</span>':""}</td>
+      <td class="mono">${kfmt(n.si)}</td>
+      <td class="mono ${chg==null?"dim":chg>0?"neg":"pos"}">${chg==null?"—":(chg>0?"+":"")+chg.toFixed(1)+"%"}</td>
+      <td class="mono ${n.dtc!=null&&n.dtc>=8?"neg":""}">${n.dtc==null?"—":n.dtc.toFixed(1)}</td>
+      <td class="mono ${sif!=null&&sif>=10?"neg":sif!=null&&sif>=5?"":"dim"}" style="${sif!=null&&sif>=10?"font-weight:700":""}">${sif==null?"—":sif.toFixed(1)+"%"}</td>
+      <td>${spark(n.si_trend)}</td>
+      <td class="mono sep">${n.srv_latest==null?"—":n.srv_latest.toFixed(0)+"%"}</td>
+      <td class="mono dim">${n.srv_avg==null?"—":n.srv_avg.toFixed(0)+"%"}${dev!=null&&Math.abs(dev)>=8?` <b class="${dev>0?"neg":"pos"}">${dev>0?"▲":"▼"}</b>`:""}</td>
+      <td>${spark(n.srv_series,110,26,"var(--cyan)")}</td>
+    </tr>`;
+  }
+  h+="</tbody></table></div>";
+  document.getElementById("body").innerHTML=h;
+}
+load();
+</script>
+</body>
+</html>

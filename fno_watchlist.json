@@ -1,0 +1,13 @@
+{
+  "_comment": "F&O names for the options tape. Indices and large caps (small caps have no options). stock_code is the ICICI code; exchange_code is NFO.",
+  "names": [
+    {
+      "stock_code": "NIFTY",
+      "exchange_code": "NFO"
+    },
+    {
+      "stock_code": "CNXBAN",
+      "exchange_code": "NFO"
+    }
+  ]
+}

@@ -1,0 +1,170 @@
+/* Research Desk — shared chrome. One palette, one sidebar, one command palette.
+   Page-specific styles stay in each page's inline <style>, which loads AFTER
+   this file, so a page that needs to deviate simply overrides. */
+:root{
+  --bg:#0a0d12; --panel:#12161d; --panel2:#161b24; --line:#232a35; --line2:#2c3542;
+  --ink:#e8edf3; --ink2:#98a3b1; --muted:#5d6774;
+  --pos:#3ecf8e; --neg:#f16472; --accent:#ED5A24; --amber:#e8a13c; --cyan:#5bb8d4;
+  --grid:#1c222c;
+  --railw:212px; --railc:58px;
+}
+/* Two themes: graphite (default, above) and alpha — the publication's light
+   theme, brand orange on ivory paper. Same green/red semantics everywhere;
+   only the chrome shifts. Applied as data-theme on <html>, persisted. */
+html[data-theme="alpha"]{
+  --bg:#f7f2e9; --panel:#fffdf8; --panel2:#efe8d9; --line:#ddd2bd; --line2:#c9bca1;
+  --ink:#221c14; --ink2:#65594a; --muted:#8f8371;
+  --pos:#178a58; --neg:#c93a4c; --accent:#ED5A24; --amber:#a3720e; --cyan:#0f7ea6;
+  --grid:#e6ddc9;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scrollbar-color:var(--line2) transparent}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  padding-left:var(--railw);transition:padding-left .22s ease,background .25s}
+html[data-rail="min"] body{padding-left:var(--railc)}
+::selection{background:rgba(237,90,36,.35)}
+.mono{font-family:"SF Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-variant-numeric:tabular-nums}
+:focus-visible{outline:2px solid var(--accent);outline-offset:1px;border-radius:4px}
+
+/* header: brand + tab strip moved into the rail; header keeps the page's
+   own controls (clock, refresh, search box, status) as a slim toolbar. */
+header{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 92%,transparent);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);display:flex;align-items:center;gap:18px;
+  padding:10px 22px;min-height:44px}
+header .brand{display:none}
+header nav{display:none}
+.right{font-size:12px;color:var(--ink2);white-space:nowrap;margin-left:auto}
+
+/* ---------------- sidebar rail ---------------- */
+#siderail{position:fixed;top:0;left:0;bottom:0;width:var(--railw);z-index:30;
+  display:flex;flex-direction:column;overflow:visible;
+  background:linear-gradient(180deg,var(--panel) 0%,var(--bg) 90%);
+  border-right:1px solid var(--line);
+  transition:width .22s ease,background .25s}
+/* the always-visible expand/collapse chevron on the rail's edge */
+#railedge{position:absolute;top:19px;right:-13px;width:26px;height:26px;border-radius:50%;
+  background:var(--panel2);border:1px solid var(--line2);color:var(--ink2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1;
+  z-index:32;box-shadow:0 2px 10px rgba(0,0,0,.55);padding:0 0 2px}
+#railedge:hover{color:var(--accent);border-color:var(--accent)}
+html[data-rail="min"] #siderail{width:var(--railc)}
+#siderail .rbrand{display:flex;align-items:center;gap:10px;padding:13px 12px 12px;
+  text-decoration:none;color:var(--ink);border-bottom:1px solid var(--line);flex:0 0 auto}
+#siderail .rlogo{flex:0 0 auto;width:30px;height:30px;border-radius:8px;background:var(--accent);
+  color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;
+  letter-spacing:.02em;box-shadow:0 2px 10px color-mix(in srgb,var(--accent) 45%,transparent)}
+#siderail .rname{font-weight:800;font-size:13px;letter-spacing:.13em;white-space:nowrap}
+#siderail .rname b{color:var(--accent)}
+#siderail .rgroups{flex:1;overflow-y:auto;overflow-x:hidden;padding:8px 8px 10px;
+  scrollbar-width:none}
+#siderail .rgroups::-webkit-scrollbar{display:none}
+#siderail .rgt{font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);padding:12px 8px 5px;white-space:nowrap}
+#siderail a.rlink{display:flex;align-items:center;gap:10px;padding:7px 9px;margin:1px 0;
+  border-radius:8px;color:var(--ink2);text-decoration:none;font-size:12.5px;
+  letter-spacing:.03em;white-space:nowrap;border:1px solid transparent}
+#siderail a.rlink svg{flex:0 0 auto;width:16px;height:16px;stroke:currentColor;fill:none;
+  stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+#siderail a.rlink:hover{color:var(--ink);background:var(--panel2)}
+#siderail a.rlink.on{color:var(--ink);background:var(--panel2);border-color:var(--line2);
+  box-shadow:inset 2px 0 0 var(--accent)}
+#siderail a.rlink.on svg{stroke:var(--accent)}
+#siderail .rfoot{flex:0 0 auto;border-top:1px solid var(--line);padding:8px}
+#siderail .rfoot button{display:flex;align-items:center;gap:10px;width:100%;
+  background:none;border:none;color:var(--muted);font-size:11px;padding:6px 9px;
+  border-radius:7px;cursor:pointer;white-space:nowrap;letter-spacing:.04em;text-align:left}
+#siderail .rfoot button:hover{color:var(--ink);background:var(--panel2)}
+#siderail .rfoot .rk{flex:0 0 auto;width:16px;text-align:center;font-size:12px}
+/* collapsed: icons only */
+html[data-rail="min"] #siderail .rname,
+html[data-rail="min"] #siderail .rgt,
+html[data-rail="min"] #siderail a.rlink span,
+html[data-rail="min"] #siderail .rfoot button span:not(.rk){display:none}
+html[data-rail="min"] #siderail .rbrand{justify-content:center;padding:13px 0 12px}
+html[data-rail="min"] #siderail a.rlink{justify-content:center;padding:8px 0}
+html[data-rail="min"] #siderail .rfoot button{justify-content:center;padding:7px 0}
+
+/* market-status dot (Desk/Watch headers) */
+.status{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--ink2);
+  text-transform:uppercase;letter-spacing:.1em;white-space:nowrap}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.dot.live{background:var(--pos);box-shadow:0 0 8px var(--pos);animation:pulse 2s infinite}
+@keyframes pulse{50%{opacity:.45}}
+
+/* shared utility vocabulary */
+.pos{color:var(--pos)} .neg{color:var(--neg)} .dim{color:var(--muted)}
+.loading{padding:60px;text-align:center;color:var(--muted)}
+
+/* chart animation vocabulary (opt-in classes used by page chart code).
+   pathLength="1" on the mark lets one dasharray rule draw any line. */
+.drawline{stroke-dasharray:1;stroke-dashoffset:1;animation:drawline .6s ease forwards}
+@keyframes drawline{to{stroke-dashoffset:0}}
+.anim-fade{animation:vfade .55s ease both}
+@keyframes vfade{from{opacity:0}}
+.anim-rise{animation:vrise .4s ease both}
+@keyframes vrise{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+
+/* stale-session ribbon: one calm line, not a wall of amber */
+.staleribbon{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;
+  background:rgba(232,161,60,.07);border:1px solid rgba(232,161,60,.28);
+  border-radius:9px;padding:7px 14px;margin-bottom:14px;
+  font-size:11.5px;color:var(--ink2);line-height:1.5}
+.staleribbon b{color:var(--amber);font-weight:700}
+.staleribbon .sr-k{color:var(--amber);font-size:10px;font-weight:800;
+  letter-spacing:.08em;text-transform:uppercase}
+
+/* ---------------- command palette (Cmd/Ctrl-K) ---------------- */
+#cmdk{position:fixed;inset:0;z-index:80;display:none;
+  background:rgba(3,4,7,.55);backdrop-filter:blur(3px)}
+#cmdk.open{display:block}
+#cmdk .ck{width:min(560px,92vw);margin:12vh auto 0;background:var(--panel);
+  border:1px solid var(--line2);border-radius:14px;overflow:hidden;
+  box-shadow:0 24px 80px rgba(0,0,0,.65);animation:vrise .18s ease both}
+#cmdk input{width:100%;background:none;border:none;outline:none;color:var(--ink);
+  font-size:15px;padding:15px 18px;border-bottom:1px solid var(--line)}
+#cmdk input::placeholder{color:var(--muted)}
+#cmdk .ckr{max-height:46vh;overflow-y:auto;padding:6px 0}
+#cmdk .ckh{font-size:9.5px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--muted);padding:9px 18px 4px}
+#cmdk .cki{display:flex;align-items:baseline;gap:10px;padding:7px 18px;cursor:pointer;
+  font-size:13px;color:var(--ink2)}
+#cmdk .cki .nm{color:var(--ink);font-weight:600}
+#cmdk .cki .ex{margin-left:auto;font-size:10.5px;color:var(--muted);white-space:nowrap}
+#cmdk .cki.sel{background:var(--panel2);box-shadow:inset 2px 0 0 var(--accent)}
+#cmdk .ckempty{padding:18px;font-size:12px;color:var(--muted)}
+
+/* bottom alert bar (pages opt in with <div id="alertbar"></div>) */
+#alertbar{position:fixed;left:var(--railw);right:0;bottom:0;z-index:40;display:none;
+  transition:left .22s ease}
+html[data-rail="min"] #alertbar{left:var(--railc)}
+#alertbar .abar{display:flex;align-items:center;gap:12px;padding:7px 20px;
+  background:color-mix(in srgb,var(--bg) 96%,transparent);border-top:1px solid var(--line2);
+  backdrop-filter:blur(10px);cursor:pointer;font-size:11.5px;color:var(--ink2)}
+#alertbar .abar:hover{color:var(--ink)}
+#alertbar .acnt{background:var(--panel2);border:1px solid var(--line2);
+  border-radius:10px;padding:1px 9px;font-size:10.5px;font-weight:700;flex:0 0 auto}
+#alertbar .acnt.hot{border-color:rgba(241,100,114,.5);color:var(--neg)}
+#alertbar .alatest{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;
+  display:flex;align-items:center;gap:8px;min-width:0}
+#alertbar .alatest span.txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#alertbar .achev{color:var(--muted);font-size:10px;letter-spacing:.08em;
+  text-transform:uppercase;flex:0 0 auto}
+#alertbar .apanel{display:none;max-height:45vh;overflow-y:auto;
+  background:color-mix(in srgb,var(--bg) 97%,transparent);border-top:1px solid var(--line2);
+  backdrop-filter:blur(10px);padding:7px 0}
+#alertbar .apanel::-webkit-scrollbar{width:8px}
+#alertbar .apanel::-webkit-scrollbar-thumb{background:var(--line2);border-radius:4px}
+#alertbar .arow{display:flex;align-items:center;gap:10px;padding:5.5px 20px;font-size:12px}
+#alertbar .arow:hover{background:var(--panel2)}
+#alertbar .arow .txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#alertbar .atime{margin-left:auto;color:var(--muted);font-size:10.5px;flex:0 0 auto}
+#alertbar .adot{width:7px;height:7px;border-radius:50%;background:var(--muted);flex:0 0 auto}
+#alertbar .adot.hot{background:var(--neg)}
+#alertbar .adot.warn{background:var(--amber)}

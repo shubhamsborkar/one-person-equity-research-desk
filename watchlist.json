@@ -1,0 +1,20 @@
+{
+  "_comment": "Edit in the Watchlist page (search-as-you-type adds a name). Codes are the broker's stock codes.",
+  "names": [
+    {
+      "code": "RELIND",
+      "exch": "NSE",
+      "source": "breeze"
+    },
+    {
+      "code": "INFTEC",
+      "exch": "NSE",
+      "source": "breeze"
+    },
+    {
+      "code": "HDFBAN",
+      "exch": "NSE",
+      "source": "breeze"
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+breeze-connect>=1.0.62
+python-dotenv>=1.0.0
+certifi>=2024.2.2
+requests>=2.31
+pypdf>=4.0

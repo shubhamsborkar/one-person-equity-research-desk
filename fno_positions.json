@@ -1,0 +1,5 @@
+{
+  "_comment": "Open F&O positions the tool cannot see live (accounts other than the API key's). This only tracks; it places no orders. lot_sizes maps underlying -> shares per contract.",
+  "lot_sizes": {},
+  "manual_positions": []
+}

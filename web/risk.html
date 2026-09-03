@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Risk — Research Desk</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23ED5A24'/><text x='16' y='22' font-size='15' font-weight='800' font-family='Arial' fill='white' text-anchor='middle'>FD</text></svg>">
+<link rel="stylesheet" href="/assets/desk.css">
+<script src="/assets/desk.js" defer></script>
+<style>
+body{padding-bottom:50px}
+main{max-width:1420px;margin:0 auto;padding:20px 22px}
+.sub{color:var(--muted);font-size:12px;margin-bottom:18px;line-height:1.55}
+h2.grp{display:flex;align-items:baseline;gap:12px;font-size:11px;text-transform:uppercase;
+  letter-spacing:.14em;color:var(--ink2);margin:30px 0 12px;padding-bottom:7px;
+  border-bottom:1px solid var(--line)}
+h2.grp:first-of-type{margin-top:0}
+h2.grp .why{font-size:11px;letter-spacing:0;text-transform:none;color:var(--muted);font-weight:400}
+
+/* ---- book cards ---- */
+.bookgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:14px}
+.bk{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:16px 18px}
+.bk .ttl{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.bk .ttl .nm{font-size:15px;font-weight:800;letter-spacing:.04em}
+.bk .chip{font-size:9.5px;font-weight:800;border-radius:5px;padding:2.5px 8px;letter-spacing:.06em}
+.chip.bench{color:var(--ink2);background:var(--panel2);border:1px solid var(--line2)}
+.chip.lev-ok{color:var(--pos);background:rgba(62,207,142,.1);border:1px solid rgba(62,207,142,.3)}
+.chip.lev-warn{color:var(--amber);background:rgba(232,161,60,.1);border:1px solid rgba(232,161,60,.32)}
+.chip.lev-hot{color:var(--neg);background:rgba(241,100,114,.1);border:1px solid rgba(241,100,114,.35)}
+.bk .navline{font-size:11.5px;color:var(--ink2);margin-top:8px}
+.bk .navline b{color:var(--ink)}
+.statrow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.stat .l{font-size:9px;text-transform:uppercase;letter-spacing:.11em;color:var(--muted)}
+.stat .v{font-size:19px;font-weight:800;margin-top:3px}
+.stat .read{font-size:10px;color:var(--muted);margin-top:4px;line-height:1.45}
+.callout{margin-top:13px;border-radius:10px;padding:9px 13px;font-size:11.5px;line-height:1.5;
+  background:var(--panel2);border:1px solid var(--line2);color:var(--ink2)}
+.callout b{color:var(--ink)}
+.callout.danger{background:rgba(241,100,114,.07);border-color:rgba(241,100,114,.3)}
+.callout.danger .flag{color:var(--neg);font-weight:700}
+.marg{margin-top:13px;padding-top:12px;border-top:1px solid var(--line)}
+.marg .l{display:flex;justify-content:space-between;align-items:baseline;gap:14px;
+  font-size:9px;text-transform:uppercase;letter-spacing:.11em;color:var(--muted);margin-bottom:6px}
+.marg .l span:first-child{white-space:nowrap;flex:0 0 auto}
+.marg .l .st{letter-spacing:.02em;text-align:right;line-height:1.5}
+.bar{height:8px;background:var(--panel2);border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:4px}
+.marg .nums{display:flex;justify-content:space-between;font-size:11px;color:var(--ink2);margin-top:5px}
+.marg .nums b{font-size:12px}
+.sleeve{font-size:10.5px;color:var(--muted);margin-top:11px;padding-top:10px;
+  border-top:1px solid var(--line);line-height:1.5}
+.sleeve b{color:var(--ink2)}
+.secblock{margin-top:13px;padding-top:12px;border-top:1px solid var(--line)}
+.secblock .l{font-size:9px;text-transform:uppercase;letter-spacing:.11em;color:var(--muted);margin-bottom:7px}
+.secrow{display:flex;align-items:center;gap:9px;margin-top:4px}
+.secrow .sn{flex:0 0 128px;font-size:10.5px;color:var(--ink2);white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.secrow .sbar{flex:1;height:6px;background:var(--panel2);border-radius:3px;overflow:hidden}
+.secrow .sbar i{display:block;height:100%;background:var(--accent);opacity:.75;border-radius:3px}
+.secrow .sp{flex:0 0 52px;text-align:right;font-size:10.5px;color:var(--ink2)}
+.hot{color:var(--neg);font-weight:700}
+.warm{color:var(--amber);font-weight:700}
+
+/* ---- tables ---- */
+.wrap{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow-x:auto}
+table{border-collapse:collapse;font-size:12.5px;width:100%}
+th,td{padding:7px 12px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{color:var(--muted);font-size:9.5px;text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+th .u{display:block;font-size:8.5px;color:var(--muted);letter-spacing:.03em;text-transform:none;font-weight:500}
+td.num,th.num{text-align:right}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--panel2)}
+td a{color:inherit;text-decoration:none}
+td a:hover{color:var(--accent)}
+.kind{font-size:8.5px;font-weight:800;border-radius:3px;padding:1.5px 5px;letter-spacing:.05em;margin-left:5px}
+.kind.EQ{background:rgba(91,184,212,.13);color:#5bb8d4}
+.kind.FUT{background:rgba(237,90,36,.16);color:var(--accent)}
+.co{font-size:10px;color:var(--muted)}
+.wtcell{display:flex;align-items:center;gap:8px;justify-content:flex-end}
+.wtbar{width:52px;height:5px;background:var(--panel2);border-radius:3px;overflow:hidden;flex:0 0 auto}
+.wtbar i{display:block;height:100%;background:var(--accent);opacity:.8;border-radius:3px}
+
+/* ---- correlation matrices ---- */
+.mx{border-collapse:collapse}
+.mx th{font-size:9px;padding:4px 6px;border-bottom:none;color:var(--ink2)}
+.mx td{padding:0;border:1px solid var(--bg)}
+.mx .cell{width:42px;height:26px;display:flex;align-items:center;justify-content:center;
+  font-size:9.5px;font-family:"SF Mono",ui-monospace,Menlo,monospace}
+.mx .rowh{font-size:9px;color:var(--ink2);padding:0 8px 0 4px;text-align:right;font-weight:600}
+.mxwrap{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;
+  overflow-x:auto;display:inline-block;max-width:100%}
+.legend{display:flex;gap:16px;align-items:center;font-size:10.5px;color:var(--muted);
+  margin:8px 2px 0;flex-wrap:wrap}
+.legend .sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:5px}
+.loadingnote{padding:60px;text-align:center;color:var(--muted)}
+footer{max-width:1420px;margin:28px auto 0;padding:14px 22px;border-top:1px solid var(--line);
+  color:var(--muted);font-size:11px;line-height:1.6}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">RESEARCH <span>DESK</span></div>
+  <nav></nav>
+  <div class="right"><span id="asof"></span></div>
+</header>
+<main>
+  <div class="sub">How much each book moves, what moves it, and what a bad index day costs —
+  <span id="window"></span>. Futures count at full underlying value, so a leveraged book shows
+  positions worth more than the account. India books measure against <b>NIFTY</b>, the US book
+  against the <b>S&amp;P 500</b>.</div>
+  <div id="banner"></div>
+  <div id="body"><div class="loadingnote">Building risk view… first run of the day fetches price
+  histories and can take a minute.</div></div>
+</main>
+<footer id="foot">Broker marks, read-only. Margin cushion = total F&amp;O limit (cash + pledged
+shares) minus blocked margin; ICICI squares off only when the whole limit is gone — there are no
+per-position stops. The −5% line is a straight beta estimate, not a promise about a gap day.
+India and US close ~9½ hours apart, so IN↔US correlations understate the true linkage. Illiquid
+names are carried at their last print; a no-trade day counts as a 0% day, same as the NAV mark.</footer>
+
+<div id="alertbar"></div>
+
+<script>
+"use strict";
+const fmt=(cur,v,dp)=>{
+  if(v==null)return "—";
+  const loc=cur==="₹"?"en-IN":"en-US";
+  return cur+Math.abs(v).toLocaleString(loc,{maximumFractionDigits:dp==null?0:dp});
+};
+const sgn=(cur,v)=>v==null?"—":(v<0?"−":"+")+fmt(cur,v);
+const n2=v=>v==null?"—":v.toFixed(2);
+const pct=v=>v==null?"—":v.toFixed(1)+"%";
+function heat(v){
+  if(v==null)return "var(--panel2)";
+  const a=(0.06+0.6*Math.abs(v)).toFixed(2);
+  return v>=0?`rgba(241,100,114,${a})`:`rgba(62,207,142,${a})`;
+}
+function matrixHTML(labels,vals,short){
+  let h=`<table class="mx"><tr><th></th>${labels.map(l=>`<th title="${l}">${short?l.slice(0,7):l}</th>`).join("")}</tr>`;
+  for(let i=0;i<labels.length;i++){
+    h+=`<tr><td class="rowh">${labels[i]}</td>`;
+    for(let j=0;j<vals[i].length;j++){
+      const v=vals[i][j];
+      const txt=v==null?"·":(i===j?"1":v.toFixed(2).replace("0.","."));
+      h+=`<td><div class="cell" style="background:${heat(i===j?null:v)}" title="${labels[i]} × ${labels[j]}: ${v==null?"not enough overlap":v.toFixed(2)}">${txt}</div></td>`;
+    }
+    h+="</tr>";
+  }
+  return h+"</table>";
+}
+const legendHTML=`<div class="legend">
+  <span><span class="sw" style="background:rgba(241,100,114,.55)"></span>move together (same day, same direction)</span>
+  <span><span class="sw" style="background:rgba(62,207,142,.5)"></span>offset each other (one cushions the other)</span>
+  <span><span class="sw" style="background:var(--panel2)"></span>· = not enough overlapping days</span>
+  <span>1.00 = identical daily moves · 0 = unrelated</span></div>`;
+
+function sectorHTML(b){
+  if(!b.sectors||!b.sectors.length)return "";
+  const rows=b.sectors.concat(b.cash_pct!=null?[{name:"Cash",pct:b.cash_pct,cash:true}]:[]);
+  const maxP=Math.max(...rows.map(s=>Math.abs(s.pct||0)),1);
+  return `<div class="secblock"><div class="l">Where the book is concentrated
+    <span style="text-transform:none;letter-spacing:.02em">· net exposure by sector, share of the account</span></div>`+
+    rows.map(s=>{
+      const hot=!s.cash&&s.pct!=null&&Math.abs(s.pct)>=40;
+      const w=Math.min(100,Math.abs(s.pct||0)/maxP*100).toFixed(0);
+      const style=s.cash?"background:var(--cyan)":hot?"background:var(--amber)":"";
+      return `<div class="secrow"><span class="sn" title="${s.name}">${s.name}</span>
+        <span class="sbar"><i style="width:${w}%;${style}"></i></span>
+        <span class="mono sp ${hot?"warm":""}">${s.pct==null?"—":(s.pct<0?"−":"")+Math.abs(s.pct).toFixed(1)+"%"}</span></div>`;
+    }).join("")+`</div>`;
+}
+function levChip(l){
+  if(l==null) return "";
+  const k=l>1.5?"lev-hot":l>1.05?"lev-warn":"lev-ok";
+  const label=l>1.05?`${l.toFixed(2)}× LEVERED`:`${l.toFixed(2)}× · UNLEVERED`;
+  return `<span class="chip ${k}">${label}</span>`;
+}
+function bookCard(b){
+  const cur=b.currency;
+  const idx=b.bench==="^NSEI"?"NIFTY":"S&P 500";
+  const dayNorm=b.vol!=null?(b.vol/15.87):null;               // ann vol -> typical daily move
+  const varShare=b.corr!=null?Math.round(b.corr*b.corr*100):null;
+  const volCls=b.vol==null?"":b.vol>=50?"hot":b.vol>=30?"warm":"";
+  const stats=`<div class="statrow">
+    <div class="stat"><div class="l">Beta</div><div class="v mono">${n2(b.beta)}</div>
+      <div class="read">a −1% ${idx} day ≈ <b>${b.beta==null?"—":"−"+b.beta.toFixed(1)+"%"}</b> here</div></div>
+    <div class="stat"><div class="l">Volatility</div><div class="v mono ${volCls}">${pct(b.vol)}</div>
+      <div class="read">a normal day is ±${dayNorm==null?"—":dayNorm.toFixed(1)}%</div></div>
+    <div class="stat"><div class="l">Max drawdown</div><div class="v mono ${b.mdd!=null&&b.mdd<-25?"hot":""}">${pct(b.mdd)}</div>
+      <div class="read">worst fall from a peak, past year</div></div>
+    <div class="stat"><div class="l">Tracks index</div><div class="v mono">${n2(b.corr)}</div>
+      <div class="read">${varShare==null?"—":"~"+varShare+"% of daily movement follows "+idx}</div></div>
+  </div>`;
+  let stress="";
+  if(b.stress_5pct!=null){
+    const big=b.margin&&b.margin.fno_free!=null&&b.stress_5pct<0&&Math.abs(b.stress_5pct)>b.margin.fno_free*0.5;
+    stress=`<div class="callout ${big?"danger":""}">A <b>−5% ${idx} day</b> costs this book about
+      <b class="mono">${sgn(cur,b.stress_5pct)}</b> (beta estimate)${
+      big?` — <span class="flag">bigger than half the free margin (${fmt(cur,b.margin.fno_free)})</span>`:""}</div>`;
+  }
+  let marg="";
+  if(b.margin&&b.margin.util_pct!=null){
+    const u=b.margin.util_pct;
+    const col=u>=85?"var(--neg)":u>=60?"var(--amber)":"var(--pos)";
+    const state=u>=85?"THIN — a bad week can force a square-off":u>=60?"working, watch it":"comfortable";
+    marg=`<div class="marg">
+      <div class="l"><span>Cushion before forced square-off</span>
+        <span class="st" style="color:${col}">${state}</span></div>
+      <div class="bar"><i style="width:${Math.min(100,u).toFixed(1)}%;background:${col}"></i></div>
+      <div class="nums"><span class="mono">${u.toFixed(1)}% of the ${fmt(cur,b.margin.fno_limit_total)} limit is blocked</span>
+      <span class="mono"><b style="color:${col}">${fmt(cur,b.margin.fno_free)}</b> free</span></div></div>`;
+  }
+  const sleeve=`<div class="sleeve">Cash set aside, the invested money alone runs
+    β <b class="mono">${n2(b.inv_beta)}</b> · vol <b class="mono">${pct(b.inv_vol)}</b> ·
+    max DD <b class="mono">${pct(b.inv_mdd)}</b>${b.note?` — ${b.note}`:""}</div>`;
+  return `<div class="bk">
+    <div class="ttl"><span class="nm">${b.label}</span>${levChip(b.leverage)}
+      <span class="chip bench">vs ${idx}</span></div>
+    <div class="navline">Account <b class="mono">${fmt(cur,b.nav)}</b>
+      (cash ${fmt(cur,b.cash)}) · positions at work <b class="mono">${fmt(cur,b.gross)}</b></div>
+    ${stats}${stress}${marg}${sectorHTML(b)}${sleeve}
+  </div>`;
+}
+function posTable(b){
+  const cur=b.currency;
+  const maxW=Math.max(...b.positions.map(p=>Math.abs(p.weight||0)),1);
+  let h=`<div class="wrap"><table><thead><tr>
+    <th>Name</th>
+    <th class="num">Exposure<span class="u">futures at underlying value</span></th>
+    <th class="num">Share of account<span class="u">can top 100% with leverage</span></th>
+    <th class="num">Beta<span class="u">move per 1% index move</span></th>
+    <th class="num">Volatility<span class="u">annualised</span></th>
+    <th class="num">Max DD<span class="u">worst fall, 1Y</span></th>
+    <th class="num">Tracks index<span class="u">−1…1</span></th></tr></thead><tbody>`;
+  for(const p of b.positions){
+    const w=p.weight;
+    h+=`<tr><td><a href="/t?symbol=${p.code}${cur==="₹"?"&region=in":""}"><b>${p.code}</b></a>${(p.kinds||[]).map(k=>`<span class="kind ${k}">${k}</span>`).join("")}
+      <div class="co">${p.name||""}${p.low_sample?` · only ${p.n} trading days of history`:""}</div></td>
+      <td class="num mono">${p.exposure<0?"−":""}${fmt(cur,p.exposure)}</td>
+      <td class="num"><span class="wtcell"><span class="wtbar"><i style="width:${Math.min(100,Math.abs(w||0)/maxW*100).toFixed(0)}%"></i></span>
+        <span class="mono ${Math.abs(w)>=20?"warm":""}">${w==null?"—":w.toFixed(1)+"%"}</span></span></td>
+      <td class="num mono">${n2(p.beta)}</td>
+      <td class="num mono ${p.vol!=null&&p.vol>60?"warm":""}">${pct(p.vol)}</td>
+      <td class="num mono ${p.mdd!=null&&p.mdd<-30?"hot":""}">${pct(p.mdd)}</td>
+      <td class="num mono">${n2(p.corr)}</td></tr>`;
+  }
+  return h+"</tbody></table></div>";
+}
+async function load(){
+  const r=await fetch("/api/risk"); const d=await r.json();
+  document.getElementById("asof").textContent="as of "+d.ts;
+  document.getElementById("window").textContent="measured on "+(d.window||"the last year of daily closes");
+  if(d.stale)
+    document.getElementById("banner").innerHTML=
+      `<div class="staleribbon"><span class="sr-k">Session expired</span>
+       <span>India books priced from the broker record of <b>${d.stale.broker_as_of}</b></span>
+       <span>· margin numbers frozen at that moment · paste tokens to go live</span></div>`;
+  if(!d.books||!d.books.length){
+    document.getElementById("body").innerHTML='<div class="loadingnote">No books available (no Breeze session and no US book file).</div>';
+    return;
+  }
+  let h=`<h2 class="grp">The three books <span class="why">headline risk per account — the small print under each number says what it means</span></h2>
+    <div class="bookgrid">${d.books.map(bookCard).join("")}</div>`;
+  if(d.cross&&d.cross.labels.length>1)
+    h+=`<h2 class="grp">Do the books hedge each other? <span class="why">correlation of daily returns on overlapping dates</span></h2>
+      <div class="mxwrap">${matrixHTML(d.cross.labels,d.cross.vals,false)}</div>${legendHTML}`;
+  for(const b of d.books){
+    h+=`<h2 class="grp">${b.label} — what's inside (${b.positions.length} positions)
+      <span class="why">sorted by size; the grid below shows which names move together</span></h2>${posTable(b)}`;
+    if(b.matrix&&b.matrix.codes.length>1)
+      h+=`<div class="mxwrap" style="margin-top:12px">${matrixHTML(b.matrix.codes,b.matrix.vals,true)}</div>${legendHTML}`;
+  }
+  document.getElementById("body").innerHTML=h;
+}
+load();
+</script>
+</body>
+</html>

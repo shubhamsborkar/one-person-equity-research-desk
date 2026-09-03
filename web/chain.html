@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chain — Research Desk</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23ED5A24'/><text x='16' y='22' font-size='15' font-weight='800' font-family='Arial' fill='white' text-anchor='middle'>FD</text></svg>">
+<link rel="stylesheet" href="/assets/desk.css">
+<script src="/assets/desk.js" defer></script>
+<style>
+body{padding-bottom:50px}
+main{max-width:1180px;margin:0 auto;padding:20px 22px}
+.chaintabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.chaintabs button{background:var(--panel);color:var(--ink2);border:1px solid var(--line2);
+  border-radius:9px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer}
+.chaintabs button.on{color:var(--ink);border-color:var(--accent);background:var(--panel2)}
+.chaintabs button:hover{color:var(--accent)}
+h1{font-size:17px;margin-bottom:4px}
+.sub{color:var(--muted);font-size:12px;margin-bottom:18px;line-height:1.6;max-width:900px}
+.notes{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px}
+@media(max-width:900px){.notes{grid-template-columns:1fr}}
+.notebox{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 16px}
+.notebox h3{font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink2);margin-bottom:8px}
+.notebox li{font-size:12px;color:var(--ink2);line-height:1.65;margin-left:16px;margin-bottom:5px}
+.layer{display:flex;gap:0;margin-bottom:10px;background:var(--panel);
+  border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.lnum{flex:0 0 52px;display:flex;align-items:center;justify-content:center;
+  font-size:19px;font-weight:800;color:var(--muted);background:var(--panel2);
+  border-right:1px solid var(--line)}
+.lbody{flex:1;padding:12px 16px}
+.lhead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.lname{font-weight:800;font-size:14px}
+.lsells{font-size:11.5px;color:var(--muted)}
+.lpres{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;border-radius:4px;
+  padding:2px 7px;font-weight:700;margin-left:auto}
+.p-strong{background:rgba(62,207,142,.13);color:var(--pos)}
+.p-real{background:rgba(91,184,212,.13);color:var(--cyan)}
+.p-thin{background:rgba(232,161,60,.12);color:var(--amber)}
+.p-none{background:var(--panel2);color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.co{border-radius:9px;border:1px solid var(--line2);background:var(--panel2);
+  padding:7px 11px;max-width:520px}
+.co .top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.co a{color:var(--ink);font-weight:800;font-size:12.5px;text-decoration:none}
+.co a:hover{color:var(--accent)}
+.st{font-size:8.5px;font-weight:800;letter-spacing:.08em;border-radius:4px;padding:1.5px 6px}
+.st.OWNED{background:rgba(237,90,36,.15);color:var(--accent);border:1px solid rgba(237,90,36,.5)}
+.st.HOLD{background:rgba(91,184,212,.13);color:var(--cyan)}
+.st.WATCH{background:rgba(232,161,60,.13);color:var(--amber)}
+.st.CHECK{background:rgba(62,207,142,.12);color:var(--pos)}
+.st.OUT{background:var(--panel);color:var(--muted);text-decoration:line-through}
+.st.CONTEXT{background:var(--panel);color:var(--muted)}
+.rc.SEED{color:var(--amber);font-weight:700}
+.rc.BOOK{color:var(--cyan);font-weight:700}
+.rc{font-size:9px;color:var(--muted);letter-spacing:.05em}
+.px{font-size:11px;margin-left:auto}
+.pos{color:var(--pos)} .neg{color:var(--neg)} .dim{color:var(--muted)}
+.co .note{font-size:11px;color:var(--ink2);line-height:1.55;margin-top:5px}
+.emptyl{font-size:11.5px;color:var(--muted);margin-top:8px;font-style:italic}
+.flow{display:flex;flex-direction:column;gap:2px;margin-top:7px}
+.flow div{font-size:10.5px;color:var(--muted);line-height:1.5}
+.flow b{font-weight:800;font-size:9px;letter-spacing:.1em;margin-right:6px}
+.flow .up b{color:var(--amber)} .flow .dn b{color:var(--cyan)}
+.edges{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  padding:13px 16px;margin-top:16px}
+.edges h3{font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink2);margin-bottom:10px}
+.edge{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;padding:6px 0;
+  border-top:1px solid var(--line)}
+.edge:first-of-type{border-top:none}
+.edge .who{font-size:12px;font-weight:700;color:var(--ink);white-space:nowrap}
+.edge .arrow{color:var(--accent);font-weight:800}
+.edge .what{font-size:11.5px;color:var(--ink2);flex:1;min-width:200px}
+.edge .src{font-size:10px;color:var(--muted);white-space:nowrap}
+footer{max-width:1180px;margin:26px auto 0;padding:14px 22px;border-top:1px solid var(--line);
+  color:var(--muted);font-size:11px;line-height:1.6}
+.loading{padding:60px;text-align:center;color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">RESEARCH <span>DESK</span></div>
+  <nav></nav>
+  <div class="right"><span id="asof"></span></div>
+</header>
+<main id="main"><div class="loading">Loading chain…</div></main>
+<footer>Rendered from supply_chain.json, which is compiled by hand from the vault research
+(2026-08-25 AI value-chain map). Receipts: DISCLOSED = in a filing · ON RECORD = company said it
+anywhere · REPORTED = press only. Prices are live ICICI marks when a session is up. Research
+opinion lives in the vault; this page just keeps it priced and in view.</footer>
+<script>
+"use strict";
+let CHAINS=[], CUR=null, TS="", DEAD=false;
+function presCls(p){
+  if(p.includes("strong")||p.includes("held")) return "p-strong";
+  if(p.includes("real")||p.includes("watchlist")) return "p-real";
+  if(p.includes("thin")||p.includes("emerging")) return "p-thin";
+  return "p-none";
+}
+function pct(x){ return x==null?"":(x>=0?"+":"−")+Math.abs(x).toFixed(2)+"%"; }
+function render(){
+  const d=CHAINS.find(c=>c.id===CUR)||CHAINS[0];
+  if(!d) return;
+  const locale = d.region==="us"?"en-US":"en-IN";
+  const tabs=`<div class="chaintabs">${CHAINS.map(c=>
+    `<button class="${c.id===d.id?"on":""}" data-c="${c.id}">${c.title}</button>`).join("")}</div>`;
+  let html=tabs+`<h1>${d.title}</h1>
+    <div class="sub">${d.source_note||""} Compiled ${d.as_of}; prices live.</div>
+    <div class="notes">
+      <div class="notebox"><h3>The frame</h3><ul>${(d.capex_notes||[]).map(n=>`<li>${n}</li>`).join("")}</ul></div>
+      <div class="notebox"><h3>The hunt (next passes)</h3><ul>${(d.hunt||[]).map(n=>`<li>${n}</li>`).join("")}</ul></div>
+    </div>`;
+  for(const l of d.layers){
+    const chips = l.names.map(n=>{
+      const href = d.region==="us" ? `/t?symbol=${n.code}` : `/t?symbol=${n.code}&region=in`;
+      const px = n.ltp!=null
+        ? `<span class="px mono"><span style="color:var(--ink)">${d.region==="us"?"$":""}${n.ltp.toLocaleString(locale)}</span>
+           <span class="${n.day_pct>=0?"pos":"neg"}">${pct(n.day_pct)}</span></span>` : "";
+      return `<div class="co"><div class="top">
+          <a href="${href}">${n.label}</a>
+          <span class="st ${n.status}">${n.status}</span>
+          <span class="rc ${n.receipt}">${n.receipt}</span>${px}</div>
+        <div class="note">${n.note||""}</div></div>`;
+    }).join("");
+    const flow=(l.buys_from||l.sells_to)?`<div class="flow">
+        ${l.buys_from?`<div class="up"><b>▲ BUYS</b>${l.buys_from}</div>`:""}
+        ${l.sells_to?`<div class="dn"><b>▼ SELLS</b>${l.sells_to}</div>`:""}
+      </div>`:"";
+    html+=`<div class="layer"><div class="lnum mono">${l.n}</div><div class="lbody">
+      <div class="lhead"><span class="lname">${l.name}</span>
+        <span class="lsells">${l.sells}</span>
+        <span class="lpres ${presCls(l.presence)}">${l.presence}</span></div>
+      ${flow}
+      ${l.names.length?`<div class="chips">${chips}</div>`
+        :`<div class="emptyl">No listed exposure mapped${l.n<=4&&d.region==="in"?" — the deepest layers live in the US book's mandate":""}.</div>`}
+    </div></div>`;
+  }
+  if((d.edges||[]).length){
+    html+=`<div class="edges"><h3>Named edges — sourced supplier → customer links</h3>
+      ${d.edges.map(e=>`<div class="edge">
+        <span class="who">${e.from}</span><span class="arrow">→</span><span class="who">${e.to}</span>
+        <span class="what">${e.what}</span>
+        <span class="rc ${e.receipt}">${e.receipt}</span>
+        <span class="src">${e.source||""}</span>
+      </div>`).join("")}</div>`;
+  }
+  document.getElementById("main").innerHTML=html;
+  document.querySelectorAll(".chaintabs button").forEach(b=>b.onclick=()=>{
+    CUR=b.dataset.c;
+    history.replaceState(null,"","/chain?c="+CUR);
+    render();
+  });
+  document.getElementById("asof").textContent="prices as of "+TS+
+    (DEAD&&d.region==="in"?" · India session offline":"");
+}
+async function load(){
+  const r=await fetch("/api/chain"); const d=await r.json();
+  CHAINS=d.chains||[]; TS=d.ts; DEAD=d.session_dead;
+  CUR=new URLSearchParams(location.search).get("c")||(CHAINS[0]&&CHAINS[0].id);
+  render();
+}
+load();
+</script>
+</body>
+</html>

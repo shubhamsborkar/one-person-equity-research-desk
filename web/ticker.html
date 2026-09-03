@@ -1,0 +1,1035 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ticker — Research Desk</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23ED5A24'/><text x='16' y='22' font-size='15' font-weight='800' font-family='Arial' fill='white' text-anchor='middle'>FD</text></svg>">
+<link rel="stylesheet" href="/assets/desk.css">
+<script src="/assets/desk.js" defer></script>
+<style>
+body{padding-bottom:50px}
+a{color:var(--cyan);text-decoration:none} a:hover{text-decoration:underline}
+.right{display:flex;gap:10px;align-items:center;white-space:nowrap}
+input#go{background:var(--panel2);color:var(--ink);border:1px solid var(--line2);
+  border-radius:8px;padding:7px 12px;font-size:13px;width:150px;text-transform:uppercase;outline:none}
+input#go:focus{border-color:var(--accent)}
+
+main{max-width:1280px;margin:0 auto;padding:18px 22px}
+.hero{display:flex;align-items:baseline;gap:18px;flex-wrap:wrap;margin-bottom:6px}
+.hero .sym{font-size:26px;font-weight:800;letter-spacing:.03em}
+.hero .co{font-size:14px;color:var(--ink2)}
+.hero .badge{font-size:10px;color:var(--muted);border:1px solid var(--line2);
+  border-radius:5px;padding:2px 7px;letter-spacing:.06em}
+.hero .px{font-size:26px;font-weight:800}
+.hero .chg{font-size:15px;font-weight:700}
+.sub{color:var(--muted);font-size:12px;margin-bottom:16px}
+.pos{color:var(--pos)} .neg{color:var(--neg)} .dim{color:var(--muted)}
+
+.grid{display:grid;grid-template-columns:1fr 340px;gap:14px}
+@media(max-width:1000px){.grid{grid-template-columns:1fr}}
+.grid.solo{grid-template-columns:1fr 340px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:14px}
+.panel-h{padding:10px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.panel-h h2{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink2)}
+.panel-h .s{font-size:10.5px;color:var(--muted)}
+.panel-b{padding:13px 14px}
+
+/* chart controls */
+.fsbtn{background:var(--panel2);color:var(--ink2);border:1px solid var(--line2);
+  border-radius:7px;padding:4px 10px;font-size:13px;cursor:pointer}
+.fsbtn:hover{color:var(--accent);border-color:var(--accent)}
+.panel.fs{position:fixed;inset:14px;z-index:60;margin:0;overflow:auto;
+  box-shadow:0 20px 60px rgba(0,0,0,.7)}
+.seg{display:flex;gap:2px;background:var(--panel2);border:1px solid var(--line2);border-radius:7px;padding:2px}
+.seg button{background:none;border:none;color:var(--ink2);font-size:10.5px;padding:4px 9px;
+  border-radius:5px;cursor:pointer;letter-spacing:.05em}
+.seg button.on{background:var(--line2);color:var(--ink)}
+.seg button:hover{color:var(--accent)}
+#chartwrap{position:relative}
+#tip{position:absolute;pointer-events:none;display:none;background:var(--panel2);border:1px solid var(--line2);
+  border-radius:8px;padding:7px 10px;font-size:11px;z-index:5;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.5)}
+#tip .d{color:var(--muted);font-size:10px}
+#tip .v{font-weight:700;font-size:13px}
+.rangeret{font-size:12px;font-weight:700}
+
+.range{margin:10px 0 4px}
+.range .cap{font-size:9.5px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.range .track{height:5px;background:var(--line);border-radius:3px;position:relative}
+.range .mark{position:absolute;top:-3.5px;width:12px;height:12px;border-radius:50%;
+  background:var(--accent);border:2px solid var(--bg)}
+.range .lbl{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:5px}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:1px;background:var(--line)}
+.st{background:var(--panel);padding:9px 12px}
+.st .l{font-size:9.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.st .v{font-size:14px;font-weight:700;margin-top:3px}
+
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--muted);font-size:9.5px;text-transform:uppercase;letter-spacing:.07em;font-weight:600}
+tbody tr:last-child td{border-bottom:none}
+
+.news-item{padding:10px 14px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:baseline}
+.news-item:last-child{border-bottom:none}
+.news-item .t{color:var(--muted);font-size:10.5px;white-space:nowrap;min-width:72px}
+.news-item .pub{color:var(--muted);font-size:10.5px}
+.news-item a{color:var(--ink);font-size:12.5px}
+.news-item a:hover{color:var(--accent)}
+
+.an-row{display:flex;justify-content:space-between;font-size:12px;padding:5px 0}
+.an-row .k{color:var(--ink2)}
+.gbar{display:flex;height:9px;border-radius:5px;overflow:hidden;margin:8px 0 4px}
+.gbar i{display:block;height:100%}
+.desc{font-size:12px;color:var(--ink2);line-height:1.6}
+.loading{padding:60px;text-align:center;color:var(--muted)}
+.poscard{background:linear-gradient(135deg,#1a1410,#12161d);border:1px solid #3a2a1a}
+
+/* ---- financials panel ---- */
+.fin-tabs{margin:0;border-radius:0;border-left:none;border-right:none;border-top:none;
+  background:var(--panel);padding:4px 8px;flex-wrap:wrap}
+.finwrap{overflow-x:auto}
+.fintab td.grp,.fintab th.grp{text-align:left}
+.fintab td:first-child{color:var(--ink2)}
+.fintab tr.sect td{color:var(--ink);font-weight:700;font-size:10px;text-transform:uppercase;
+  letter-spacing:.1em;padding-top:13px;border-bottom:1px solid var(--line2)}
+.fintab td.tot,.fintab tr.tot td{font-weight:700;color:var(--ink)}
+.fin-note{font-size:10.5px;color:var(--muted);padding:9px 14px;line-height:1.5}
+.fintab tr.chgrow td{font-size:10px;font-style:italic;padding-top:0;padding-bottom:6px;color:var(--muted)}
+.fintab tr.chgrow td.pos{color:var(--pos);opacity:.85}
+.fintab tr.chgrow td.neg{color:var(--neg);opacity:.85}
+.fintab tr.chgrow td:first-child{font-weight:400}
+.fintab tr.haschg td{border-bottom:none;padding-bottom:2px}
+.peertab th{cursor:pointer;user-select:none}
+.peertab th:hover{color:var(--accent)}
+.dcfgrid{display:grid;grid-template-columns:1fr 300px;gap:16px}
+@media(max-width:900px){.dcfgrid{grid-template-columns:1fr}}
+.dcf-as{margin-bottom:11px}
+.dcf-as .l{display:flex;justify-content:space-between;font-size:11px;color:var(--ink2);margin-bottom:3px}
+.dcf-as .l b{color:var(--ink);font-size:12px}
+.dcf-as .hint{font-size:9.5px;color:var(--muted);margin-top:2px}
+.dcf-as input[type=range]{width:100%;accent-color:var(--accent);height:20px}
+.dcfout{background:var(--panel2);border:1px solid var(--line2);border-radius:10px;padding:14px;height:fit-content}
+.dcfout .big{font-size:24px;font-weight:800;margin:2px 0}
+.dcfout .vs{font-size:13px;font-weight:700;margin-bottom:10px}
+.dcfout .an-row{font-size:11.5px}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">RESEARCH <span>DESK</span></div>
+  <nav></nav>
+  <div class="right">
+    <input id="go" placeholder="Ticker… ⏎">
+  </div>
+</header>
+<main id="app"><div class="loading">Loading research view…</div></main>
+
+<script>
+"use strict";
+const P = new URLSearchParams(location.search);
+const SYM = (P.get("symbol")||"AAPL").toUpperCase();
+const REG = (P.get("region")||"us").toLowerCase();
+document.getElementById("go").addEventListener("keydown",e=>{
+  if(e.key==="Enter"&&e.target.value.trim())
+    location.href="/t?symbol="+e.target.value.trim().toUpperCase()+(REG==="in"?"&region=in":"");});
+
+const F=(x,dp=2)=>x==null||isNaN(x)?"—":Number(x).toFixed(dp).replace(/\B(?=(\d{3})+(?!\d))/g,",");
+const CUR = REG==="in" ? "₹" : "$";
+const money=(x,dp=2)=>x==null||isNaN(x)?"—":(x<0?"−"+CUR:CUR)+F(Math.abs(x),dp);
+const usd=money;
+const pct=(x,dp=2)=>x==null||isNaN(x)?"—":(x>=0?"+":"−")+Math.abs(x).toFixed(dp)+"%";
+const cls=x=>x==null?"dim":(x>=0?"pos":"neg");
+const big=x=>{if(x==null)return "—";if(Math.abs(x)>=1e12)return "$"+(x/1e12).toFixed(2)+"T";
+  if(Math.abs(x)>=1e9)return "$"+(x/1e9).toFixed(1)+"B";if(Math.abs(x)>=1e6)return "$"+(x/1e6).toFixed(0)+"M";return usd(x,0);};
+const xr=(x,dp=1)=>x==null||isNaN(x)?"—":Number(x).toFixed(dp)+"x";
+const pc=(x,dp=1)=>x==null||isNaN(x)?"—":(x*100).toFixed(dp)+"%";
+const ago=iso=>{if(!iso)return "";const s=(Date.now()-new Date(iso.replace(" ","T")+(iso.includes("Z")?"":"Z")))/1e3;
+  if(s<3600)return Math.max(1,Math.round(s/60))+"m";if(s<86400)return Math.round(s/3600)+"h";return Math.round(s/86400)+"d";};
+
+/* ============ CHART v3: native-pixel, fullscreen, intraday, premium ============ */
+let HIST=[];               // oldest -> newest {date, price, o,h,l,v}
+let INTRA={};              // {"1D":[...], "5D":[...]} (India only)
+let mode="candles", range="1Y", isFS=false;
+const DAYRANGES={"1M":22,"3M":66,"6M":132,"1Y":252,"3Y":756,"5Y":1260,"MAX":1e9};
+
+function rangeList(){
+  const base=Object.keys(DAYRANGES);
+  return (INTRA["1D"]?.length||INTRA["5D"]?.length) ? ["1D","5D",...base] : base;
+}
+function sliced(){
+  if(range==="1D"||range==="5D") return INTRA[range]||[];
+  const n=DAYRANGES[range]; return n>=HIST.length?HIST:HIST.slice(HIST.length-n);
+}
+/* Aggregate daily bars to weekly/monthly so CANDLES stays candles on long
+   ranges (the Koyfin/TradingView behaviour) instead of falling back to a line. */
+function resampleOHLC(pts,bucket){
+  const out=[]; let cur=null, key="";
+  for(const p of pts){
+    const k = bucket==="M" ? (p.date||"").slice(0,7)
+      : String(Math.floor((Date.parse(p.date)/864e5+4)/7));   // ISO-ish week bucket
+    if(k!==key){ if(cur)out.push(cur); key=k;
+      cur={date:p.date,o:p.o??p.price,h:p.h??p.price,l:p.l??p.price,price:p.price,v:p.v||0};
+    }else{
+      cur.h=Math.max(cur.h,p.h??p.price); cur.l=Math.min(cur.l,p.l??p.price);
+      cur.price=p.price; cur.v+=(p.v||0); cur.date=p.date;    // stamp = period end
+    }
+  }
+  if(cur)out.push(cur);
+  return out;
+}
+function seriesFor(pts,intra){
+  if(mode!=="drawdown") return pts.map(p=>({d:p.date,v:p.price}));
+  if(!intra&&HIST.length){
+    // running peak over FULL loaded history, not just the visible window —
+    // a 1Y view starts below zero when the peak is older than the window.
+    let peak=-Infinity; const dd={};
+    for(const p of HIST){peak=Math.max(peak,p.price); dd[p.date]=(p.price/peak-1)*100;}
+    return pts.map(p=>({d:p.date,v:dd[p.date]??0}));
+  }
+  let peak=-Infinity;
+  return pts.map(p=>{peak=Math.max(peak,p.price);return {d:p.date,v:(p.price/peak-1)*100};});
+}
+const MONS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function xLabel(d){
+  if(range==="1D") return d.slice(11,16);
+  if(range==="5D") return d.slice(8,10)+" · "+d.slice(11,16);
+  if(range==="1M"||range==="3M") return d.slice(5,10);
+  if(range==="6M"||range==="1Y") return MONS[+d.slice(5,7)-1]+" "+d.slice(2,4);
+  if(range==="3Y"||range==="5Y") return MONS[+d.slice(5,7)-1]+" "+d.slice(2,4);
+  return d.slice(0,4);
+}
+function niceStep(span){
+  const raw=span/4, mag=Math.pow(10,Math.floor(Math.log10(raw)));
+  for(const m of [1,2,2.5,5,10]) if(raw<=m*mag) return m*mag;
+  return 10*mag;
+}
+function sma(arr,n){
+  const out=new Array(arr.length).fill(null); let sum=0;
+  for(let i=0;i<arr.length;i++){
+    sum+=arr[i]; if(i>=n)sum-=arr[i-n];
+    if(i>=n-1)out[i]=sum/n;
+  }
+  return out;
+}
+function drawChart(){
+  const el=document.getElementById("chart");
+  if(!el)return;
+  let pts=sliced();
+  if(pts.length<2){el.innerHTML='<div class="dim" style="padding:30px">No data for this range.</div>';return;}
+  const intra=(range==="1D"||range==="5D");
+  let barNote="";
+  if(mode==="candles"&&!intra&&pts.length>320){
+    pts=resampleOHLC(pts,"W"); barNote="weekly bars";
+    if(pts.length>320){pts=resampleOHLC(sliced(),"M"); barNote="monthly bars";}
+  }
+  const S=seriesFor(pts,intra);
+  const showVol = mode!=="drawdown" && pts.some(p=>p.v);
+  // native pixels: crisp type at every width
+  const w=Math.max(560, el.clientWidth||860);
+  const h=isFS ? Math.max(380, window.innerHeight-230) : 300;
+  const L=8, R=62, T=16, B=28;
+  const vh=showVol?Math.round((h-T-B)*0.16):0;           // volume strip
+  const pT=T, pB=h-B-(showVol?vh+10:0);                  // price plot bottom
+  const vals=S.map(s=>s.v);
+  const useCandles = mode==="candles" && !pts.some(p=>p.o==null);
+  let min,max;
+  if(useCandles){
+    min=Math.min(...pts.map(p=>p.l??p.price)); max=Math.max(...pts.map(p=>p.h??p.price));
+  }else{min=Math.min(...vals);max=Math.max(...vals);}
+  if(mode==="drawdown"){max=0;}
+  const pad=(max-min)*0.06||1; min-=pad; if(mode!=="drawdown")max+=pad;
+  const plotW=w-L-R;
+  const X=i=>L+(i/(S.length-1))*plotW, Y=v=>pT+(pB-pT)*(1-(v-min)/(max-min));
+  const lastV=vals[vals.length-1];
+  const up = mode!=="drawdown" ? lastV>=vals[0] : lastV>=-0.001;
+  const col = mode==="drawdown" ? "var(--neg)" : (up?"var(--pos)":"var(--neg)");
+
+  // y grid
+  let gy=""; const step=niceStep(max-min);
+  for(let v=Math.ceil(min/step)*step; v<=max; v+=step){
+    const y=Y(v);
+    gy+=`<line x1="${L}" y1="${y}" x2="${w-R}" y2="${y}" stroke="var(--grid)" stroke-width="1"/>
+      <text x="${w-R+8}" y="${y+4}" fill="var(--muted)" font-size="11">${mode!=="drawdown"?F(v,step<1?2:step<10?1:0):v.toFixed(0)+"%"}</text>`;
+  }
+  // x ticks — consecutive duplicate labels dropped (no more "2024 2024")
+  let gx=""; const xstep=Math.max(1,Math.floor(S.length/(isFS?9:6)));
+  let lastLbl="";
+  for(let i=0;i<S.length;i+=xstep){
+    const x=X(i); if(x<44||x>w-R-30)continue;
+    const lbl=xLabel(S[i].d); if(lbl===lastLbl)continue; lastLbl=lbl;
+    gx+=`<text x="${x}" y="${h-8}" fill="var(--muted)" font-size="10.5" text-anchor="middle">${lbl}</text>`;
+  }
+
+  // marks: candles or line
+  let marks="";
+  const cw=plotW/S.length;
+  if(useCandles && cw>=2.2 && mode==="candles"){
+    // body fills ~72% of its slot (capped) so sparse ranges read as real
+    // candles, not skinny bars floating in space; wick scales with the body
+    const bw=Math.max(1.6,Math.min(30,cw*0.72));
+    const wickW=Math.max(1,Math.min(2.4,bw*0.12));
+    for(let i=0;i<pts.length;i++){
+      const p=pts[i]; if(p.o==null)continue;
+      const close=p.price;
+      const x=X(i), o=Y(p.o), c=Y(close),
+            hi=Y(p.h??Math.max(p.o,close)), lo=Y(p.l??Math.min(p.o,close));
+      const bull=close>=p.o, cc=bull?"var(--pos)":"var(--neg)";
+      const top=Math.min(o,c), bh=Math.max(1.2,Math.abs(o-c));
+      marks+=`<line x1="${x}" y1="${hi}" x2="${x}" y2="${lo}" stroke="${cc}" stroke-width="${wickW}" opacity="0.9"/>
+        <rect x="${x-bw/2}" y="${top}" width="${bw}" height="${bh}" fill="${cc}" fill-opacity="0.95" rx="${bw>6?1.5:0.5}"/>`;
+    }
+    marks=`<g class="anim-rise">${marks}</g>`;
+  }else{
+    const line=S.map((s,i)=>`${X(i).toFixed(1)},${Y(s.v).toFixed(1)}`).join(" ");
+    const base = mode==="drawdown" ? Y(0) : pB;
+    marks=`<polygon class="anim-fade" points="${X(0)},${base} ${line} ${X(S.length-1)},${base}" fill="url(#fade)"/>
+      <polyline class="drawline" pathLength="1" points="${line}" fill="none" stroke="${col}" stroke-width="2"
+        stroke-linejoin="round" stroke-linecap="round"/>`;
+  }
+
+  // moving averages — computed on DAILY closes, joined to visible bars by
+  // date (index-joining breaks once long ranges resample to weekly/monthly)
+  let mas="", legend="";
+  if(!intra && mode!=="drawdown" && HIST.length>50){
+    const closes=HIST.map(p=>p.price);
+    for(const [n,mcol,name] of [[50,"var(--amber)","MA50"],[200,"var(--cyan)","MA200"]]){
+      if(HIST.length<n+5)continue;
+      const m=sma(closes,n), byDate={};
+      for(let i=0;i<HIST.length;i++) if(m[i]!=null) byDate[HIST[i].date]=m[i];
+      const seg=[];
+      for(let i=0;i<pts.length;i++){
+        const v=byDate[pts[i].date];
+        if(v!=null&&v>=min&&v<=max)seg.push(`${X(i).toFixed(1)},${Y(v).toFixed(1)}`);
+      }
+      if(seg.length>2){
+        mas+=`<polyline points="${seg.join(" ")}" fill="none" stroke="${mcol}" stroke-width="1.3" opacity="0.75"/>`;
+        legend+=`<span style="color:${mcol};font-size:10px;margin-left:10px">— ${name}</span>`;
+      }
+    }
+  }
+
+  // volume strip
+  let vol="";
+  if(showVol){
+    const vmax=Math.max(...pts.map(p=>p.v||0))||1;
+    const vT=pB+8, vB2=h-B;
+    const vw=Math.max(1,Math.min(30,cw*0.72));
+    for(let i=0;i<pts.length;i++){
+      const p=pts[i]; if(!p.v)continue;
+      const vhgt=Math.max(1,(p.v/vmax)*(vB2-vT));
+      const cc=(p.o!=null&&p.price<p.o)?"var(--neg)":"var(--pos)";
+      vol+=`<rect x="${X(i)-vw/2}" y="${vB2-vhgt}" width="${vw}" height="${vhgt}" fill="${cc}" opacity="0.35"/>`;
+    }
+    vol=`<g class="anim-fade">${vol}<text x="${L+2}" y="${vT+9}" fill="var(--muted)" font-size="9" letter-spacing=".08em">VOLUME</text></g>`;
+  }
+
+  // last-value pill
+  const ly=Math.max(pT+9,Math.min(pB-9,Y(lastV)));
+  const pill=`<g class="anim-fade"><rect x="${w-R+2}" y="${ly-10}" width="${R-6}" height="20" rx="5" fill="${col}"/>
+    <text x="${w-R+2+(R-6)/2}" y="${ly+4}" fill="var(--bg)" font-size="11" font-weight="700" text-anchor="middle">${mode!=="drawdown"?F(lastV,lastV<100?2:lastV<10000?1:0):lastV.toFixed(1)+"%"}</text></g>`;
+
+  el.innerHTML=`<svg id="csvg" width="${w}" height="${h}" style="display:block">
+    <defs><linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${col}" stop-opacity="${mode==="drawdown"?0.02:0.20}"/>
+      <stop offset="100%" stop-color="${col}" stop-opacity="${mode==="drawdown"?0.25:0.01}"/>
+    </linearGradient></defs>
+    ${gy}${gx}${vol}${marks}${mas}${pill}
+    <line id="xh" x1="0" y1="${pT}" x2="0" y2="${h-B}" stroke="var(--ink2)" stroke-width="0.8" stroke-dasharray="3 3" style="display:none"/>
+    <circle id="xdot" r="4" fill="${col}" stroke="var(--bg)" stroke-width="1.6" style="display:none"/>
+  </svg>`;
+  const ret = mode!=="drawdown" ? (vals[vals.length-1]/vals[0]-1)*100 : null;
+  const maxdd = mode!=="drawdown" ? null : Math.min(...vals);
+  const lbl=document.getElementById("chartret");
+  if(lbl) lbl.innerHTML = (mode!=="drawdown"
+    ? `<span class="rangeret mono ${cls(ret)}">${pct(ret)}</span> <span class="dim">over ${range}${barNote?" · "+barNote:""}</span>`
+    : `<span class="rangeret mono neg">${maxdd.toFixed(1)}%</span> <span class="dim">deepest in ${range} · % below the running peak of all loaded history</span>`)+legend;
+
+  const svg=document.getElementById("csvg"), tip=document.getElementById("tip");
+  svg.addEventListener("mousemove",ev=>{
+    const r=svg.getBoundingClientRect();
+    let i=Math.round(((ev.clientX-r.left)-L)/plotW*(S.length-1));
+    i=Math.max(0,Math.min(S.length-1,i));
+    const x=X(i),y=Y(S[i].v);
+    const xh=document.getElementById("xh"),xd=document.getElementById("xdot");
+    xh.setAttribute("x1",x);xh.setAttribute("x2",x);xh.style.display="block";
+    xd.setAttribute("cx",x);xd.setAttribute("cy",y);xd.style.display="block";
+    tip.style.display="block";
+    const p=pts[i];
+    tip.innerHTML = mode==="drawdown"
+      ? `<div class="d">${S[i].d}</div><div class="v mono">${S[i].v.toFixed(1)}%</div>`
+      : (p.o!=null
+        ? `<div class="d">${S[i].d}</div><div class="v mono">${money(p.price)}</div>
+           <div class="d mono">O ${F(p.o)} · H ${F(p.h)} · L ${F(p.l)}</div>
+           ${p.v!=null?`<div class="d mono">Vol ${F(p.v,0)}</div>`:""}`
+        : `<div class="d">${S[i].d}</div><div class="v mono">${money(S[i].v)}</div>`);
+    const wrap=document.getElementById("chartwrap").getBoundingClientRect();
+    let tx=ev.clientX-wrap.left+14; if(tx>wrap.width-150)tx-=170;
+    tx=Math.max(4,tx);
+    let ty=ev.clientY-wrap.top-16;
+    ty=Math.max(4,Math.min(wrap.height-86,ty));   // keep the tip inside the panel
+    tip.style.left=tx+"px"; tip.style.top=ty+"px";
+  });
+  svg.addEventListener("mouseleave",()=>{tip.style.display="none";
+    document.getElementById("xh").style.display="none";
+    document.getElementById("xdot").style.display="none";});
+}
+function renderRangeSeg(){
+  const seg=document.getElementById("rangeseg");
+  if(seg) seg.innerHTML=rangeList().map(r=>`<button data-r="${r}" class="${r===range?"on":""}">${r}</button>`).join("");
+}
+function chartPanel(){
+  return `<section class="panel" id="chartpanel">
+    <div class="panel-h"><h2>Price</h2>
+      <span id="chartret"></span>
+      <span style="flex:1"></span>
+      <div class="seg" id="modeseg">
+        <button data-m="candles" class="on">CANDLES</button>
+        <button data-m="line">LINE</button>
+        <button data-m="drawdown">DD</button>
+      </div>
+      <div class="seg" id="rangeseg"></div>
+      <button class="fsbtn" id="fsbtn" title="Full screen">⛶</button>
+    </div>
+    <div class="panel-b" id="chartwrap"><div id="chart"></div><div id="tip"></div></div>
+  </section>`;
+}
+function bindChart(){
+  renderRangeSeg();
+  document.getElementById("rangeseg").addEventListener("click",e=>{
+    const b=e.target.closest("button"); if(!b)return;
+    range=b.dataset.r; renderRangeSeg(); drawChart();});
+  document.querySelectorAll("#modeseg button").forEach(b=>b.onclick=()=>{
+    mode=b.dataset.m;
+    document.querySelectorAll("#modeseg button").forEach(x=>x.classList.toggle("on",x===b));
+    drawChart();});
+  document.getElementById("fsbtn").onclick=toggleFS;
+  window.addEventListener("resize",()=>drawChart());
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&isFS)toggleFS();});
+  drawChart();
+}
+function toggleFS(){
+  isFS=!isFS;
+  document.getElementById("chartpanel").classList.toggle("fs",isFS);
+  document.body.style.overflow=isFS?"hidden":"";
+  document.getElementById("fsbtn").textContent=isFS?"✕":"⛶";
+  drawChart();
+}
+
+function rangeBar(cap,lo,hi,px,loD,hiD){
+  if(lo==null||hi==null||hi<=lo)return "";
+  const posn=Math.min(100,Math.max(0,(px-lo)/(hi-lo)*100));
+  return `<div class="range"><div class="cap">${cap}</div>
+    <div class="track"><span class="mark" style="left:calc(${posn.toFixed(1)}% - 6px)"></span></div>
+    <div class="lbl"><span>${F(lo)}${loD?" · "+loD:""}</span><span>${F(hi)}${hiD?" · "+hiD:""}</span></div></div>`;
+}
+function st(l,v,k){return `<div class="st"><div class="l">${l}</div><div class="v mono ${k||""}">${v}</div></div>`;}
+
+/* ================= LOADERS ================= */
+async function load(){
+  const r=await fetch("/api/ticker?symbol="+SYM+"&region="+REG);
+  const d=await r.json();
+  const app=document.getElementById("app");
+  if(d.error){app.innerHTML=`<div class="loading">${d.error}</div>`;return;}
+  document.title=SYM+" — Research Desk";
+  HIST=[...(d.history||[])].reverse();
+  INTRA=d.intraday||{};
+  if(REG==="in") renderIN(d,app); else renderUS(d,app);
+  bindChart();
+}
+
+function renderIN(d,app){
+  const q=d.quote, m=d.meta||{};
+  const px=q.ltp;
+  // position cards — labelled by account number; futures detected by shape
+  let posCards="";
+  for(const [k,h] of Object.entries(d.held_in||{})){
+    const isFut = ("expiry" in h) && ("side" in h);
+    if(isFut){
+      const sign=(h.side||"Buy").toLowerCase()==="buy"?1:-1;
+      const pnl=(h.ltp!=null&&h.avg!=null&&h.qty!=null)?(h.ltp-h.avg)*h.qty*sign:null;
+      posCards+=`<section class="panel poscard"><div class="panel-h"><h2>${k}</h2><span class="s">${h.expiry||""}</span></div>
+        <div class="panel-b">
+        <div class="an-row"><span class="k">${h.side} qty</span><span class="mono">${F(h.qty,0)}</span></div>
+        <div class="an-row"><span class="k">Avg</span><span class="mono">${money(h.avg)}</span></div>
+        <div class="an-row"><span class="k">Mark</span><span class="mono">${money(h.ltp)}</span></div>
+        <div class="an-row"><span class="k">MTM</span><span class="mono ${cls(pnl)}">${pnl==null?"—":(pnl>=0?"+":"")+money(pnl,0)}</span></div>
+        </div></section>`;
+    }else{
+      const val=px*h.qty, cost=h.avg*h.qty, pnl=val-cost;
+      posCards+=`<section class="panel poscard"><div class="panel-h"><h2>Held — ${k}</h2></div>
+        <div class="panel-b">
+        <div class="an-row"><span class="k">Qty</span><span class="mono">${F(h.qty,0)}</span></div>
+        <div class="an-row"><span class="k">Avg cost</span><span class="mono">${money(h.avg)}</span></div>
+        <div class="an-row"><span class="k">Value</span><span class="mono">${money(val,0)}</span></div>
+        <div class="an-row"><span class="k">Open P&L</span><span class="mono ${cls(pnl)}">${(pnl>=0?"+":"")+money(pnl,0)} (${pct(pnl/cost*100)})</span></div>
+        </div></section>`;
+    }
+  }
+  // futures book: live bid/ask/OI on the contract itself
+  let futBook="";
+  for(const fq of (d.futures_quotes||[])){
+    futBook+=`<section class="panel"><div class="panel-h"><h2>Futures book</h2><span class="s">${fq.expiry}</span></div>
+      <div class="panel-b">
+      <div class="an-row"><span class="k">LTP</span><span class="mono" style="font-weight:700">${money(fq.ltp)}</span></div>
+      <div class="an-row"><span class="k">Bid</span><span class="mono">${money(fq.bid)} × ${F(fq.bid_qty,0)}</span></div>
+      <div class="an-row"><span class="k">Ask</span><span class="mono">${money(fq.offer)} × ${F(fq.offer_qty,0)}</span></div>
+      <div class="an-row"><span class="k">Open interest</span><span class="mono">${F(fq.oi,0)}</span></div>
+      <div class="an-row"><span class="k">Volume</span><span class="mono">${F(fq.ttq,0)}</span></div>
+      <div class="an-row"><span class="k">Prev close</span><span class="mono">${money(fq.prev)}</span></div>
+      </div></section>`;
+  }
+  posCards += futBook;
+  app.innerHTML=`
+  <div class="hero">
+    <span class="sym">${SYM}</span><span class="co">${m.company||""}</span>
+    <span class="badge">${q.exch||m.exch||""}</span>
+    ${m.nse_symbol?`<span class="badge">NSE: ${m.nse_symbol}</span>`:""}
+    <span style="flex:1"></span>
+    <span class="px mono">${money(px)}</span>
+    <span class="chg mono ${cls(q.day_pct)}">${pct(q.day_pct)}</span>
+  </div>
+  <div class="sub">${m.isin?"ISIN "+m.isin+" · ":""}bid ${money(q.bid)} × ${F(q.bid_qty,0)} · offer ${money(q.offer)} × ${F(q.offer_qty,0)} · vol ${F(q.ttq,0)} · as of ${d.ts}</div>
+  <div class="grid">
+    <div>
+      ${chartPanel()}
+      <section class="panel">
+        <div class="panel-h"><h2>Session</h2></div>
+        <div class="stats">
+          ${st("Open",money(q.open))}${st("High",money(q.high))}${st("Low",money(q.low))}
+          ${st("Prev close",money(q.prev))}${st("Volume",F(q.ttq,0))}
+          ${st("Day move",pct(q.day_pct),cls(q.day_pct))}
+        </div>
+      </section>
+      <section class="panel"><div class="panel-h"><h2>Quarterly results</h2><span class="s">NSE integrated filings · ₹ Cr</span></div>
+        <div class="panel-b" id="if-q"><div class="desc">Loading filings…</div></div>
+      </section>
+      <section class="panel"><div class="panel-h"><h2>Corporate filings</h2><span class="s">Reg 30, last 90 days</span></div>
+        <div class="panel-b" id="if-ann"><div class="desc">Loading…</div></div>
+      </section>
+    </div>
+    <div>
+      ${posCards}
+      <section class="panel">
+        <div class="panel-h"><h2>Where it trades</h2><span class="s">security master</span></div>
+        <div class="panel-b">
+          ${rangeBar("52-WEEK RANGE",m.w52l??q.low,m.w52h??q.high,px)}
+          ${rangeBar("LIFETIME RANGE",m.ltl,m.lth,px,m.low_date?.slice(0,10),m.high_date?.slice(0,10))}
+        </div>
+      </section>
+      <section class="panel"><div class="panel-h"><h2>Shareholding</h2><span class="s">NSE</span></div>
+        <div class="panel-b" id="if-sh"><div class="desc">Loading…</div></div>
+      </section>
+    </div>
+  </div>`;
+  loadInfund();
+}
+
+async function loadInfund(){
+  let d;
+  try{ const r=await fetch("/api/infund?symbol="+SYM); d=await r.json(); }
+  catch(e){ d={error:"fetch failed"}; }
+  const qEl=document.getElementById("if-q"), aEl=document.getElementById("if-ann"), sEl=document.getElementById("if-sh");
+  if(!qEl) return;
+  if(d.error){
+    qEl.innerHTML=aEl.innerHTML=sEl.innerHTML=`<div class="desc">${d.error}</div>`;
+    return;
+  }
+  const qs=d.quarters||[];
+  if(qs.length){
+    const MON={JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
+    const flavor=qs[0].flavor||"", qlabel=s=>{
+      const p=s.split("-"); const m=MON[(p[1]||"").toUpperCase()], y=+p[2];
+      if(m==null||!y) return s;
+      const q=m>=3?Math.floor((m-3)/3)+1:4, fy=(m>=3?y+1:y)%100;
+      return "Q"+q+" FY"+fy;};
+    qEl.innerHTML=`<table class="mini"><thead><tr><th>Quarter</th><th>Revenue</th><th>PBT</th><th>PAT</th><th>EPS</th></tr></thead><tbody>`+
+      qs.map(x=>{
+        const yoy=qs.find(o=>o!==x&&o.quarter_ended.slice(0,6)===x.quarter_ended.slice(0,6)&&+o.quarter_ended.slice(-4)===+x.quarter_ended.slice(-4)-1);
+        const g=(yoy&&yoy.revenue&&x.revenue!=null)?((x.revenue-yoy.revenue)/Math.abs(yoy.revenue)*100):null;
+        return `<tr><td>${qlabel(x.quarter_ended)}<span class="s"> ${x.quarter_ended}</span></td>
+          <td class="mono">${x.revenue==null?"—":F(x.revenue,0)}${g==null?"":` <span class="${g>=0?"pos":"neg"}" style="font-size:10px">${pct(g)}</span>`}</td>
+          <td class="mono ${cls(x.pbt)}">${x.pbt==null?"—":F(x.pbt,0)}</td>
+          <td class="mono ${cls(x.pat)}">${x.pat==null?"—":F(x.pat,0)}</td>
+          <td class="mono ${cls(x.eps)}">${x.eps==null?"—":x.eps}</td></tr>`;}).join("")+
+      `</tbody></table><div class="desc" style="margin-top:6px">${flavor}, as filed with NSE (revenue % is YoY same quarter, when in range). Rounding read from each filing.</div>`;
+  }else qEl.innerHTML=`<div class="desc">No integrated filings found (feed covers results filed after Dec 2024).</div>`;
+  const sh=d.shareholding||[];
+  sEl.innerHTML = sh.length
+    ? `<table class="mini"><thead><tr><th>As of</th><th>Promoter</th><th>Public</th></tr></thead><tbody>`+
+      sh.map(x=>`<tr><td>${x.date}</td><td class="mono">${x.promoter==null?"—":x.promoter.toFixed(2)+"%"}</td><td class="mono">${x.public==null?"—":x.public.toFixed(2)+"%"}</td></tr>`).join("")+
+      `</tbody></table>`
+    : `<div class="desc">No shareholding data.</div>`;
+  const ann=d.announcements||[];
+  aEl.innerHTML = ann.length
+    ? ann.map(x=>`<div class="an-row" style="align-items:baseline;gap:10px">
+        <span class="s mono" style="white-space:nowrap">${x.date}</span>
+        <span style="flex:1;font-size:12px">${x.pdf?`<a href="${x.pdf}" target="_blank" style="color:var(--ink);text-decoration:none">${x.desc||"Filing"}</a>`:(x.desc||"Filing")}
+          <span class="s"> — ${x.text||""}</span></span></div>`).join("")
+    : `<div class="desc">No filings in the last 90 days.</div>`;
+}
+
+function renderUS(d,app){
+  const q=d.quote, p=d.profile, ra=d.ratios, m=d.metrics;
+  const px=q.price;
+  const pt=d.pt||{}, g=d.grades||{};
+  const avgPT=pt.lastQuarterAvgPriceTarget||pt.lastYearAvgPriceTarget;
+  const upside=(avgPT&&px)?((avgPT-px)/px*100):null;
+  const gTot=(g.strongBuy||0)+(g.buy||0)+(g.hold||0)+(g.sell||0)+(g.strongSell||0);
+  const gbar=gTot?`<div class="gbar">
+    <i style="width:${(g.strongBuy||0)/gTot*100}%;background:#2aa876"></i>
+    <i style="width:${(g.buy||0)/gTot*100}%;background:var(--pos)"></i>
+    <i style="width:${(g.hold||0)/gTot*100}%;background:var(--amber)"></i>
+    <i style="width:${(g.sell||0)/gTot*100}%;background:var(--neg)"></i>
+    <i style="width:${(g.strongSell||0)/gTot*100}%;background:#c23a4b"></i></div>
+    <div class="an-row"><span class="k">SB ${g.strongBuy||0} · B ${g.buy||0} · H ${g.hold||0} · S ${g.sell||0} · SS ${g.strongSell||0}</span>
+    <span class="mono">${g.consensus||""}</span></div>`:"";
+  let posCard="";
+  if(d.held&&d.held.us_book){
+    const h=d.held.us_book, val=px*h.shares, cost=h.avg_cost*h.shares, pnl=val-cost;
+    posCard=`<section class="panel poscard"><div class="panel-h"><h2>Held — US Desk</h2></div>
+      <div class="panel-b">
+      <div class="an-row"><span class="k">Shares</span><span class="mono">${h.shares}</span></div>
+      <div class="an-row"><span class="k">Avg cost</span><span class="mono">${usd(h.avg_cost)}</span></div>
+      <div class="an-row"><span class="k">Value</span><span class="mono">${usd(val)}</span></div>
+      <div class="an-row"><span class="k">Open P&L</span><span class="mono ${cls(pnl)}">${(pnl>=0?"+":"")+usd(pnl)} (${pct(pnl/cost*100)})</span></div>
+      <div class="an-row"><span class="k">Decided by</span><span class="dim" style="font-size:11px">${h.decided_by||""}</span></div>
+      </div></section>`;
+  }
+  const now=new Date().toISOString().slice(0,10);
+  const eRows=(d.earnings||[]).map(e=>{
+    const fut=e.date>now, beat=(e.epsActual!=null&&e.epsEstimated!=null)?e.epsActual-e.epsEstimated:null;
+    return `<tr><td class="mono ${fut?"":"dim"}">${e.date}${fut?' <span style="color:var(--amber);font-size:9px">NEXT</span>':""}</td>
+      <td class="mono">${e.epsActual??"—"}</td><td class="mono dim">${e.epsEstimated??"—"}</td>
+      <td class="mono ${cls(beat)}">${beat==null?"—":(beat>=0?"BEAT":"MISS")}</td>
+      <td class="mono dim">${e.revenueActual?big(e.revenueActual):"—"}</td></tr>`;}).join("");
+  const insRows=(d.insiders||[]).slice(0,9).map(i=>{
+    const buy=(i.acquisitionOrDisposition==="A");
+    return `<tr><td class="mono dim">${(i.transactionDate||"").slice(2)}</td>
+      <td style="max-width:130px;overflow:hidden;text-overflow:ellipsis">${(i.reportingName||"").split(" ").slice(0,2).join(" ")}</td>
+      <td class="${buy?"pos":"neg"}">${buy?"BUY":"SELL"}</td>
+      <td class="mono">${F(i.securitiesTransacted,0)}</td>
+      <td class="mono dim">${i.price?usd(i.price):"—"}</td></tr>`;}).join("");
+  const newsItems=(d.news||[]).map(n=>`<div class="news-item">
+    <span class="t mono">${ago(n.publishedDate)} ago</span>
+    <a href="${n.url}" target="_blank" rel="noopener">${n.title}</a>
+    <span class="pub">${n.publisher||n.site||""}</span></div>`).join("");
+
+  app.innerHTML=`
+  <div class="hero">
+    <span class="sym">${SYM}</span><span class="co">${p.companyName||q.name||""}</span>
+    <span class="badge">${q.exchange||p.exchange||""}</span>
+    ${p.sector?`<span class="badge">${p.sector}</span>`:""}
+    <span style="flex:1"></span>
+    <span class="px mono">${usd(px)}</span>
+    <span class="chg mono ${cls(q.changePercentage)}">${(q.change>=0?"+":"−")+F(Math.abs(q.change??0))} (${pct(q.changePercentage)})</span>
+  </div>
+  <div class="sub">${p.industry||""}${p.ceo?" · CEO "+p.ceo:""}${p.fullTimeEmployees?" · "+F(p.fullTimeEmployees,0)+" employees":""} · data as of ${d.ts}</div>
+  <div class="grid">
+    <div>
+      ${chartPanel()}
+      <section class="panel">
+        <div class="panel-h"><h2>Valuation</h2><span class="s">TTM</span></div>
+        <div class="stats">
+          ${st("P/E",xr(ra.priceToEarningsRatioTTM))}
+          ${st("P/S",xr(ra.priceToSalesRatioTTM))}
+          ${st("P/B",xr(ra.priceToBookRatioTTM))}
+          ${st("P/FCF",xr(ra.priceToFreeCashFlowRatioTTM))}
+          ${st("EV/EBITDA",xr(m.evToEBITDATTM))}
+          ${st("EV/Sales",xr(m.evToSalesTTM))}
+          ${st("PEG",xr(ra.priceToEarningsGrowthRatioTTM,2))}
+          ${st("Earnings yield",pc(m.earningsYieldTTM))}
+          ${st("FCF yield",pc(m.freeCashFlowYieldTTM))}
+          ${st("Mkt cap",big(q.marketCap))}
+          ${st("Beta",F(p.beta,2))}
+          ${st("Avg volume",F(q.avgVolume??p.averageVolume,0))}
+        </div>
+      </section>
+      <section class="panel">
+        <div class="panel-h"><h2>Quality &amp; balance sheet</h2><span class="s">TTM</span></div>
+        <div class="stats">
+          ${st("Gross margin",pc(ra.grossProfitMarginTTM))}
+          ${st("Op margin",pc(ra.operatingProfitMarginTTM))}
+          ${st("Net margin",pc(ra.netProfitMarginTTM))}
+          ${st("ROE",pc(m.returnOnEquityTTM))}
+          ${st("ROIC",pc(m.returnOnInvestedCapitalTTM))}
+          ${st("ROA",pc(m.returnOnAssetsTTM))}
+          ${st("Debt/Equity",xr(ra.debtToEquityRatioTTM,2))}
+          ${st("Net debt/EBITDA",xr(m.netDebtToEBITDATTM,2))}
+          ${st("Current ratio",xr(ra.currentRatioTTM,2))}
+          ${st("Capex/Rev",pc(m.capexToRevenueTTM))}
+          ${st("R&D/Rev",pc(m.researchAndDevelopementToRevenueTTM))}
+          ${st("SBC/Rev",pc(m.stockBasedCompensationToRevenueTTM))}
+        </div>
+      </section>
+      <section class="panel" id="finpanel">
+        <div class="panel-h"><h2>Financials</h2><span class="s">FMP, as filed · fiscal years</span>
+          <span style="flex:1"></span>
+          <div class="seg" id="fin-period">
+            <button data-p="annual" class="on" onclick="finPeriod('annual')">Annual</button>
+            <button data-p="quarter" onclick="finPeriod('quarter')">Quarterly</button>
+          </div>
+          <div class="seg" id="fin-unit">
+            <button data-u="B" onclick="finUnit('B')">B</button>
+            <button data-u="M" class="on" onclick="finUnit('M')">M</button>
+            <button data-u="K" onclick="finUnit('K')">K</button>
+          </div>
+          <div class="seg"><button id="fin-chgbtn" onclick="finChg()">% Chg</button></div>
+        </div>
+        <div class="seg fin-tabs" id="fin-tabs">
+          <button data-m="inc" class="on" onclick="finTab('inc')">Income</button>
+          <button data-m="bs" onclick="finTab('bs')">Balance Sheet</button>
+          <button data-m="cf" onclick="finTab('cf')">Cash Flow</button>
+          <button data-m="ratios" onclick="finTab('ratios')">Ratios</button>
+          <button data-m="seg" onclick="finTab('seg')">Segments</button>
+          <button data-m="est" onclick="finTab('est')">Estimates</button>
+          <button data-m="peers" onclick="finTab('peers')">Peers</button>
+          <button data-m="div" onclick="finTab('div')">Dividends</button>
+          <button data-m="dcf" onclick="finTab('dcf')">DCF</button>
+        </div>
+        <div id="finbody"><div class="fin-note">Loading financials…</div></div>
+      </section>
+      <section class="panel">
+        <div class="panel-h"><h2>Earnings</h2><span class="s">EPS vs street</span></div>
+        <table><thead><tr><th>Date</th><th>EPS act</th><th>EPS est</th><th>Result</th><th>Revenue</th></tr></thead>
+        <tbody>${eRows||'<tr><td class="dim">No data.</td></tr>'}</tbody></table>
+      </section>
+      <section class="panel">
+        <div class="panel-h"><h2>News</h2><span class="s">latest</span></div>
+        ${newsItems||'<div class="panel-b dim">No recent news.</div>'}
+      </section>
+    </div>
+    <div>
+      ${posCard}
+      <section class="panel">
+        <div class="panel-h"><h2>Analyst</h2><span class="s">street view</span></div>
+        <div class="panel-b">
+          <div class="an-row"><span class="k">Avg target (last qtr)</span><span class="mono">${usd(avgPT)}</span></div>
+          <div class="an-row"><span class="k">Implied vs price</span><span class="mono ${cls(upside)}">${pct(upside)}</span></div>
+          <div class="an-row"><span class="k">Analysts (last qtr)</span><span class="mono">${pt.lastQuarterCount??"—"}</span></div>
+          ${gbar}
+        </div>
+      </section>
+      <section class="panel">
+        <div class="panel-h"><h2>52-week range</h2></div>
+        <div class="panel-b">${rangeBar("",q.yearLow,q.yearHigh,px)}</div>
+      </section>
+      <section class="panel">
+        <div class="panel-h"><h2>Insider activity</h2><span class="s">Form 4</span></div>
+        <table><thead><tr><th>Date</th><th>Who</th><th></th><th>Shares</th><th>Px</th></tr></thead>
+        <tbody>${insRows||'<tr><td class="dim">None recent.</td></tr>'}</tbody></table>
+      </section>
+      <section class="panel">
+        <div class="panel-h"><h2>Dividends</h2></div>
+        <div class="panel-b">
+          ${(d.dividends||[]).length?d.dividends.map(v=>`<div class="an-row"><span class="k mono">${v.date||v.paymentDate||""}</span><span class="mono">${usd(v.dividend??v.adjDividend)}</span></div>`).join(""):'<div class="dim" style="font-size:12px">No dividend.</div>'}
+          ${p.lastDividend?`<div class="an-row"><span class="k">Yield (ann.)</span><span class="mono">${pc(p.lastDividend/px,2)}</span></div>`:""}
+        </div>
+      </section>
+      <section class="panel">
+        <div class="panel-h"><h2>About</h2></div>
+        <div class="panel-b desc">${(p.description||"").slice(0,480)}${(p.description||"").length>480?"…":""}</div>
+      </section>
+    </div>
+  </div>`;
+  FINPX=px; FINCO=p.companyName||q.name||SYM;
+  loadFin();
+}
+
+// ---------- Financials layer (lazy /api/fin bundle) ----------
+let FIN=null, FINPX=null, FINCO="", FS={mode:"inc",period:"annual",unit:"M",chg:false,sk:"mktCap",sd:-1};
+async function loadFin(){
+  if(!document.getElementById("finbody")) return;
+  try{ const r=await fetch("/api/fin?symbol="+SYM); FIN=await r.json(); }
+  catch(e){ FIN={error:"fetch failed — reload to retry"}; }
+  renderFin();
+}
+function finTab(m){FS.mode=m;renderFin();}
+function finPeriod(p){FS.period=p;renderFin();}
+function finUnit(u){FS.unit=u;renderFin();}
+function finChg(){FS.chg=!FS.chg;renderFin();}
+const UDIV={B:1e9,M:1e6,K:1e3};
+function fu(v){ if(v==null||isNaN(v)) return "—";
+  const n=v/UDIV[FS.unit], dp=Math.abs(n)>=100?0:Math.abs(n)>=10?1:2;
+  return (n<0?"−":"")+Math.abs(n).toLocaleString("en-US",{minimumFractionDigits:dp,maximumFractionDigits:dp});}
+function fp(v,dp=1){ return v==null||isNaN(v)?"—":(v<0?"−":"")+Math.abs(v).toFixed(dp)+"%"; }
+function fx(v,dp=2){ return v==null||isNaN(v)?"—":v.toFixed(dp); }
+function colLabel(r){ const mon=(r.date||"").slice(5,7), M=["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+mon]||"";
+  return FS.period==="quarter" ? `${r.period} FY${String(r.fiscalYear).slice(-2)}` : `FY${r.fiscalYear} (${M})`; }
+function stmtRows(kind){
+  const R=(f,l,t)=>({f,l,t});     // t: n=money p=percent e=per-share
+  if(kind==="inc") return [
+    R(r=>r.revenue,"Revenue","n"), R(r=>r.costOfRevenue,"Cost of Revenue","n"),
+    R(r=>r.grossProfit,"Gross Profit","n"), R(r=>r.revenue?r.grossProfit/r.revenue*100:null,"Gross Margin","p"),
+    R(r=>r.sellingGeneralAndAdministrativeExpenses,"SG&A Expenses","n"),
+    R(r=>r.researchAndDevelopmentExpenses,"R&D Expenses","n"),
+    R(r=>r.operatingExpenses,"Operating Expenses","n"),
+    R(r=>r.operatingIncome,"Operating Income","n"), R(r=>r.revenue?r.operatingIncome/r.revenue*100:null,"Operating Margin","p"),
+    R(r=>r.ebitda,"EBITDA","n"), R(r=>r.depreciationAndAmortization,"D&A","n"),
+    R(r=>r.interestIncome,"Interest Income","n"), R(r=>r.interestExpense,"Interest Expense","n"),
+    R(r=>r.incomeBeforeTax,"Income Before Tax","n"), R(r=>r.incomeTaxExpense,"Income Tax Expense","n"),
+    R(r=>r.netIncome,"Net Income","n"), R(r=>r.revenue?r.netIncome/r.revenue*100:null,"Net Margin","p"),
+    R(r=>r.eps,"EPS (Basic)","e"), R(r=>r.epsDiluted,"EPS (Diluted)","e")];
+  if(kind==="bs") return [
+    R(r=>r.cashAndShortTermInvestments,"Cash & ST Investments","n"),
+    R(r=>r.netReceivables,"Receivables","n"), R(r=>r.inventory,"Inventory","n"),
+    R(r=>r.totalCurrentAssets,"Total Current Assets","n"),
+    R(r=>r.propertyPlantEquipmentNet,"PP&E (net)","n"),
+    R(r=>r.goodwillAndIntangibleAssets,"Goodwill & Intangibles","n"),
+    R(r=>r.totalAssets,"Total Assets","n"),
+    R(r=>r.shortTermDebt,"Short-Term Debt","n"), R(r=>r.longTermDebt,"Long-Term Debt","n"),
+    R(r=>r.totalDebt,"Total Debt","n"), R(r=>r.netDebt,"Net Debt","n"),
+    R(r=>r.totalCurrentLiabilities,"Total Current Liabilities","n"),
+    R(r=>r.totalLiabilities,"Total Liabilities","n"),
+    R(r=>r.totalStockholdersEquity,"Shareholders' Equity","n"),
+    R(r=>r.retainedEarnings,"Retained Earnings","n")];
+  return [
+    R(r=>r.netIncome,"Net Income","n"), R(r=>r.depreciationAndAmortization,"D&A","n"),
+    R(r=>r.stockBasedCompensation,"Stock-Based Comp","n"),
+    R(r=>r.changeInWorkingCapital,"Working Capital Change","n"),
+    R(r=>r.operatingCashFlow,"Operating Cash Flow","n"),
+    R(r=>r.capitalExpenditure,"Capital Expenditure","n"),
+    R(r=>r.freeCashFlow,"Free Cash Flow","n"),
+    R(r=>r.acquisitionsNet,"Acquisitions (net)","n"),
+    R(r=>r.netCashProvidedByInvestingActivities,"Investing Cash Flow","n"),
+    R(r=>r.netDebtIssuance,"Net Debt Issued","n"),
+    R(r=>r.commonStockRepurchased,"Buybacks","n"),
+    R(r=>r.netDividendsPaid,"Dividends Paid","n"),
+    R(r=>r.netCashProvidedByFinancingActivities,"Financing Cash Flow","n"),
+    R(r=>r.netChangeInCash,"Net Change in Cash","n")];
+}
+function finStmtHTML(kind){
+  const key=(kind==="inc"?"inc":kind==="bs"?"bs":"cf")+(FS.period==="quarter"?"_q":"_a");
+  const cols=(FIN[key]||[]).slice().reverse();
+  if(!cols.length) return `<div class="fin-note">No ${FS.period} data on this tier.</div>`;
+  const rows=stmtRows(kind);
+  let h=`<div class="finwrap"><table class="fintab"><thead><tr><th class="grp">$ in ${FS.unit}</th>`+
+    cols.map(c=>`<th>${colLabel(c)}</th>`).join("")+`</tr></thead><tbody>`;
+  for(const r of rows){
+    const vals=cols.map(c=>{try{return r.f(c);}catch(e){return null;}});
+    if(vals.every(v=>v==null||v===0)) continue;
+    const tot=/Total|Revenue$|Gross Profit|Operating Income|EBITDA|Net Income|Free Cash Flow|Equity/.test(r.l);
+    const cl=[tot?"tot":"",FS.chg&&r.t==="n"?"haschg":""].filter(Boolean).join(" ");
+    h+=`<tr${cl?` class="${cl}"`:""}><td>${r.l}</td>`+vals.map(v=>{
+      const s=r.t==="n"?fu(v):r.t==="p"?fp(v):fx(v);
+      return `<td class="mono${v!=null&&v<0?" neg":""}">${s}</td>`;}).join("")+"</tr>";
+    if(FS.chg&&r.t==="n")
+      h+=`<tr class="chgrow"><td>% Chg</td>`+vals.map((v,i)=>{
+        const pv=i>0?vals[i-1]:null;
+        const g=(pv!=null&&pv!==0&&v!=null)?(v-pv)/Math.abs(pv)*100:null;
+        return `<td class="mono ${g==null?"dim":g>=0?"pos":"neg"}">${g==null?"—":(g>=0?"+":"−")+Math.abs(g).toFixed(1)+"%"}</td>`;}).join("")+"</tr>";
+  }
+  h+=`</tbody></table></div><div class="fin-note">As filed with the SEC, via FMP. ${FS.chg?"% Chg is the change vs the previous column, under each line. ":""}Margins and EPS ignore the unit toggle.</div>`;
+  return h;
+}
+function finRatiosHTML(){
+  const cols=(FIN.ratios||[]).slice().reverse();
+  if(!cols.length) return '<div class="fin-note">No ratio history.</div>';
+  const mByY={}; for(const m of FIN.metrics||[]) mByY[m.fiscalYear]=m;
+  const G=[["Trailing Valuation",[
+      ["P/E",r=>fx(r.priceToEarningsRatio)],["P/S",r=>fx(r.priceToSalesRatio)],
+      ["P/B",r=>fx(r.priceToBookRatio)],["EV/EBITDA",r=>fx(r.enterpriseValueMultiple)],
+      ["P/FCF",r=>fx(r.priceToFreeCashFlowRatio)]]],
+    ["Dividends",[
+      ["Dividend Yield",r=>fp(r.dividendYieldPercentage,2)],["Dividend Per Share",r=>fx(r.dividendPerShare)],
+      ["Payout Ratio",r=>fp((r.dividendPayoutRatio??0)*100)]]],
+    ["Margins",[
+      ["Gross Margin",r=>fp(r.grossProfitMargin*100)],["Operating Margin",r=>fp(r.operatingProfitMargin*100)],
+      ["EBITDA Margin",r=>fp(r.ebitdaMargin*100)],["Net Margin",r=>fp(r.netProfitMargin*100)],
+      ["FCF/OCF Ratio",r=>fp(r.freeCashFlowOperatingCashFlowRatio*100)]]],
+    ["Capital Efficiency",[
+      ["ROE",r=>{const m=mByY[r.fiscalYear];return m?fp(m.returnOnEquity*100):"—";}],
+      ["ROIC",r=>{const m=mByY[r.fiscalYear];return m?fp(m.returnOnInvestedCapital*100):"—";}],
+      ["ROA",r=>{const m=mByY[r.fiscalYear];return m?fp(m.returnOnAssets*100):"—";}],
+      ["ROCE",r=>{const m=mByY[r.fiscalYear];return m?fp(m.returnOnCapitalEmployed*100):"—";}],
+      ["Asset Turnover",r=>fx(r.assetTurnover)]]],
+    ["Financial Health",[
+      ["Current Ratio",r=>fx(r.currentRatio)],["Quick Ratio",r=>fx(r.quickRatio)],
+      ["Debt/Equity",r=>fx(r.debtToEquityRatio)],
+      ["Net Debt/EBITDA",r=>{const m=mByY[r.fiscalYear];return m?fx(m.netDebtToEBITDA):"—";}],
+      ["Interest Coverage",r=>fx(r.interestCoverageRatio,1)]]]];
+  let h=`<div class="finwrap"><table class="fintab"><thead><tr><th class="grp">Metric</th>`+
+    cols.map(c=>`<th>FY${c.fiscalYear}</th>`).join("")+`</tr></thead><tbody>`;
+  for(const [g,rows] of G){
+    h+=`<tr class="sect"><td colspan="${cols.length+1}">${g}</td></tr>`;
+    for(const [l,f] of rows)
+      h+=`<tr><td>${l}</td>`+cols.map(c=>`<td class="mono">${f(c)}</td>`).join("")+`</tr>`;
+  }
+  h+=`</tbody></table></div>`;
+  const sc=FIN.scores||{};
+  if(sc.piotroskiScore!=null||sc.altmanZScore!=null)
+    h+=`<div class="fin-note">Piotroski F-score <b>${sc.piotroskiScore??"—"}</b> / 9 · Altman Z <b>${sc.altmanZScore==null?"—":sc.altmanZScore.toFixed(2)}</b> (below ~1.8 signals distress, above ~3 is safe territory).</div>`;
+  return h;
+}
+function finSegHTML(){
+  const block=(list,title)=>{
+    const all=(list||[]), fyOnly=all.filter(s=>(s.period||"FY")==="FY");
+    const fy=fyOnly.length?fyOnly:all;
+    const seen={}, cols=[];
+    for(const s of fy){ if(!seen[s.fiscalYear]){seen[s.fiscalYear]=1;cols.push(s);} }
+    cols.sort((a,b)=>a.fiscalYear-b.fiscalYear);
+    while(cols.length>5) cols.shift();   // last 5 FYs; segment naming drifts before that
+    if(!cols.length) return "";
+    const names=[...new Set(cols.flatMap(c=>Object.keys(c.data||{})))];
+    const last=cols[cols.length-1].data||{};
+    names.sort((a,b)=>(last[b]||0)-(last[a]||0));
+    let h=`<div class="fin-note" style="padding-bottom:2px"><b>${title}</b></div>
+      <div class="finwrap"><table class="fintab"><thead><tr><th class="grp">Segment ($ in ${FS.unit})</th>`+
+      cols.map(c=>`<th>FY${c.fiscalYear}</th>`).join("")+`</tr></thead><tbody>`;
+    for(const n of names){
+      h+=`<tr><td>${n}</td>`+cols.map(c=>{
+        const d=c.data||{}, v=d[n], tot=Object.values(d).reduce((a,x)=>a+(x||0),0);
+        return `<td class="mono">${v==null?"—":fu(v)+` <span class="dim" style="font-size:10px">(${tot?(v/tot*100).toFixed(1):"—"}%)</span>`}</td>`;}).join("")+`</tr>`;
+    }
+    h+=`<tr class="tot"><td>Total</td>`+cols.map(c=>{
+      const tot=Object.values(c.data||{}).reduce((a,x)=>a+(x||0),0);
+      return `<td class="mono">${fu(tot)}</td>`;}).join("")+`</tr></tbody></table></div>`;
+    return h;
+  };
+  const h=block(FIN.seg_p,"Product segments")+block(FIN.seg_g,"Geographic segments");
+  return h||'<div class="fin-note">This company does not report segment data FMP can parse.</div>';
+}
+function finEstHTML(){
+  const cols=(FIN.est_a||[]).slice().sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+  const yr=new Date().getFullYear(), keep=cols.filter(c=>+(c.date||"").slice(0,4)>=yr-2).slice(0,6);
+  if(!keep.length) return '<div class="fin-note">No analyst estimates.</div>';
+  const rows=[["Revenue",c=>fu(c.revenueAvg)],["EBITDA",c=>fu(c.ebitdaAvg)],
+    ["EBIT",c=>fu(c.ebitAvg)],["Net Income",c=>fu(c.netIncomeAvg)],
+    ["SG&A Expense",c=>fu(c.sgaExpenseAvg)],["EPS",c=>fx(c.epsAvg)],
+    ["Analysts (EPS)",c=>c.numAnalystsEps??"—"]];
+  let h=`<div class="finwrap"><table class="fintab"><thead><tr><th class="grp">$ in ${FS.unit} (avg)</th>`+
+    keep.map(c=>{const y=+(c.date||"").slice(0,4);return `<th>FY${y}${y>=yr?"E":""}</th>`;}).join("")+
+    `</tr></thead><tbody>`;
+  for(const [l,f] of rows)
+    h+=`<tr><td>${l}</td>`+keep.map(c=>`<td class="mono">${f(c)}</td>`).join("")+`</tr>`;
+  return h+`</tbody></table></div><div class="fin-note">Street averages via FMP; high/low spreads exist behind each number. E marks fiscal years not yet reported.</div>`;
+}
+function finPeersSort(k){ if(FS.sk===k) FS.sd=-FS.sd; else {FS.sk=k;FS.sd=-1;} renderFin(); }
+function finPeersHTML(){
+  const rows=(FIN.peers||[]).slice();
+  if(!rows.length) return '<div class="fin-note">No peer set from FMP.</div>';
+  rows.sort((a,b)=>{const x=a[FS.sk],y=b[FS.sk];
+    if(x==null)return 1; if(y==null)return -1; return (x<y?-1:x>y?1:0)*FS.sd;});
+  const C=[["symbol","Name"],["mktCap","Mkt cap"],["price","Price"],["pe","P/E"],["ps","P/S"],
+    ["evx","EV/EBITDA"],["gm","Gross"],["om","Op"],["nm","Net"],["de","D/E"],["divy","Div yld"]];
+  let h=`<div class="finwrap"><table class="fintab peertab"><thead><tr>`+
+    C.map(([k,l])=>`<th ${k==="symbol"?'class="grp"':""} onclick="finPeersSort('${k}')">${l}${FS.sk===k?(FS.sd<0?" ↓":" ↑"):""}</th>`).join("")+
+    `</tr></thead><tbody>`;
+  for(const r of rows){
+    const me=r.symbol===SYM;
+    h+=`<tr${me?' class="tot"':""}><td class="grp"><a href="/t?symbol=${r.symbol}">${r.symbol}</a> <span class="dim" style="font-size:10px">${(r.name||"").slice(0,26)}</span></td>
+      <td class="mono">${big(r.mktCap)}</td><td class="mono">${usd(r.price)}</td>
+      <td class="mono">${fx(r.pe,1)}</td><td class="mono">${fx(r.ps,1)}</td><td class="mono">${fx(r.evx,1)}</td>
+      <td class="mono">${r.gm==null?"—":fp(r.gm*100,0)}</td><td class="mono">${r.om==null?"—":fp(r.om*100,0)}</td>
+      <td class="mono">${r.nm==null?"—":fp(r.nm*100,0)}</td><td class="mono">${fx(r.de,2)}</td>
+      <td class="mono">${r.divy==null?"—":fp(r.divy,1)}</td></tr>`;
+  }
+  return h+`</tbody></table></div><div class="fin-note">FMP's peer set, TTM figures. Click a column to sort; click a ticker to open it.</div>`;
+}
+function finDivHTML(){
+  const ds=(FIN.divs||[]).slice(0,16);
+  if(!ds.length) return '<div class="fin-note">No dividend history — this name does not pay one.</div>';
+  const t12=(FIN.divs||[]).filter(d=>(d.date||"")>=new Date(Date.now()-365*864e5).toISOString().slice(0,10))
+    .reduce((a,d)=>a+(d.adjDividend??d.dividend??0),0);
+  let h=`<div class="fin-note">Trailing 12 months: <b>${usd(t12)}</b> per share${FINPX?` · yield <b>${fp(t12/FINPX*100,2)}</b> at today's price`:""}.</div>
+    <div class="finwrap"><table class="fintab"><thead><tr><th class="grp">Ex-date</th><th>Dividend</th><th>Adjusted</th></tr></thead><tbody>`;
+  for(const d of ds)
+    h+=`<tr><td>${d.date||""}</td><td class="mono">${usd(d.dividend)}</td><td class="mono">${usd(d.adjDividend??d.dividend)}</td></tr>`;
+  return h+`</tbody></table></div>`;
+}
+// ---- DCF workspace (client-side, seeded from actuals) ----
+let DCFA=null;
+function dcfSeeds(){
+  const inc=(FIN.inc_a||[]).slice().reverse(), cf=(FIN.cf_a||[]).slice().reverse(),
+        bs=(FIN.bs_a||[]).slice().reverse();
+  const li=inc[inc.length-1]||{}, lc=cf[cf.length-1]||{}, lb=bs[bs.length-1]||{};
+  const clamp=(v,a,b,d)=>(v==null||isNaN(v))?d:Math.min(b,Math.max(a,v));
+  let cagr=8;
+  // seed off the last ~3 growth intervals so a distressed base year (e.g. a
+  // COVID-era FY) does not inflate the default into fantasy
+  const win=inc.slice(-4);
+  if(win.length>=2&&win[0].revenue>0)
+    cagr=(Math.pow(li.revenue/win[0].revenue,1/(win.length-1))-1)*100;
+  return {
+    g: clamp(Math.round(cagr),-5,30,8),
+    em: clamp(Math.round(li.revenue?li.ebitda/li.revenue*100:20),1,70,20),
+    da: clamp(Math.round(li.revenue?li.depreciationAndAmortization/li.revenue*100:4),0,25,4),
+    cx: clamp(Math.round(li.revenue?Math.abs(lc.capitalExpenditure||0)/li.revenue*100:4),0,30,4),
+    tax: clamp(Math.round(li.incomeBeforeTax>0?li.incomeTaxExpense/li.incomeBeforeTax*100:21),5,40,21),
+    wacc: 9, tg: 2.5,
+    rev0: li.revenue||0, netDebt: lb.netDebt??((lb.totalDebt||0)-(lb.cashAndCashEquivalents||0)),
+    shares: li.weightedAverageShsOutDil||li.weightedAverageShsOut||null, fy: li.fiscalYear
+  };
+}
+function dcfCompute(){
+  const a=DCFA; if(!a||!a.rev0||!a.shares) return null;
+  if(a.wacc<=a.tg+0.5) return {err:"Discount rate must sit above terminal growth."};
+  let rev=a.rev0, pv=0, fcfN=0;
+  for(let t=1;t<=5;t++){
+    rev*=(1+a.g/100);
+    const ebitda=rev*a.em/100, da=rev*a.da/100, ebit=ebitda-da;
+    const nopat=ebit*(1-a.tax/100), fcf=nopat+da-rev*a.cx/100;
+    pv+=fcf/Math.pow(1+a.wacc/100,t);
+    if(t===5) fcfN=fcf;
+  }
+  const tv=fcfN*(1+a.tg/100)/((a.wacc-a.tg)/100), tvPV=tv/Math.pow(1+a.wacc/100,5);
+  const ev=pv+tvPV, eq=ev-(a.netDebt||0), ps=eq/a.shares;
+  return {ev,eq,ps,tvShare:ev?tvPV/ev*100:null};
+}
+function dcfSlider(k,label,hint,min,max,step){
+  return `<div class="dcf-as"><div class="l"><span>${label}</span><b id="dcfv-${k}" class="mono">${DCFA[k]}%</b></div>
+    <input type="range" min="${min}" max="${max}" step="${step}" value="${DCFA[k]}"
+      oninput="DCFA.${k}=+this.value;document.getElementById('dcfv-${k}').textContent=this.value+'%';dcfOut()">
+    <div class="hint">${hint}</div></div>`;
+}
+function dcfOut(){
+  const el=document.getElementById("dcfout"); if(!el) return;
+  const r=dcfCompute();
+  if(!r){ el.innerHTML='<div class="fin-note">Not enough filed data to seed a model here.</div>'; return; }
+  if(r.err){ el.innerHTML=`<div class="fin-note">${r.err}</div>`; return; }
+  const up=FINPX?(r.ps-FINPX)/FINPX*100:null;
+  el.innerHTML=`<div class="an-row"><span class="k">My fair value / share</span></div>
+    <div class="big mono">${usd(r.ps)}</div>
+    <div class="vs mono ${up==null?"":up>=0?"pos":"neg"}">${up==null?"":(up>=0?"+":"")+up.toFixed(1)+"% vs price "+usd(FINPX)}</div>
+    <div class="an-row"><span class="k">Enterprise value</span><span class="mono">${big(r.ev)}</span></div>
+    <div class="an-row"><span class="k">Less net debt</span><span class="mono">${big(DCFA.netDebt)}</span></div>
+    <div class="an-row"><span class="k">Equity value</span><span class="mono">${big(r.eq)}</span></div>
+    <div class="an-row"><span class="k">Terminal value share</span><span class="mono">${r.tvShare==null?"—":r.tvShare.toFixed(0)+"%"}</span></div>
+    ${FIN.dcf&&FIN.dcf.dcf?`<div class="an-row"><span class="k">FMP's own DCF</span><span class="mono">${usd(FIN.dcf.dcf)}</span></div>`:""}`;
+}
+function finDcfHTML(){
+  if(!DCFA) DCFA=dcfSeeds();
+  setTimeout(dcfOut,0);
+  return `<div class="panel-b"><div class="dcfgrid"><div>
+    ${dcfSlider("g","Revenue growth / yr","Seeded from the filed years' actual growth path",-5,30,0.5)}
+    ${dcfSlider("em","EBITDA margin","What each revenue dollar keeps before depreciation and interest",1,70,0.5)}
+    ${dcfSlider("da","D&A, % of revenue","Wear and tear charged against profit",0,25,0.5)}
+    ${dcfSlider("cx","Capex, % of revenue","Cash spent on plant and equipment each year",0,30,0.5)}
+    ${dcfSlider("tax","Tax rate","Seeded from the company's last effective rate",5,40,1)}
+    ${dcfSlider("wacc","Discount rate (WACC)","The return you demand for waiting and risk",5,15,0.25)}
+    ${dcfSlider("tg","Terminal growth","Growth forever after year 5 — keep it near GDP",0,4,0.25)}
+    <button class="fsbtn" onclick="DCFA=null;renderFin()">Reset to filed numbers</button>
+  </div><div class="dcfout" id="dcfout"></div></div>
+  <div class="fin-note" style="padding:10px 0 0">A five-year FCFF sandbox seeded from ${FINCO}'s filed FY${DCFA.fy} numbers. It answers "what am I assuming at this price," never "what should anyone do." Working capital is left out for simplicity; check the cash flow tab for how much that omits.</div></div>`;
+}
+function renderFin(){
+  const el=document.getElementById("finbody"); if(!el||!FIN) return;
+  document.querySelectorAll("#fin-tabs button").forEach(b=>b.classList.toggle("on",b.dataset.m===FS.mode));
+  document.querySelectorAll("#fin-period button").forEach(b=>b.classList.toggle("on",b.dataset.p===FS.period));
+  document.querySelectorAll("#fin-unit button").forEach(b=>b.classList.toggle("on",b.dataset.u===FS.unit));
+  const cb=document.getElementById("fin-chgbtn"); if(cb) cb.classList.toggle("on",FS.chg);
+  if(FIN.error){ el.innerHTML=`<div class="fin-note">${FIN.error}</div>`; return; }
+  const m=FS.mode;
+  el.innerHTML = m==="inc"||m==="bs"||m==="cf" ? finStmtHTML(m)
+    : m==="ratios" ? finRatiosHTML()
+    : m==="seg" ? finSegHTML()
+    : m==="est" ? finEstHTML()
+    : m==="peers" ? finPeersHTML()
+    : m==="div" ? finDivHTML()
+    : finDcfHTML();
+}
+load();
+</script>
+</body>
+</html>

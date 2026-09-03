@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Funds 13F — Research Desk</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23ED5A24'/><text x='16' y='22' font-size='15' font-weight='800' font-family='Arial' fill='white' text-anchor='middle'>FD</text></svg>">
+<link rel="stylesheet" href="/assets/desk.css">
+<script src="/assets/desk.js" defer></script>
+<style>
+body{padding-bottom:50px}
+main{max-width:1420px;margin:0 auto;padding:20px 22px}
+.sub{color:var(--muted);font-size:12px;margin-bottom:16px;max-width:980px;line-height:1.6}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(440px,1fr));gap:15px}
+.fund{background:var(--panel);border:1px solid var(--line);border-radius:13px;overflow:auto}
+.fund-h{padding:13px 16px;border-bottom:1px solid var(--line)}
+.fund-h .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.fund-h .n{font-weight:800;font-size:14.5px}
+.fund-h .tv{font-size:13px;font-weight:700;color:var(--ink2)}
+.fund-h .meta{font-size:10.5px;color:var(--muted);margin-top:4px}
+.fund-h .note{font-size:11px;color:var(--ink2);margin-top:5px;font-style:italic}
+.chg{padding:10px 16px;border-bottom:1px solid var(--line);background:#10141b;
+  display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chg .cl{font-size:9px;letter-spacing:.1em;color:var(--muted);margin-right:2px}
+.chip{font-size:10.5px;border-radius:5px;padding:2.5px 8px;font-weight:600;white-space:nowrap}
+.chip.new{background:rgba(62,207,142,.14);color:var(--pos);border:1px solid rgba(62,207,142,.3)}
+.chip.exit{background:rgba(241,100,114,.13);color:var(--neg);border:1px solid rgba(241,100,114,.3)}
+.chip.add{background:rgba(232,161,60,.12);color:var(--amber);border:1px solid rgba(232,161,60,.28)}
+.chip.trim{background:rgba(93,103,116,.15);color:var(--ink2);border:1px solid var(--line2)}
+.badge{font-size:9px;border-radius:4px;padding:1px 5px;margin-left:7px;font-weight:700;vertical-align:1px}
+.badge.new{background:rgba(62,207,142,.16);color:var(--pos)}
+.badge.up{color:var(--amber)}
+.badge.dn{color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+th,td{padding:6.5px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--muted);font-size:9.5px;text-transform:uppercase;letter-spacing:.07em;font-weight:600}
+col.c-iss{width:45%} col.c-val{width:16%} col.c-own{width:14%} col.c-wt{width:25%}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--panel2)}
+td.iss{font-weight:600}
+td.iss a{color:inherit;text-decoration:none}
+td.iss a:hover{color:var(--accent)}
+.wbar{display:inline-block;height:4px;background:var(--accent);border-radius:2px;
+  vertical-align:middle;margin-right:6px;opacity:.75}
+.dim{color:var(--muted)}
+.loading{padding:60px;text-align:center;color:var(--muted)}
+.burrybox{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  padding:12px 16px;margin-bottom:15px}
+.burrybox .bh{font-size:10.5px;text-transform:uppercase;letter-spacing:.11em;
+  color:var(--ink2);font-weight:700;margin-bottom:8px}
+.bposts{display:flex;flex-wrap:wrap;gap:7px}
+.bp{font-size:11.5px;background:var(--panel2);border:1px solid var(--line2);
+  border-radius:7px;padding:4px 10px;color:var(--ink2);text-decoration:none;max-width:420px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bp:hover{color:var(--accent);border-color:var(--accent)}
+.bp .d{color:var(--muted);font-size:10px;margin-right:6px}
+footer{max-width:1420px;margin:26px auto 0;padding:14px 22px;border-top:1px solid var(--line);
+  color:var(--muted);font-size:11px;line-height:1.6}
+/* 13D/G activist feed */
+h2.grp{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--ink2);
+  margin:28px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.actwrap{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  max-height:420px;overflow-y:auto}
+.actwrap::-webkit-scrollbar{width:8px}
+.actwrap::-webkit-scrollbar-thumb{background:var(--line2);border-radius:4px}
+.actwrap table{table-layout:auto;font-size:12.5px}
+.actwrap th,.actwrap td{text-align:left;white-space:nowrap}
+.actwrap td.filer{white-space:normal;max-width:460px}
+.actwrap thead th{position:sticky;top:0;background:var(--panel);z-index:2}
+.actwrap tr.held td{background:rgba(237,90,36,.05)}
+.fm{font-size:9px;font-weight:800;border-radius:4px;padding:1.5px 6px;letter-spacing:.04em}
+.fm.d{background:rgba(237,90,36,.16);color:var(--accent)}
+.fm.g{background:rgba(91,184,212,.13);color:#5bb8d4}
+.fm.a{opacity:.75}
+.tag{font-size:9px;font-weight:800;border-radius:4px;padding:1.5px 6px;margin-left:6px}
+.tag.held{background:rgba(237,90,36,.16);color:var(--accent)}
+.tag.watch{background:rgba(93,103,116,.18);color:var(--ink2)}
+.actwrap td a{color:inherit;text-decoration:none}
+.actwrap td a:hover{color:var(--accent)}
+.flink{font-size:10.5px;color:var(--muted) !important}
+.flink:hover{color:var(--accent) !important}
+.fundrow td.fname{font-weight:700;color:var(--ink2)}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">RESEARCH <span>DESK</span></div>
+  <nav></nav>
+  <div class="right"><span id="asof"></span></div>
+</header>
+<main>
+  <div class="sub">Latest 13F-HR for every fund on the register, straight from SEC EDGAR — and
+  <b style="color:var(--ink2)">what changed since last quarter</b>: new buys, exits, adds and trims,
+  diffed on CUSIP across the two most recent filings. 13Fs show US long positions only — no shorts,
+  no cash, no non-US listings.</div>
+  <div class="burrybox" id="burry" style="display:none">
+    <div class="bh">CASSANDRA UNCHAINED · Michael Burry's Substack <span class="dim" style="font-weight:400">— his only public surface since Scion's final 13F (below)</span></div>
+    <div class="bposts" id="bposts"></div>
+  </div>
+  <div class="grid" id="funds"><div class="loading">Reading 13F filings from EDGAR… first load of the day takes up to a minute.</div></div>
+  <div id="act"></div>
+</main>
+<footer>Quarterly snapshots filed up to 45 days after quarter end — positions may have moved since.
+Change threshold: ±10% of shares. "% of co" = the fund's reported shares against the company's
+current shares outstanding (live float math, so quarter-end stakes vs today's share count).
+Register lives in the vault (13f-analysis/FUND_REGISTER.md); edit funds.json to add a fund by CIK.</footer>
+<script>
+"use strict";
+const big=x=>{if(x==null)return "—";if(x>=1e9)return "$"+(x/1e9).toFixed(1)+"B";
+  if(x>=1e6)return "$"+(x/1e6).toFixed(0)+"M";return "$"+Math.round(x).toLocaleString();};
+function chips(f){
+  const c=f.changes;
+  if(!c) return "";
+  let bits="";
+  if(c.new.length){bits+=`<span class="cl">NEW</span>`+c.new.map(x=>`<span class="chip new" title="${big(x.value)}">${x.issuer}</span>`).join("");}
+  if(c.exits.length){bits+=`<span class="cl">EXITED</span>`+c.exits.map(x=>`<span class="chip exit" title="was ${big(x.value)}">${x.issuer}</span>`).join("");}
+  if(c.adds.length){bits+=`<span class="cl">ADDED</span>`+c.adds.map(x=>`<span class="chip add">${x.issuer} +${x.pct.toFixed(0)}%</span>`).join("");}
+  if(c.trims.length){bits+=`<span class="cl">TRIMMED</span>`+c.trims.map(x=>`<span class="chip trim">${x.issuer} ${x.pct.toFixed(0)}%</span>`).join("");}
+  if(!bits) bits=`<span class="dim" style="font-size:11px">No position changes ≥10% vs ${f.prev_period}</span>`;
+  return `<div class="chg">${bits}</div>`;
+}
+function badge(chg){
+  if(!chg) return "";
+  if(chg==="NEW") return `<span class="badge new">NEW</span>`;
+  if(chg.startsWith("+")) return `<span class="badge up">▲ ${chg}</span>`;
+  return `<span class="badge dn">▼ ${chg}</span>`;
+}
+function ownFmt(x){
+  if(x==null) return "—";
+  if(x>=1) return x.toFixed(1)+"%";
+  if(x>=0.1) return x.toFixed(2)+"%";
+  return "<0.1%";
+}
+async function load(){
+  const r=await fetch("/api/funds"); const d=await r.json();
+  document.getElementById("asof").textContent="as of "+d.ts;
+  let html="";
+  for(const f of d.funds){
+    let rows="";
+    const maxW=f.top.length?f.top[0].weight:1;
+    for(const h of f.top){
+      const name = h.ticker
+        ? `<a href="/t?symbol=${h.ticker}" title="${h.issuer}">${h.issuer}</a>`
+        : `<span title="${h.issuer}">${h.issuer}</span>`;
+      rows+=`<tr><td class="iss">${name}${badge(h.chg)}</td>
+        <td class="mono">${big(h.value)}</td>
+        <td class="mono dim" title="share of the company's stock this fund owns">${ownFmt(h.own_pct)}</td>
+        <td class="mono"><span class="wbar" style="width:${(h.weight/maxW*40).toFixed(0)}px"></span>${h.weight!=null?h.weight.toFixed(1)+"%":"—"}</td></tr>`;
+    }
+    html+=`<div class="fund">
+      <div class="fund-h">
+        <div class="top"><span class="n">${f.name}</span><span class="tv mono">${big(f.total_value)}</span></div>
+        <div class="meta mono">Q ending ${f.period||"?"} · filed ${f.filed} · ${f.positions} positions${f.prev_period?` · changes vs ${f.prev_period}`:""}</div>
+        ${f.note?`<div class="note">${f.note}</div>`:""}</div>
+      ${chips(f)}
+      <table><colgroup><col class="c-iss"><col class="c-val"><col class="c-own"><col class="c-wt"></colgroup>
+      <thead><tr><th>Holding</th><th>Value</th><th title="share of the company's stock the fund owns">Own</th><th>Weight</th></tr></thead>
+      <tbody>${rows}</tbody></table></div>`;
+  }
+  document.getElementById("funds").innerHTML=html||'<div class="loading">No filings parsed — EDGAR may be busy; refresh in a minute.</div>';
+}
+load();
+/* ---- 13D/G activist feed (EDGAR full-text search; live SCHEDULE 13D/G forms) ---- */
+function fmChip(form){
+  const g=form.includes("13G"), amend=form.includes("/A");
+  return `<span class="fm ${g?"g":"d"}${amend?" a":""}">${form}</span>`;
+}
+function filersTxt(r){
+  return (r.filers||[]).map(f=>f.name).join(", ")||"—";
+}
+function actRow(r,withTag){
+  const t=(r.subject.tickers||[])[0];
+  const sub=t?`<a href="/t?symbol=${t}"><b>${t}</b></a> <span class="dim">${r.subject.name}</span>`
+             :`<b>${r.subject.name}</b>`;
+  return `<tr class="${withTag&&r.tag==="held"?"held":""}">
+    <td class="mono dim">${r.date}</td><td>${fmChip(r.form)}</td>
+    <td>${sub}${withTag?`<span class="tag ${r.tag}">${r.tag.toUpperCase()}</span>`:""}</td>
+    <td class="filer">${filersTxt(r)}</td>
+    <td><a class="flink" href="${r.link}" target="_blank">filing ↗</a></td></tr>`;
+}
+(async()=>{
+  try{
+    const r=await fetch("/api/activist"); const d=await r.json();
+    let h="";
+    const head=`<thead><tr><th>Filed</th><th>Form</th><th>Subject</th><th>Filer(s)</th><th></th></tr></thead>`;
+    if(d.ours&&d.ours.length){
+      h+=`<h2 class="grp">13D / 13G on our names <span class="dim" style="text-transform:none;letter-spacing:0">— beneficial-ownership filings where a book or watchlist company is the subject, last two years</span></h2>
+        <div class="actwrap"><table>${head}<tbody>${d.ours.map(x=>actRow(x,true)).join("")}</tbody></table></div>`;
+    }
+    if(d.funds&&d.funds.length){
+      let rows="";
+      for(const f of d.funds){
+        rows+=`<tr class="fundrow"><td class="fname" colspan="5">${f.name}</td></tr>`;
+        rows+=f.rows.map(x=>actRow(x,false)).join("");
+      }
+      h+=`<h2 class="grp">13D / 13G filed by tracked funds <span class="dim" style="text-transform:none;letter-spacing:0">— activist and 5%+ stakes the register funds have declared</span></h2>
+        <div class="actwrap"><table>${head}<tbody>${rows}</tbody></table></div>`;
+    }
+    if(d.firehose&&d.firehose.length){
+      h+=`<h2 class="grp">13D firehose <span class="dim" style="text-transform:none;letter-spacing:0">— every SCHEDULE 13D and amendment hitting EDGAR, whole market, newest first</span></h2>
+        <div class="actwrap"><table>${head}<tbody>${d.firehose.map(x=>actRow(x,false)).join("")}</tbody></table></div>`;
+    }
+    if(d.unmapped&&d.unmapped.length)
+      h+=`<div class="dim" style="font-size:10.5px;margin-top:8px">No EDGAR ticker mapping (no 13D/G coverage here): ${d.unmapped.join(", ")}</div>`;
+    document.getElementById("act").innerHTML=h;
+  }catch(e){}
+})();
+(async()=>{
+  try{
+    const r=await fetch("/api/burry"); const d=await r.json();
+    if(!d.posts||!d.posts.length) return;
+    document.getElementById("bposts").innerHTML=d.posts.map(p=>
+      `<a class="bp" href="${p.link}" target="_blank" title="${p.title}"><span class="d mono">${p.date}</span>${p.title}</a>`).join("");
+    document.getElementById("burry").style.display="block";
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
