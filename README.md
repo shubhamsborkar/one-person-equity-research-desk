@@ -13,10 +13,10 @@ You do not need to know git, and you do not need to type the setup commands lowe
 3. **Paste this and press Enter.**
 
 ```
-Read README.md in this folder and set the desk up for me on this computer. Create the Python environment, install the requirements, copy .env.example to .env, and ask me for each key one at a time, telling me where to get it. My broker is <your broker>. If it is not the shipped one, read its API documentation and rewrite the broker adapter the way the README describes. If I say I have no broker to connect yet, leave the broker keys empty and skip the adapter; the US desk and the intelligence tabs run without one. Then start the desk and tell me the address to open.
+Read README.md in this folder and set the desk up for me on this computer. Create the Python environment, install the requirements, copy .env.example to .env, and ask me for each key one at a time, telling me where to get it. My broker is <your broker>. If it is not the shipped one, read its API documentation and rewrite the broker adapter the way the README describes. If I say I have no broker to connect yet, leave the broker keys empty and skip the adapter; the US desk and the intelligence tabs run without one. Then start the desk, set it to start by itself at login using the Keep Desk Running file for my operating system, and tell me the address to open.
 ```
 
-4. **Answer its questions.** When it says the desk is up, open the address it gives you (normally `http://localhost:8765`) in your browser, or inside Obsidian as described further down.
+4. **Answer its questions.** When it says the desk is up, open the address it gives you (normally `http://localhost:8765`) in your browser, or inside Obsidian as described further down. From then on it starts with your computer.
 
 If anything goes wrong at any step, copy the error, paste it to the agent and ask it to fix it. That is the whole method, and it is the same one that built the desk.
 
@@ -24,7 +24,7 @@ If anything goes wrong at any step, copy the error, paste it to the agent and as
 
 This folder is only the desk: the program that draws the twelve tabs, the pages, the broker adapter and the data templates. It is not the Obsidian vault. The vault (your notes, the rulebook file, the raw inbox, the wiki and output folders, the skills) is a separate folder that the newsletter edition walks you through building, and the desk works with or without it. The two connect in two places only: the `obsidian/Live Desk.md` note, which shows the desk inside Obsidian, and the optional `VAULT_OUTPUT_DIR` setting, which drops the desk's daily reports into your vault as notes. The desk folder can sit anywhere on your computer, inside the vault or next to it.
 
-Day to day you do not need the coding agent to run the desk; you start it with the start file and look at it in a browser or in Obsidian. The agent (Claude Code, Codex, Kimi Code, Grok Build, in a terminal or in its desktop app) is for setting it up, adapting it to your broker, and changing it later by describing what you want.
+Day to day you do not need the coding agent to run the desk; it starts with your computer (or with the start file) and you look at it in a browser or in Obsidian. The agent (Claude Code, Codex, Kimi Code, Grok Build, in a terminal or in its desktop app) is for setting it up, adapting it to your broker, and changing it later by describing what you want.
 
 ## Two desks for two markets
 
@@ -90,13 +90,17 @@ Then put your names in the files under *The files you edit* (or add them in the 
 
 Or hand all of this to your agent, as the *Start here* section at the top describes.
 
-## Every day
+## Keep the desk running
 
-Double-click `Start Desk.command` (or `python server.py`), then open `http://localhost:8765`.
+Two ways to run it. Pick one.
 
-That is the whole routine. Nothing on the desk needs a login of its own: Desk · US, the watch grids, Funds, Flow, Short, Capitol, Macro and Risk run from the public record and the optional feed key you set once.
+**Start it when you want it.** Double-click `Start Desk.command` (Mac) or `Start Desk.bat` (Windows), then open `http://localhost:8765`. Close the window and the desk stops.
 
-Whether Desk · Home needs anything each day is up to your broker, not the desk. Most brokers keep an API session alive for weeks or months once the key is set. The shipped ICICI adapter is the exception: that broker's regulator requires a fresh login every trading day, so on days you want the Home page live it asks for a session token in the terminal (open the login URL it prints, log in, and when the page jumps to a `localhost` address copy the value after `apisession=` and paste it; it is cached for the day). If you skip it, the desk keeps serving the last saved book re-priced live and shows a ribbon, and every other page is unaffected.
+**Always on.** Double-click `Keep Desk Running.command` (Mac) or `Keep Desk Running.bat` (Windows) once. From then on the desk starts by itself when you log in, and if it ever stops, for any reason, it is back within a few seconds. Shut the laptop and it sleeps with it; open the lid and it carries on. `Stop Desk.command` / `Stop Desk.bat` switches it off (and, on the Mac, back on). On the Mac this uses the built-in launch agent; on Windows it registers a task in Task Scheduler that runs `desk-service.ps1` hidden at logon. The Windows files were written from Microsoft's documented commands and have not been run on a Windows machine by the author; if one of them complains, paste the window's text to your coding agent and ask it to fix it, which is the same method that built the desk. On Linux the same thing is a five-line systemd user unit (`ExecStart=<folder>/.venv/bin/python server.py`, `WorkingDirectory=<folder>`, `Restart=always`, enabled with `systemctl --user enable --now`), and your agent can write it.
+
+Nothing on the desk needs a login of its own: Desk · US, the watch grids, Funds, Flow, Short, Capitol, Macro and Risk run from the public record and the optional feed key you set once.
+
+Whether Desk · Home needs anything each day is up to your broker, not the desk. Most brokers keep an API session alive for weeks or months once the key is set. The shipped ICICI adapter is the exception: that broker's regulator requires a fresh login every trading day, so on a morning you want the Home page live you double-click `Paste Token.command` / `Paste Token.bat`, it opens the broker's login page, you paste the number after `apisession=` from the address bar, press Enter, and the desk reconnects (the token is cached for the day). Skip it and the desk keeps serving the last saved book re-priced live and shows a ribbon, and every other page is unaffected. Readers on other brokers can ignore the Paste Token files entirely.
 
 To have the desk inside Obsidian: switch on the **Web Viewer** core plugin, copy `obsidian/Live Desk.md` into your vault, and (optional) copy `obsidian/desk.css` into `.obsidian/snippets/` and enable it, so the note uses the full width.
 
