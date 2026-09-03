@@ -1,6 +1,6 @@
 # One-person equity research desk
 
-A twelve-tab investment research desk that runs on your own computer, reads your broker, the public record and one optional data feed, and opens as a tab inside Obsidian. Built by describing it to an AI coding agent (Claude Code) in plain English. This is the whole desk, minus the author's positions, published by Alpha with AI (Shubham Borkar). The screenshots in the newsletter edition show the author's own copy, whose sidebar reads "Family Desk"; this is the same code with a neutral name.
+A twelve-tab investment research desk that runs on your own computer, reads your broker, the public record and one optional data feed, and opens as a tab inside Obsidian. Built by describing it to an AI coding agent (Claude Code) in plain English. This is the whole desk, minus the author's positions, published by Alpha with AI (Shubham Borkar) alongside the newsletter edition [How to Build a One-Person Equity Research Desk (a Mini Bloomberg) with Claude Fable](https://ai.shikshannivesh.com/p/how-to-build-a-one-person-equity), which explains every tab and the build. The screenshots in the newsletter edition show the author's own copy, whose sidebar reads "Family Desk"; this is the same code with a neutral name.
 
 This copy reads accounts and shows them; it contains no order code. Your broker's API can take orders, and wiring that in is your own build, under your broker's and regulator's rules.
 
@@ -147,7 +147,7 @@ Yahoo's quote endpoints are unofficial and can change; the code degrades to the 
 
 ## Built with an agent
 
-Every line here was written by Claude Code from plain-English descriptions and screenshots. The story of how, and the setup around it (the vault, the rulebook, the skills, the clock), is in the *Alpha with AI* newsletter: [How I Set Up Claude Code as My Investment Research Analyst](https://ai.shikshannivesh.com/p/how-i-set-up-claude-code-as-my-investment) and its later editions.
+Every line here was written by Claude Code from plain-English descriptions and screenshots. The edition this repository ships with, which walks through every tab, how the desk was built and how to install the setup around it (the vault, the rulebook, the skills, the clock), is [How to Build a One-Person Equity Research Desk (a Mini Bloomberg) with Claude Fable](https://ai.shikshannivesh.com/p/how-to-build-a-one-person-equity) in the *Alpha with AI* newsletter. The earlier setup editions start at [How I Set Up Claude Code as My Investment Research Analyst](https://ai.shikshannivesh.com/p/how-i-set-up-claude-code-as-my-investment).
 
 ## Disclaimer
 
