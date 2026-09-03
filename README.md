@@ -35,7 +35,7 @@ Read README.md in this folder and set the desk up for me on this computer. Insta
 
 4. **Answer its questions.** It will ask for your broker's key and, if you want one, the feed key, and it tells you where each comes from. If you have neither, say so and it skips them. It then installs everything, starts the desk, and gives you an address. Open that address in your browser. The whole thing takes about twenty minutes, most of it the agent working while you watch.
 
-If anything goes wrong at any step, copy the error, paste it to the agent and ask it to fix it. That is the whole method, and it is the same one that built the desk.
+If anything goes wrong at any step, or at any point later, give your agent this file. Whether you use Claude Code, Codex, Kimi Code, Grok Build or any other agent, point it at the desk folder, tell it to read README.md, and describe the problem in your own words: it cannot install, the page is blank, the broker will not connect, you want a screen changed. Copy any error you see and paste it in. That is the whole method, and it is the same one that built the desk.
 
 ## Where the desk lives: the address
 
@@ -52,7 +52,7 @@ The folder you downloaded contains a few files whose names are plain English, an
 
 What happens in daily life once Keep Desk Running has been used: you shut the computer down and switch it on again, the desk is back once you log in. You close the laptop lid, the desk sleeps with it and carries on when you open the lid. Something crashes, the desk restarts itself. You never start it by hand again.
 
-How to tell it is running: the address opens. If the page is blank, do these in order: wait thirty seconds and reload, then double-click Start Desk, then, if it is still blank, paste what the window says to the agent and ask it to fix it.
+How to tell it is running: the address opens. If the page is blank, do these in order: wait thirty seconds and reload, then double-click Start Desk, then, if it is still blank, give your agent this file and what the window says, and ask it to fix it.
 
 Two honest notes. The Windows files were written from Microsoft's documented commands and have not been run on a Windows machine by the author; if one of them complains, the agent fixes it. And on the first ever start the Capitol screen downloads recent House disclosures and reads them, which takes a minute or two once; Yahoo's free quotes occasionally rate-limit a brand new install and show "retry in a few minutes", and the desk retries on its own.
 
@@ -107,6 +107,8 @@ Setup by hand, the file map, how to adapt the broker adapter, the data sources i
 ## Built with an agent
 
 Every line here was written by Claude Code from plain-English descriptions and screenshots. The edition that walks through every screen, the build and the setup around it (the vault, the rulebook, the skills) is [How to Build a One-Person Equity Research Desk (a Mini Bloomberg) with Claude Fable](https://ai.shikshannivesh.com/p/how-to-build-a-one-person-equity) in the *Alpha with AI* newsletter.
+
+The desk sits on top of a different setup, the agent itself as your research analyst: a folder of notes it reads, a rulebook it follows, and the habits of clipping filings into it and asking it questions. That is its own guide, and the place to start if you are new to all of this: [How I Set Up Claude Code as My Investment Research Analyst](https://ai.shikshannivesh.com/p/how-i-set-up-claude-code-as-my-investment), with its rebuild inside Obsidian in [How I Set Up Claude Code as My Investment Research Analyst 2.0](https://ai.shikshannivesh.com/p/how-i-set-up-claude-code-as-my-investment-c2b). The desk works with or without that setup.
 
 ## Disclaimer
 
