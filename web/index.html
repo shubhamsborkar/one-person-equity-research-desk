@@ -282,12 +282,12 @@ function futuresTable(accounts, sparks){
       <td class="mono dim">${f.expiry||"—"}</td>
       <td class="mono ${dte!=null&&dte<=7?"neg":"dim"}">${dte??"—"}d</td>
       <td class="dim">${f.side}</td>
-      ${cell("fq"+f.acct+f.underlying, inr(f.qty))}
-      ${cell("fa"+f.acct+f.underlying, inr(f.avg,2))}
-      ${cell("fm"+f.acct+f.underlying, inr(f.ltp,2))}
-      ${cell("fn"+f.acct+f.underlying, inr(f.notional))}
-      ${cell("fp"+f.acct+f.underlying, signed(f.mtm), cls(f.mtm))}
-      ${cell("fpp"+f.acct+f.underlying, pct(f.mtm_pct), cls(f.mtm_pct))}
+      ${cell("fq"+f.acct+(f.contract||f.underlying), inr(f.qty))}
+      ${cell("fa"+f.acct+(f.contract||f.underlying), inr(f.avg,2))}
+      ${cell("fm"+f.acct+(f.contract||f.underlying), inr(f.ltp,2))}
+      ${cell("fn"+f.acct+(f.contract||f.underlying), inr(f.notional))}
+      ${cell("fp"+f.acct+(f.contract||f.underlying), signed(f.mtm), cls(f.mtm))}
+      ${cell("fpp"+f.acct+(f.contract||f.underlying), pct(f.mtm_pct), cls(f.mtm_pct))}
       <td>${spark(sparks[f.underlying])}</td></tr>`;
   }
   return html+"</tbody></table>";

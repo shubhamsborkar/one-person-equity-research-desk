@@ -2494,6 +2494,8 @@ class Handler(BaseHTTPRequestHandler):
             elif path == "/t":
                 with open(os.path.join(HERE, "web", "ticker.html"), "rb") as fh:
                     self._send(fh.read(), "text/html; charset=utf-8")
+            elif path == "/api/ping":
+                return self._send(b'{"ok":true}', "application/json")
             elif path == "/api/usbook":
                 self._send(json.dumps(build_usbook()).encode(), "application/json")
             elif path == "/macro":

@@ -288,4 +288,28 @@
   } else {
     boot();
   }
+
+  /* ---- heartbeat: if the desk restarts under an open page, say so and reload
+     the page the moment it answers again ------------------------------------ */
+  (function () {
+    var fails = 0, wasDown = false, bar = null;
+    function showBar() {
+      if (bar) return;
+      bar = document.createElement("div");
+      bar.id = "desk-reconnect";
+      bar.textContent = "The desk is restarting. This page reconnects by itself.";
+      bar.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:9999;padding:8px 14px;background:#b8860b;color:#111;font:600 13px -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;text-align:center";
+      document.body.appendChild(bar);
+    }
+    setInterval(function () {
+      fetch("/api/ping", { cache: "no-store" }).then(function (r) {
+        if (!r.ok) throw new Error("down");
+        if (wasDown) { location.reload(); return; }
+        fails = 0;
+      }).catch(function () {
+        fails++;
+        if (fails >= 2) { wasDown = true; showBar(); }
+      });
+    }, 5000);
+  })();
 })();
