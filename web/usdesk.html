@@ -176,7 +176,7 @@ async function pull(){
   document.getElementById("alloc").innerHTML=allocBar(d);
   document.getElementById("asof").textContent="positions as recorded "+d.as_of+" · prices live via FMP · click a ticker for full research";
   document.getElementById("note").innerHTML =
-    `Positions come from <b>us_book.json</b> in the desk folder; prices are live. Edit the file
+    `Positions come from <b>data/us_book.json</b> in the desk folder; prices are live. Edit the file
      after any trade and this desk follows. If your US broker offers an API, have the agent
      replace the file read with a live pull.`;
   const dot=document.getElementById("mktdot");

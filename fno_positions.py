@@ -1,6 +1,6 @@
 """Track open F&O positions across the configured accounts. Places no orders.
 The primary account's positions come live from the API; positions in accounts
-you have no key for can be recorded in fno_positions.json and are marked to
+you have no key for can be recorded in data/fno_positions.json and are marked to
 market off the live price of the same contract.
 
     python fno_positions.py
@@ -16,7 +16,7 @@ from dashboard import _fmt, _num, output_path
 
 
 def _load_config():
-    path = os.path.join(os.path.dirname(__file__), "fno_positions.json")
+    path = os.path.join(os.path.dirname(__file__), "data", "fno_positions.json")
     with open(path) as fh:
         return json.load(fh)
 

@@ -41,6 +41,7 @@ from pricing import _pull_candles
 
 PORT = int(os.getenv("DESK_PORT", "8765"))
 HERE = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(HERE, "data")   # the files you edit: watchlists, book, funds, alerts
 
 SNAP_TTL = 30      # seconds between fresh Breeze pulls for positions/funds
 TAPE_TTL = 600     # option chains are heavy; refresh every 10 min
@@ -78,7 +79,7 @@ def _account_label(name, breeze):
     return name
 
 # ---- watchlist ---------------------------------------------------------------
-WATCHLIST_PATH = os.path.join(HERE, "watchlist.json")
+WATCHLIST_PATH = os.path.join(DATA_DIR, "watchlist.json")
 WATCH = {}                     # code -> latest quote dict
 _watch_lock = threading.Lock()
 
@@ -139,7 +140,7 @@ def fetch_watch_quote(breeze, code, exch):
 
 
 # ---- US watchlist (FMP) ------------------------------------------------------
-WATCHLIST_US_PATH = os.path.join(HERE, "watchlist_us.json")
+WATCHLIST_US_PATH = os.path.join(DATA_DIR, "watchlist_us.json")
 WATCH_US = {}
 _fmp_backoff = {"until": 0.0}
 
@@ -343,7 +344,7 @@ def _held_context(symbol):
     """Where this name sits in the family: US book position and/or watchlists."""
     ctx = {}
     try:
-        with open(os.path.join(HERE, "us_book.json")) as fh:
+        with open(os.path.join(DATA_DIR, "us_book.json")) as fh:
             book = json.load(fh)
         for p in book.get("positions", []):
             if p["symbol"] == symbol:
@@ -776,7 +777,7 @@ def cached_fin(symbol):
 
 
 # ---- global watch (Yahoo, keyless) ------------------------------------------
-WATCHLIST_GLOBAL_PATH = os.path.join(HERE, "watchlist_global.json")
+WATCHLIST_GLOBAL_PATH = os.path.join(DATA_DIR, "watchlist_global.json")
 WATCH_GLOBAL = {}
 
 
@@ -840,8 +841,8 @@ def global_watch_loop():
 
 
 def build_usbook():
-    """The US book: positions from us_book.json, priced live via FMP."""
-    with open(os.path.join(HERE, "us_book.json")) as fh:
+    """The US book: positions from data/us_book.json, priced live via FMP."""
+    with open(os.path.join(DATA_DIR, "us_book.json")) as fh:
         book = json.load(fh)
     rows = []
     for p in book.get("positions", []):
@@ -1170,7 +1171,7 @@ def build_earnings():
     one bulk FMP calendar call. India has no comparable feed yet - said so in UI."""
     ours = set()
     try:
-        with open(os.path.join(HERE, "us_book.json")) as fh:
+        with open(os.path.join(DATA_DIR, "us_book.json")) as fh:
             for p in json.load(fh).get("positions", []):
                 ours.add((p["symbol"], "held"))
     except OSError:
@@ -1707,7 +1708,7 @@ def _fund_13f(cik, name, note):
 
 
 def build_funds():
-    with open(os.path.join(HERE, "funds.json")) as fh:
+    with open(os.path.join(DATA_DIR, "funds.json")) as fh:
         funds = json.load(fh).get("funds", [])
     out = []
     with ThreadPoolExecutor(max_workers=4) as ex:   # EDGAR allows 10 req/s; be modest
@@ -1756,7 +1757,7 @@ def quote_saver_loop():
 
 
 # ---- alerts engine (read-only: notifies, never acts) -------------------------
-ALERTS_PATH = os.path.join(HERE, "alerts.json")
+ALERTS_PATH = os.path.join(DATA_DIR, "alerts.json")
 ALERTS = {"active": [], "fired": set()}   # fired keys: "YYYY-MM-DD|rule|symbol"
 _alerts_lock = threading.Lock()
 
@@ -1961,13 +1962,13 @@ _chain_cache = {"at": 0.0, "data": None}
 
 
 def build_chain():
-    """supply_chain.json (one or more chains) + a live quote per name — Breeze
+    """data/supply_chain.json (one or more chains) + a live quote per name — Breeze
     for India chains, FMP/watch cache for US ones. Research content lives in
     the JSON; this only prices it."""
     now = time.time()
     if _chain_cache["data"] and now - _chain_cache["at"] < CHAIN_TTL:
         return _chain_cache["data"]
-    with open(os.path.join(HERE, "supply_chain.json")) as fh:
+    with open(os.path.join(DATA_DIR, "supply_chain.json")) as fh:
         blob = json.load(fh)
     chains = blob.get("chains", [])
     breeze = next(iter(clients.values()), None)
@@ -2036,7 +2037,7 @@ def build_insiders():
     names. ~30 FMP pages per refresh; None (uncached) when the feed fails."""
     ours = set()
     try:
-        with open(os.path.join(HERE, "us_book.json")) as fh:
+        with open(os.path.join(DATA_DIR, "us_book.json")) as fh:
             for p in json.load(fh).get("positions", []):
                 ours.add(p["symbol"])
     except OSError:
@@ -2189,7 +2190,7 @@ def build_risk():
                        "util_pct": (blocked / limit_total * 100) if limit_total else None},
         })
     try:
-        with open(os.path.join(HERE, "us_book.json")) as fh:
+        with open(os.path.join(DATA_DIR, "us_book.json")) as fh:
             usb = json.load(fh)
         frm = (datetime.now() - timedelta(days=500)).strftime("%Y-%m-%d")
         positions = []
@@ -2217,7 +2218,7 @@ def build_risk():
                           "bench": "^GSPC",
                           "nav": cash + sum(p["exposure"] for p in positions),
                           "cash": cash, "positions": positions, "margin": None,
-                          "note": f"positions as of {usb.get('as_of')} (from us_book.json); "
+                          "note": f"positions as of {usb.get('as_of')} (from data/us_book.json); "
                                   "cash account, no margin"})
     except OSError:
         pass
@@ -2240,13 +2241,13 @@ def build_activist():
     for n in load_watchlist_us():
         our[n["code"]] = "watch"
     try:
-        with open(os.path.join(HERE, "us_book.json")) as fh:
+        with open(os.path.join(DATA_DIR, "us_book.json")) as fh:
             for p in json.load(fh).get("positions", []):
                 our[p["symbol"]] = "held"
     except OSError:
         pass
     try:
-        with open(os.path.join(HERE, "funds.json")) as fh:
+        with open(os.path.join(DATA_DIR, "funds.json")) as fh:
             funds = json.load(fh).get("funds", [])
     except (OSError, ValueError):
         funds = []
@@ -2263,7 +2264,7 @@ def build_flow():
     from the second day a name is covered."""
     held = set()
     try:
-        with open(os.path.join(HERE, "us_book.json")) as fh:
+        with open(os.path.join(DATA_DIR, "us_book.json")) as fh:
             held = {p["symbol"] for p in json.load(fh).get("positions", [])}
     except OSError:
         pass
@@ -2291,7 +2292,7 @@ def _float_shares(sym):
 def build_short():
     held = set()
     try:
-        with open(os.path.join(HERE, "us_book.json")) as fh:
+        with open(os.path.join(DATA_DIR, "us_book.json")) as fh:
             held = {p["symbol"] for p in json.load(fh).get("positions", [])}
     except OSError:
         pass
@@ -2366,7 +2367,7 @@ def build_capitol():
     a name on the book or watchlist. Read-only public PTR data via FMP."""
     ours = set()
     try:
-        with open(os.path.join(HERE, "us_book.json")) as fh:
+        with open(os.path.join(DATA_DIR, "us_book.json")) as fh:
             held = {p["symbol"] for p in json.load(fh).get("positions", [])}
     except OSError:
         held = set()
@@ -2374,7 +2375,7 @@ def build_capitol():
     ours |= {n["code"] for n in load_watchlist_us()}
 
     try:
-        with open(os.path.join(HERE, "members.json")) as fh:
+        with open(os.path.join(DATA_DIR, "members.json")) as fh:
             tracked_members = json.load(fh).get("members", [])
     except (OSError, ValueError):
         tracked_members = []

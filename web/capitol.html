@@ -83,7 +83,7 @@ footer{max-width:1420px;margin:26px auto 0;padding:14px 22px;border-top:1px soli
 
   <section class="panel">
     <div class="panel-h"><h2>Tracked members</h2>
-      <span class="s">edit members.json to follow someone else</span></div>
+      <span class="s">edit data/members.json to follow someone else</span></div>
     <div class="memgrid" id="members"><div class="loading">Loading…</div></div>
   </section>
 
@@ -162,7 +162,7 @@ function renderMembers(){
         <span class="cnt">${m.count} filings on record · scroll for the latest ${m.rows.length}</span></div>
       <div class="memscroll"><table><thead><tr><th>Traded</th><th>Ticker</th><th>Type</th><th>Amount</th><th>Asset</th></tr></thead>
       <tbody>${rows||'<tr><td class="dim" style="padding:14px">No filings.</td></tr>'}</tbody></table></div></div>`;
-  }).join("") : '<div class="empty">No members tracked — add one to members.json.</div>';
+  }).join("") : '<div class="empty">No members tracked — add one to data/members.json.</div>';
 }
 function renderDjt(){
   const rows=(D.djt||[]).map(r=>`<tr>

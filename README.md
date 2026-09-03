@@ -45,7 +45,7 @@ So a reader in Australia runs Desk · Home on an ASX broker adapter and Desk · 
 - **Flow**: the options-tape read on every US name from CBOE's free delayed chains: put/call ratios, OI walls, expected move, unusual strikes, day-over-day OI builds.
 - **Short**: FINRA short interest (bi-monthly) and the daily short-volume ratio, kept apart.
 - **Capitol**: Senate and House trading disclosures on your names, plus tracked members.
-- **Chain**: a value-chain map from `supply_chain.json`, receipt-graded, live-priced.
+- **Chain**: a value-chain map from `data/supply_chain.json`, receipt-graded, live-priced.
 - **/t?symbol=X**: one page per ticker: chart, valuation, quality, estimates, insiders, dividends, news, and with a feed key the full financials block (statements, ratios, segments, peers, DCF sandbox).
 
 Cmd+K opens a command palette that jumps to any page or ticker. Two themes (graphite and a light one). A collapsible sidebar.
@@ -102,20 +102,22 @@ The dated markdown reports (`python daily.py`: holdings, movers, options tape, f
 
 ## The files you edit
 
+All of them sit in the `data/` folder, plain JSON you can open in any text editor.
+
 | File | What it is |
 |---|---|
-| `us_book.json` | Your US positions and cash. The desk prices them. |
-| `watchlist.json`, `watchlist_us.json`, `watchlist_global.json` | The three watch grids (also editable in the page). Home codes are your broker's stock codes. |
-| `fno_watchlist.json` | Names for the home options tape (indices and large caps). |
-| `funds.json` | The 13F filers you follow (name + CIK). |
-| `members.json` | Congress members tracked by name. |
-| `supply_chain.json` | Your value-chain maps (an example ships). |
-| `alerts.json` | Alert rules: day moves, margin used, futures expiry, earnings, price levels, insider clusters, 13Ds. Checked every minute; fires a macOS notification and an on-desk chip once per rule per day. |
-| `watch_levels.json` | Optional price levels per holding. |
+| `data/us_book.json` | Your US positions and cash. The desk prices them. |
+| `data/watchlist.json`, `data/watchlist_us.json`, `data/watchlist_global.json` | The three watch grids (also editable in the page). Home codes are your broker's stock codes. |
+| `data/fno_watchlist.json` | Names for the home options tape (indices and large caps). |
+| `data/funds.json` | The 13F filers you follow (name + CIK). |
+| `data/members.json` | Congress members tracked by name. |
+| `data/supply_chain.json` | Your value-chain maps (an example ships). |
+| `data/alerts.json` | Alert rules: day moves, margin used, futures expiry, earnings, price levels, insider clusters, 13Ds. Checked every minute; fires a macOS notification and an on-desk chip once per rule per day. |
+| `data/watch_levels.json` | Optional price levels per holding. |
 
 ## More than one account
 
-The desk supports several accounts at the same broker. Add a line to `ACCOUNTS` in `breeze_session.py` and the matching key pair in `.env`. Only the first account's daily token is required; the others are optional and fall back to their last saved book, re-priced live. The same shape works across markets: a home account on the broker adapter, a US book in `us_book.json` (or a live pull if your US broker has an API), and any other market on its own adapter.
+The desk supports several accounts at the same broker. Add a line to `ACCOUNTS` in `breeze_session.py` and the matching key pair in `.env`. Only the first account's daily token is required; the others are optional and fall back to their last saved book, re-priced live. The same shape works across markets: a home account on the broker adapter, a US book in `data/us_book.json` (or a live pull if your US broker has an API), and any other market on its own adapter.
 
 ## Adapting to your broker
 

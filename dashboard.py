@@ -190,7 +190,7 @@ def output_path(stamp):
 
 
 def load_watch_levels():
-    path = os.path.join(os.path.dirname(__file__), "watch_levels.json")
+    path = os.path.join(os.path.dirname(__file__), "data", "watch_levels.json")
     if not os.path.exists(path):
         return {}
     with open(path) as fh:

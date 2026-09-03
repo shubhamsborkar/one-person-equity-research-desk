@@ -1,6 +1,6 @@
 """Phase 3 entry: the India options-tape read.
 
-For each F&O name in fno_watchlist.json, pull the nearest-expiry chain and write
+For each F&O name in data/fno_watchlist.json, pull the nearest-expiry chain and write
 a dated markdown report describing how the options market is positioned (OI
 walls, today's fresh positioning, expected move, downside skew). Read-only,
 describe-only. No thesis judgement, no trade.
@@ -18,7 +18,7 @@ from fno import analyze, find_chain, posture_note
 
 
 def load_watchlist():
-    path = os.path.join(os.path.dirname(__file__), "fno_watchlist.json")
+    path = os.path.join(os.path.dirname(__file__), "data", "fno_watchlist.json")
     with open(path) as fh:
         data = json.load(fh)
     return data.get("names", [])
