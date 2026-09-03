@@ -52,7 +52,7 @@ The folder you downloaded contains a few files whose names are plain English, an
 
 What happens in daily life once Keep Desk Running has been used: you shut the computer down and switch it on again, the desk is back once you log in. You close the laptop lid, the desk sleeps with it and carries on when you open the lid. Something crashes, the desk restarts itself. You never start it by hand again.
 
-How to tell it is running: the address opens. If the page is blank, do these in order: wait thirty seconds and reload, then double-click Start Desk, then, if it is still blank, give your agent this file and what the window says, and ask it to fix it.
+How to tell it is running: the address opens. If the page is blank, do these in order. First close that tab and open the address in a fresh tab, because a tab that once found the desk down keeps showing it down even after it is back, and a reload does not clear that. If the fresh tab is also blank, wait thirty seconds and open it again; the always-on service restarts the desk on its own. Then double-click Start Desk. Then, if it is still blank, give your agent this file and what the window says, and ask it to fix it.
 
 Two honest notes. The Windows files were written from Microsoft's documented commands and have not been run on a Windows machine by the author; if one of them complains, the agent fixes it. And on the first ever start the Capitol screen downloads recent House disclosures and reads them, which takes a minute or two once; Yahoo's free quotes occasionally rate-limit a brand new install and show "retry in a few minutes", and the desk retries on its own.
 
