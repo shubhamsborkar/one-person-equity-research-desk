@@ -1,4 +1,4 @@
-"""Build a good-looking, self-contained HTML dashboard for the family accounts.
+"""Build a good-looking, self-contained HTML dashboard for the configured accounts.
 
 Open the file in any browser. Read-only monitor; the tool places no orders.
 
@@ -197,11 +197,11 @@ def build_html(data, stamp_full):
     fam_free = sum(a["totals"]["cushion"] or 0 for a in data.values())
 
     fam_tiles = "".join([
-        tile("Family equity value", "&#8377; " + inr(fam_equity)),
-        tile("Family equity P&amp;L", pnl_cell(fam_eq_pnl)),
-        tile("Family F&amp;O MTM", pnl_cell(fam_fno)),
-        tile("Family cash", "&#8377; " + inr(fam_cash)),
-        tile("Family free F&amp;O limit", "&#8377; " + inr(fam_free)),
+        tile("Total equity value", "&#8377; " + inr(fam_equity)),
+        tile("Total equity P&amp;L", pnl_cell(fam_eq_pnl)),
+        tile("Total F&amp;O MTM", pnl_cell(fam_fno)),
+        tile("Total cash", "&#8377; " + inr(fam_cash)),
+        tile("Total free F&amp;O limit", "&#8377; " + inr(fam_free)),
     ])
 
     sections = "".join(account_section(name, acc) for name, acc in data.items())
@@ -209,11 +209,11 @@ def build_html(data, stamp_full):
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Family Portfolio Monitor</title>
+<title>Portfolio Monitor</title>
 <style>{CSS}</style></head>
 <body>
 <header>
-  <h1>Family Portfolio Monitor</h1>
+  <h1>Portfolio Monitor</h1>
   <div class="ts">{stamp_full} &middot; read-only, no orders</div>
 </header>
 <section class="family"><div class="tiles">{fam_tiles}</div></section>
@@ -238,7 +238,7 @@ def main():
     stamp_full = now.strftime("%Y-%m-%d %H:%M")
     html = build_html(data, stamp_full)
 
-    path = output_path(stamp).replace("-india-holdings.md", "-family-dashboard.html")
+    path = output_path(stamp).replace("-india-holdings.md", "-dashboard.html")
     with open(path, "w") as fh:
         fh.write(html)
     print(f"Wrote dashboard to:\n  {path}\n\nOpen it in a browser:\n  file://{path}")

@@ -150,7 +150,7 @@ function render(){
     render();
   });
   document.getElementById("asof").textContent="prices as of "+TS+
-    (DEAD&&d.region==="in"?" · India session offline":"");
+    (DEAD&&d.region==="in"?" · Home session offline":"");
 }
 async function load(){
   const r=await fetch("/api/chain"); const d=await r.json();

@@ -1,4 +1,4 @@
-"""Authenticated Breeze clients, one per family account.
+"""Authenticated Breeze clients, one per configured account.
 
 Each account has its own Breeze app (key + secret in .env) and its own DAILY
 session token, pasted into the terminal when asked and cached for the day in

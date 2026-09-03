@@ -191,7 +191,7 @@ def main():
         print(f"  {r['account']}: {r['underlying']} {r['expiry']} {r['side']} "
               f"{_fmt(r['lots'],0)} lot(s) pnl={_fmt(r['pnl'])}")
 
-    path = output_path(stamp).replace("-india-holdings.md", "-family-fno-positions.md")
+    path = output_path(stamp).replace("-india-holdings.md", "-fno-positions.md")
     with open(path, "w") as fh:
         fh.write(render(rows, stamp, flags))
     print(f"\nWrote {len(rows)} F&O positions to:\n  {path}")

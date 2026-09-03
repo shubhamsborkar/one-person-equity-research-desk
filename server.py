@@ -341,7 +341,7 @@ _ticker_cache = {}
 
 
 def _held_context(symbol):
-    """Where this name sits in the family: US book position and/or watchlists."""
+    """Where this name sits across the books: US book position and/or watchlists."""
     ctx = {}
     try:
         with open(os.path.join(DATA_DIR, "us_book.json")) as fh:
@@ -472,7 +472,7 @@ def _futures_quote_in(breeze, code, expiry_human):
 
 def build_ticker_in(code):
     """India research view: Breeze quote + chunked candles + intraday + security
-    master meta + family positions (labelled by account number) + futures book.
+    master meta + account positions (labelled by account number) + futures book.
     Fundamentals/news need a non-FMP source (Starter is US-only) — sections the
     page simply hides."""
     breeze = next(iter(clients.values()), None)

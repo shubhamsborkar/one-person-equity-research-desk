@@ -68,7 +68,7 @@
     el.id = "siderail";
     el.innerHTML =
       '<a class="rbrand" href="/"><span class="rlogo">RD</span>' +
-      '<span class="rname">FAMILY <b>DESK</b></span></a>' +
+      '<span class="rname">RESEARCH <b>DESK</b></span></a>' +
       '<div class="rgroups">' +
       groups.map(g =>
         `<div class="rgt">${g.name}</div>` +
@@ -199,7 +199,7 @@
     section("Pages", d.pages.map(p => ({ nm: p.label, href: p.href, ex: "page" })));
     section("Tickers · US", d.us.map(t => ({
       nm: t.code, sub: t.name, ex: t.exch, href: "/t?symbol=" + encodeURIComponent(t.code) })));
-    section("Tickers · India", d.in.map(t => ({
+    section("Tickers · Home", d.in.map(t => ({
       nm: t.code, sub: t.name, ex: t.exch,
       href: "/t?symbol=" + encodeURIComponent(t.code) + "&region=in" })));
     r.innerHTML = html || '<div class="ckempty">Nothing matches.</div>';

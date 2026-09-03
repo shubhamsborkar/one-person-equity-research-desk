@@ -417,13 +417,13 @@ function render(snap){
     const app=document.getElementById("app");
     app.className="";
     app.innerHTML=`<div class="tokenbar">
-      <h3>India session expired — paste fresh Breeze tokens</h3>
-      <p>The daily SEBI session tokens have lapsed and no earlier book is saved yet.
+      <h3>Broker session expired — paste a fresh session token</h3>
+      <p>The broker session token has lapsed and no earlier book is saved yet.
       To connect: <b>quit the desk</b> (close its terminal window), double-click
       <b>Start&nbsp;Desk.command</b>, and paste today's session token when prompted.
       US, Global, Macro and Funds pages keep running without tokens.</p></div>
     <section class="panel" style="margin-top:14px">
-      <div class="panel-h"><h2>Upcoming results · India</h2>
+      <div class="panel-h"><h2>Upcoming results · Home</h2>
         <span class="sub" id="einsub">board meetings with a Financial Results purpose (NSE) — runs without tokens</span></div>
       <div class="erail" id="einrail">${einHtml||'<span class="dim" style="font-size:12px">Loading NSE calendar… first load takes ~15s.</span>'}</div>
     </section>`;
@@ -453,7 +453,7 @@ function render(snap){
   if(firstPaint) setTimeout(()=>app.classList.remove("firstpaint"), 1600);
   app.innerHTML=`${ribbon}
     <div class="grid family-strip">
-      ${tile("Family equity", rupee(fam.eq))}
+      ${tile("Total equity", rupee(fam.eq))}
       ${tile("Equity P&L", signed(fam.pnl), cls(fam.pnl),
         pct(fam.eq-fam.pnl ? fam.pnl/(fam.eq-fam.pnl)*100 : null))}
       ${tile("F&O MTM", signed(fam.mtm), cls(fam.mtm))}
@@ -476,7 +476,7 @@ function render(snap){
       ${Object.entries(acc).map(([n,a])=>accountPanel(n,a)).join("")}
     </div>
     <section class="panel" style="margin-top:14px">
-      <div class="panel-h"><h2>Upcoming results · India</h2>
+      <div class="panel-h"><h2>Upcoming results · Home</h2>
         <span class="sub" id="einsub">board meetings with a Financial Results purpose (NSE)</span></div>
       <div class="erail" id="einrail">${einHtml||'<span class="dim" style="font-size:12px">Loading NSE calendar… first load takes ~15s.</span>'}</div>
     </section>`;

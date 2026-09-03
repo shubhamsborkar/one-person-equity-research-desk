@@ -1,4 +1,4 @@
-"""Gather a full read-only snapshot of every family account for the dashboard.
+"""Gather a full read-only snapshot of every configured account for the dashboard.
 
 Uses broker marks (get_portfolio_holdings' current_market_price and the
 position ltp), because square-off risk is computed by ICICI against ITS marks,

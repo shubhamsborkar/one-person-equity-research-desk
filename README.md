@@ -13,7 +13,7 @@ You do not need to know git, and you do not need to type the setup commands lowe
 3. **Paste this and press Enter.**
 
 ```
-Read README.md in this folder and set the desk up for me on this computer. Create the Python environment, install the requirements, copy .env.example to .env, and ask me for each key one at a time, telling me where to get it. My broker is <your broker>. If it is not the shipped one, read its API documentation and rewrite the broker adapter the way the README describes. Then start the desk and tell me the address to open.
+Read README.md in this folder and set the desk up for me on this computer. Create the Python environment, install the requirements, copy .env.example to .env, and ask me for each key one at a time, telling me where to get it. My broker is <your broker>. If it is not the shipped one, read its API documentation and rewrite the broker adapter the way the README describes. If I say I have no broker to connect yet, leave the broker keys empty and skip the adapter; the US desk and the intelligence tabs run without one. Then start the desk and tell me the address to open.
 ```
 
 4. **Answer its questions.** When it says the desk is up, open the address it gives you (normally `http://localhost:8765`) in your browser, or inside Obsidian as described further down.
@@ -28,9 +28,9 @@ Day to day you do not need the coding agent to run the desk; you start it with t
 
 ## Two desks for two markets
 
-The desk has two account pages, and they are built differently on purpose.
+The desk has two account pages, and they are built differently on purpose. If you invest in the US, Desk · US is your desk and it needs no broker at all; Desk · Home is the page that connects to a broker account in whatever market you trade, and it can stay dark.
 
-- **Desk · Home** is your broker account in whatever market you trade: holdings, open futures, funds, margin used as a bar, an options tape on the index, a ticker strip, a results calendar and the alert strip. It talks to the broker through an adapter, and the adapter shipped here is for ICICI Direct's Breeze API (India), because that is the broker the desk was built against. With any other broker you swap the adapter (see *Adapting to your broker*); until then, leave the broker keys empty and the desk still boots with everything else live.
+- **Desk · Home** is your broker account in whatever market you trade: holdings, open futures, funds, margin used as a bar, an options tape on the index, a ticker strip, a results calendar and the alert strip. It talks to the broker through an adapter, and the adapter shipped here is for ICICI Direct's Breeze API (India), because that is the broker the desk was built against. With any other broker you swap the adapter (see *Adapting to your broker*); until then, leave the broker keys empty and the desk still boots with everything else live. Because the shipped adapter is Indian, the Home page's currency, results calendar and index labels are Indian until the adapter is swapped, and the agent changes them along with it.
 - **Desk · US** is the US market read from the public record and one optional feed: a book of US positions priced live, the earnings countdown, the insider tape from Form 4 filings (with cluster buys), and a market pulse. It needs no broker at all, so it works from anywhere, and the US intelligence tabs (Funds, Flow, Short, Capitol) sit on the same free sources.
 
 So a reader in Australia runs Desk · Home on an ASX broker adapter and Desk · US as it ships; a reader in the US can treat Desk · US as the home desk and leave Desk · Home dark; a reader in India runs both as they are. The labels are two strings at the top of `web/assets/desk.js`; rename them to your markets.
@@ -94,7 +94,9 @@ Or hand all of this to your agent, as the *Start here* section at the top descri
 
 Double-click `Start Desk.command` (or `python server.py`), then open `http://localhost:8765`.
 
-The shipped adapter asks for a session token in the terminal each morning, because that broker's regulator requires a daily login: open the login URL it prints, log in, and when the page jumps to a `localhost` address copy the value after `apisession=` and paste it. It is cached for the day. Most brokers keep a session alive for longer; your adapter decides. If the token has lapsed, the desk keeps serving the last saved book with live prices and shows a ribbon; US, Global, Macro and Funds keep running without any token.
+That is the whole routine. Nothing on the desk needs a login of its own: Desk · US, the watch grids, Funds, Flow, Short, Capitol, Macro and Risk run from the public record and the optional feed key you set once.
+
+Whether Desk · Home needs anything each day is up to your broker, not the desk. Most brokers keep an API session alive for weeks or months once the key is set. The shipped ICICI adapter is the exception: that broker's regulator requires a fresh login every trading day, so on days you want the Home page live it asks for a session token in the terminal (open the login URL it prints, log in, and when the page jumps to a `localhost` address copy the value after `apisession=` and paste it; it is cached for the day). If you skip it, the desk keeps serving the last saved book re-priced live and shows a ribbon, and every other page is unaffected.
 
 To have the desk inside Obsidian: switch on the **Web Viewer** core plugin, copy `obsidian/Live Desk.md` into your vault, and (optional) copy `obsidian/desk.css` into `.obsidian/snippets/` and enable it, so the note uses the full width.
 
@@ -117,7 +119,7 @@ All of them sit in the `data/` folder, plain JSON you can open in any text edito
 
 ## More than one account
 
-The desk supports several accounts at the same broker. Add a line to `ACCOUNTS` in `breeze_session.py` and the matching key pair in `.env`. Only the first account's daily token is required; the others are optional and fall back to their last saved book, re-priced live. The same shape works across markets: a home account on the broker adapter, a US book in `data/us_book.json` (or a live pull if your US broker has an API), and any other market on its own adapter.
+The desk supports several accounts at the same broker. Add a line to `ACCOUNTS` in `breeze_session.py` and the matching key pair in `.env`. Only the first account's session is required; the others are optional and fall back to their last saved book, re-priced live. The same shape works across markets: a home account on the broker adapter, a US book in `data/us_book.json` (or a live pull if your US broker has an API), and any other market on its own adapter.
 
 ## Adapting to your broker
 
@@ -125,7 +127,7 @@ Everything that is specific to the shipped broker and its market sits in a short
 
 | File | What it does | What yours has to return |
 |---|---|---|
-| `breeze_session.py` | Login and the daily session | A client object the reads below can call |
+| `breeze_session.py` | Login and the session (daily on the shipped adapter, longer-lived on most brokers) | A client object the reads below can call |
 | `collect.py` | The four reads: holdings, open positions, funds, margin; plus a live quote | Lists of positions with code, quantity, average price and last price; funds and margin as numbers |
 | `stream_in.py` | Live ticks for Watch · Home during market hours | Optional; without it the grid polls quotes |
 | `secmaster.py` | The broker's symbol master (short code to name, exchange, 52-week range) | A lookup from your broker's codes to names |
@@ -137,7 +139,7 @@ The fastest route is to open this folder in your coding agent, give it your brok
 
 ## Data sources
 
-- Broker API: your account, live ticks during market hours (shipped adapter: India).
+- Broker API: your account, live ticks during market hours (shipped adapter: ICICI Direct, India; any broker with an API can replace it).
 - SEC EDGAR, keyless: Form 4 insider filings on your names (`sec_form4.py`), plus the 13F and 13D/G feeds.
 - House Clerk, keyless: periodic transaction reports as PDFs, parsed with pypdf (`house_ptr.py`).
 - Yahoo Finance, keyless: quotes, candles, and the ticker page basics when there is no feed (`freefeed.py`).
