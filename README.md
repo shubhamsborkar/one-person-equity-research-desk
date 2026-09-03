@@ -4,6 +4,22 @@ A twelve-tab investment research desk that runs on your own computer, reads your
 
 This copy reads accounts and shows them; it contains no order code. Your broker's API can take orders, and wiring that in is your own build, under your broker's and regulator's rules.
 
+## Start here if GitHub is new to you
+
+You do not need to know git, and you do not need to type the setup commands lower down yourself. The agent that built this desk can install it for you.
+
+1. **Get the folder.** Click the green **Code** button at the top of this page, choose **Download ZIP**, and unzip it anywhere on your computer. Documents is fine.
+2. **Open it in your coding agent.** Claude Code, Codex, Kimi Code or Grok Build, whichever you use. Start the agent the way you normally do and tell it the folder you just unzipped, or open a terminal in that folder and type the agent's name.
+3. **Paste this and press Enter.**
+
+```
+Read README.md in this folder and set the desk up for me on this computer. Create the Python environment, install the requirements, copy .env.example to .env, and ask me for each key one at a time, telling me where to get it. My broker is <your broker>. If it is not the shipped one, read its API documentation and rewrite the broker adapter the way the README describes. Then start the desk and tell me the address to open.
+```
+
+4. **Answer its questions.** When it says the desk is up, open the address it gives you (normally `http://localhost:8765`) in your browser, or inside Obsidian as described further down.
+
+If anything goes wrong at any step, copy the error, paste it to the agent and ask it to fix it. That is the whole method, and it is the same one that built the desk.
+
 ## Two desks for two markets
 
 The desk has two account pages, and they are built differently on purpose.
@@ -54,7 +70,7 @@ Two honest notes on the free paths. Yahoo's endpoints are unofficial and rate-li
 - Optional: a Financial Modeling Prep key (any plan) for the US financials block on the ticker page and a few US pages. Without it the US watch grid runs on Yahoo's free quotes, and Funds, Flow, Short, Capitol and Macro still work, because they read free public sources.
 - Nothing else. No database, no hosting, no framework.
 
-## Setup, once
+## Setup, once (if you would rather do it yourself)
 
 ```
 git clone https://github.com/shubhamsborkar/one-person-equity-research-desk.git
@@ -66,7 +82,7 @@ cp .env.example .env      # then fill in your keys
 
 Then put your names in the files under *The files you edit* (or add them in the pages once the desk is up).
 
-If you have never done any of this: open this folder in your coding agent (Claude Code, Codex, Kimi Code, whichever you use) and paste this README in as the instruction. It can run the setup, fill the templates with your names and, if you give it your broker's API documentation, write the adapter for you.
+Or hand all of this to your agent, as the *Start here* section at the top describes.
 
 ## Every day
 
