@@ -23,15 +23,17 @@ Three things are involved, and it helps to know which is which.
 
 ## Install it (about twenty minutes, the agent does the work)
 
-1. **Get the folder.** Click the green **Code** button at the top of this page, choose **Download ZIP**, and unzip it. Documents is fine. That folder is the desk, and everything below happens inside it.
-2. **Open the folder in your agent.** Start your agent the way you normally do and point it at that folder.
+1. **Get the folder.** Click the green **Code** button at the top of this page and choose **Download ZIP**. The file lands in your Downloads folder. Double-click it and a folder with the same name appears next to it; drag that folder into Documents. That folder is the desk, and everything below happens inside it.
+
+2. **Get an agent, if you do not have one.** You do not need to know what a terminal is. Install the Claude desktop app from claude.ai/download (Codex, Kimi Code and Grok Build have their own apps and work the same way), sign in, and open its **Code** section. It asks which folder to work in: choose the desk folder you just moved to Documents. That is what "open the folder in your agent" means everywhere in this page. If you already use Claude Code in a terminal, open a terminal, type `cd ` (with the space), drag the desk folder onto the terminal window, press Enter, then type `claude` and press Enter.
+
 3. **Paste this and press Enter:**
 
 ```
 Read README.md in this folder and set the desk up for me on this computer. Install what it needs, copy .env.example to .env, and ask me for each key one at a time, telling me where to get it. My broker is <your broker>. If it is not the shipped one, read its API documentation and rewrite the broker adapter the way TECHNICAL.md describes. If I say I have no broker to connect yet, leave the broker keys empty and skip the adapter. Then start the desk, set it to start by itself whenever I log in using the Keep Desk Running file for my operating system (TECHNICAL.md explains it), and tell me the address to open.
 ```
 
-4. **Answer its questions.** When it says the desk is up, open the address it gives you in your browser.
+4. **Answer its questions.** It will ask for your broker's key and, if you want one, the feed key, and it tells you where each comes from. If you have neither, say so and it skips them. It then installs everything, starts the desk, and gives you an address. Open that address in your browser. The whole thing takes about twenty minutes, most of it the agent working while you watch.
 
 If anything goes wrong at any step, copy the error, paste it to the agent and ask it to fix it. That is the whole method, and it is the same one that built the desk.
 
