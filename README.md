@@ -20,6 +20,12 @@ Read README.md in this folder and set the desk up for me on this computer. Creat
 
 If anything goes wrong at any step, copy the error, paste it to the agent and ask it to fix it. That is the whole method, and it is the same one that built the desk.
 
+## What this folder is, and what it is not
+
+This folder is only the desk: the program that draws the twelve tabs, the pages, the broker adapter and the data templates. It is not the Obsidian vault. The vault (your notes, the rulebook file, the raw inbox, the wiki and output folders, the skills) is a separate folder that the newsletter edition walks you through building, and the desk works with or without it. The two connect in two places only: the `obsidian/Live Desk.md` note, which shows the desk inside Obsidian, and the optional `VAULT_OUTPUT_DIR` setting, which drops the desk's daily reports into your vault as notes. The desk folder can sit anywhere on your computer, inside the vault or next to it.
+
+Day to day you do not need the coding agent to run the desk; you start it with the start file and look at it in a browser or in Obsidian. The agent (Claude Code, Codex, Kimi Code, Grok Build, in a terminal or in its desktop app) is for setting it up, adapting it to your broker, and changing it later by describing what you want.
+
 ## Two desks for two markets
 
 The desk has two account pages, and they are built differently on purpose.
